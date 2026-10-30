@@ -19,6 +19,13 @@ from src.canon_ledger import CanonLedgerManager, sample_weekly_themes
 from src.portal_builder import ROUND_METADATA
 
 GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
+FALLBACK_FLASH_MODELS = [
+    "gemini-3.8-flash",
+    "gemini-3.7-flash",
+    "gemini-3.6-flash",
+    "gemini-3.5-flash",
+    "gemini-3.1-flash-lite",
+]
 
 
 class GeminiFreeTierClient:
@@ -73,38 +80,37 @@ class GeminiFreeTierClient:
         body_bytes = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         headers = {"Content-Type": "application/json; charset=utf-8"}
 
-        for attempt in range(max_retries):
-            req = urllib.request.Request(url, data=body_bytes, headers=headers, method="POST")
+        models_to_try = [model] + [m for m in FALLBACK_FLASH_MODELS if m != model]
+        total_attempts = max(max_retries, len(models_to_try) + 2)
+
+        for attempt in range(total_attempts):
+            active_model = models_to_try[min(attempt, len(models_to_try) - 1)]
+            active_url = f"{GEMINI_API_BASE}/{active_model}:generateContent?key={self.api_key}"
+            req = urllib.request.Request(active_url, data=body_bytes, headers=headers, method="POST")
             try:
                 with urllib.request.urlopen(req, timeout=180) as resp:
-                    if model == self.pro_model:
+                    if active_model == self.pro_model:
                         self._last_pro_call_ts = time.time()
                     data = json.loads(resp.read().decode("utf-8"))
                     candidates = data.get("candidates", [])
                     if not candidates:
-                        raise RuntimeError(f"Resposta vazia do Gemini ({model}): {data}")
+                        raise RuntimeError(f"Resposta vazia do Gemini ({active_model}): {data}")
                     content_parts = candidates[0].get("content", {}).get("parts", [])
                     return "".join(p.get("text", "") for p in content_parts)
             except urllib.error.HTTPError as exc:
                 err_body = exc.read().decode("utf-8", errors="replace")
-                if exc.code == 429 and attempt < max_retries - 1:
-                    wait_time = 35.0 * (attempt + 1)
-                    print(f"[Gemini 429 Rate Limit] Tentativa {attempt + 1}/{max_retries}: aguardando {wait_time}s...")
+                if exc.code in (429, 500, 502, 503, 504) and attempt < total_attempts - 1:
+                    next_model = models_to_try[min(attempt + 1, len(models_to_try) - 1)]
+                    wait_time = 8.0 * (attempt + 1) if exc.code != 429 else 20.0 * (attempt + 1)
+                    print(
+                        f"[Gemini HTTP {exc.code} em {active_model}] Tentativa {attempt + 1}/{total_attempts}: "
+                        f"alternando para {next_model} após {wait_time:.0f}s..."
+                    )
                     time.sleep(wait_time)
                     continue
-                if exc.code in (429, 503) and model == self.pro_model:
-                    print(f"[Fallback] Cota do {self.pro_model} atingida; alternando automaticamente para {self.flash_model}...")
-                    return self._call_generate_content(
-                        model=self.flash_model,
-                        parts=parts,
-                        system_instruction=system_instruction,
-                        temperature=temperature,
-                        response_mime_type=response_mime_type,
-                        max_retries=2,
-                    )
-                raise RuntimeError(f"Gemini API HTTP {exc.code}: {err_body}") from exc
+                raise RuntimeError(f"Gemini API HTTP {exc.code} ({active_model}): {err_body}") from exc
 
-        raise RuntimeError(f"Falha ao chamar Gemini ({model}) após {max_retries} tentativas.")
+        raise RuntimeError(f"Falha ao chamar Gemini ({model}) após {total_attempts} tentativas.")
 
     def extract_tv_overlay_from_photos(
         self,
@@ -190,13 +196,16 @@ class GeminiFreeTierClient:
                     )
                 },
             ]
-            transcript = self._call_generate_content(
-                model=self.flash_model,
-                parts=parts,
-                temperature=0.2,
-            ).strip()
-            entry = f"- **{marker} Transcrição de Áudio:** {transcript}\n"
-            existing_notes += entry
+            try:
+                transcript = self._call_generate_content(
+                    model=self.flash_model,
+                    parts=parts,
+                    temperature=0.2,
+                ).strip()
+                entry = f"- **{marker} Transcrição de Áudio:** {transcript}\n"
+                existing_notes += entry
+            except Exception as exc:
+                print(f"[Audio Debrief Warning] Falha ao transcrever {audio_path.name}: {exc}")
 
         if audio_files:
             debrief_dir.mkdir(parents=True, exist_ok=True)

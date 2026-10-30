@@ -218,6 +218,14 @@ class DiscordGatewayClient:
         if not isinstance(messages, list):
             return state
 
+        # Find latest message ID already posted by F1 Showrunner bot to prevent duplicate replies on resume
+        bot_msg_ids = [
+            int(m["id"])
+            for m in messages
+            if m.get("author", {}).get("bot") and "Showrunner" in (m.get("author", {}).get("username") or "")
+        ]
+        last_bot_msg_id = max(bot_msg_ids) if bot_msg_ids else 0
+
         # Process in chronological order (oldest -> newest)
         new_files: List[str] = []
         new_debriefs: List[str] = []
@@ -229,6 +237,7 @@ class DiscordGatewayClient:
             if author_obj.get("bot"):
                 continue
 
+            should_reply = send_bot_replies and (int(msg_id) > last_bot_msg_id)
             author_name = author_obj.get("global_name") or author_obj.get("username") or "Piloto"
             raw_content = (msg.get("content") or "").strip()
             # Clean any @Bot mentions (<@123456> or <@!123456>) so both mentioned and plain text work
@@ -248,7 +257,7 @@ class DiscordGatewayClient:
                     state["session_files"] = []
                     state["debrief_messages"] = []
                     stage_event = f"START_ROUND_{r_num}"
-                    if send_bot_replies:
+                    if should_reply:
                         meta = ROUND_METADATA.get(r_folder, {"name": f"Etapa {r_num}", "flag": "🏁"})
                         self.post_channel_message(
                             self.ingest_channel_id,
@@ -269,7 +278,7 @@ class DiscordGatewayClient:
                     state["active_round_folder"] = r_folder
                     stage_event = f"END_ROUND_{r_num}"
                     total_session_files = len(state.get("session_files", []))
-                    if send_bot_replies:
+                    if should_reply:
                         self.post_channel_message(
                             self.ingest_channel_id,
                             f"🏁 **ETAPA {r_num} ENCERRADA (`{r_folder}`) — PACOTE RECEBIDO!**\n"
@@ -316,7 +325,7 @@ class DiscordGatewayClient:
                 new_files.append(fname)
                 state.setdefault("session_files", []).append(fname)
 
-            if send_bot_replies and (msg_photos or msg_csvs or msg_audios):
+            if should_reply and (msg_photos or msg_csvs or msg_audios):
                 ack_parts: List[str] = []
                 if msg_photos:
                     ack_parts.append(f"📸 **{len(msg_photos)} foto(s) da TV** arquivadas em `photos/`")
@@ -339,7 +348,7 @@ class DiscordGatewayClient:
                 notes_file = debrief_dir / "debriefing_notes.md"
                 existing_notes = notes_file.read_text(encoding="utf-8") if notes_file.exists() else "# Relatos de Debriefing Pós-Corrida (Discord Voice Chat)\n\n"
                 notes_file.write_text(existing_notes + note_entry + "\n", encoding="utf-8")
-                if send_bot_replies:
+                if should_reply:
                     self.post_channel_message(
                         self.ingest_channel_id,
                         f"📝 **Debriefing de {author_name} registrado!** (`\"{content[:80]}{'...' if len(content) > 80 else ''}\"`)",
