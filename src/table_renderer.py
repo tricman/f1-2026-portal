@@ -238,7 +238,7 @@ def format_table_as_mobile_cards(headers: List[str], rows: List[List[str]]) -> s
 
         # Heuristic formatting based on table structure
         # Case A: Race Classification (Pos | Nº | Piloto | Equipe | Grid | Δ | Voltas | Paradas | Estratégia | Melhor Volta | Gap | Desgaste | Pontos)
-        if len(cells) >= 12 and "Piloto" in " ".join(clean_h):
+        if len(cells) >= 13 and "Piloto" in " ".join(clean_h):
             num, driver, team = cells[1], cells[2], cells[3]
             grid, delta = cells[4], cells[5]
             strat, best_lap, gap, wear, pts = cells[8], cells[9], cells[10], cells[11], cells[12]
@@ -247,6 +247,14 @@ def format_table_as_mobile_cards(headers: List[str], rows: List[List[str]]) -> s
                 f"> {badge} `{num}` **{driver}** — *{team}*{pts_str}\n"
                 f"> ⏱️ **Tempo/Gap:** `{gap}` | **VR:** `{best_lap}` | **Grid:** {grid} (`{delta}`)\n"
                 f"> 🛞 **Pneus:** `{strat}` (Desgaste: `{wear}`)"
+            )
+        elif len(cells) >= 10 and "Piloto" in " ".join(clean_h) and "Gap" in " ".join(clean_h):
+            num, driver, team = cells[1], cells[2], cells[3]
+            best_lap = cells[8] if len(cells) > 8 else (cells[7] if len(cells) > 7 else "-")
+            gap = cells[9] if len(cells) > 9 else "-"
+            cards.append(
+                f"> {badge} `{num}` **{driver}** — *{team}*\n"
+                f"> ⏱️ **Tempo/Gap:** `{gap}` | **Melhor Volta:** `{best_lap}`"
             )
         # Case B: Pit Stops Table (Pos. Pit | Volta | Nº | Piloto | Equipe | Tempo | Transição | Reparos)
         elif len(cells) >= 7 and ("Parada" in " ".join(clean_h) or "Pit" in " ".join(clean_h)):
