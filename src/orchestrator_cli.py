@@ -1,0 +1,401 @@
+import argparse
+import json
+import os
+import shutil
+import subprocess
+import time
+import urllib.parse
+from pathlib import Path
+from typing import Dict, Tuple
+from src.telemetry_merger import parse_free_practice_summary, merge_race_telemetry
+from src.fia_calculator import update_championship_standings
+from src.canon_ledger import CanonLedgerManager
+from src.discord_gateway import DiscordGatewayClient
+from src.portal_builder import build_editorial_portal, ROUND_METADATA, classify_module_badge
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
+
+def load_dotenv_if_present() -> None:
+    env_path = ROOT_DIR / ".env"
+    if not env_path.exists():
+        return
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        k, v = line.split("=", 1)
+        os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+
+
+MODULE_PERSONAS: Dict[str, str] = {
+    "Semana das Equipes": "F1 Paddock Insider | Blog 'A F1 Que Você Não Vê'",
+    "Coletiva de Imprensa FIA": "FIA Communications — Tom Clarkson",
+    "Treino Livre": "FIA Technical Delegate — Jo Bauer",
+    "Treino de Classificação": "FIA Race Direction — Niels Wittich & Jo Bauer",
+    "Resultado Final": "FIA Stewards & Race Control",
+    "Cerimônia do Pódio": "F1 TV World Feed & Drive to Survive Crew",
+    "Atualização Classificação": "FIA World Motor Sport Council Secretariat",
+    "Repercussão Imprensa": "Global F1 Media Hub (Band / Sky / Gazzetta / X)",
+}
+
+
+def resolve_persona_for_filename(filename: str) -> str:
+    low = filename.lower()
+    if "semana" in low:
+        return "F1 Paddock Insider | Blog 'A F1 Que Você Não Vê'"
+    for key, persona in MODULE_PERSONAS.items():
+        if key.lower() in low:
+            return persona
+    return "FIA Official Media Center"
+
+
+def process_round_10_telemetry() -> None:
+    et10_dir = ROOT_DIR / "data" / "seasons" / "season_01" / "et_10_espanha"
+    tel_dir = et10_dir / "telemetry"
+    tel_dir.mkdir(parents=True, exist_ok=True)
+
+    # Copy raw CSVs and TV screenshots into et_10_espanha/telemetry/ if in root
+    for item in ROOT_DIR.glob("pacedex_catalunya-espanha*"):
+        target = tel_dir / item.name
+        if not target.exists():
+            shutil.copy2(item, target)
+    for item in ROOT_DIR.glob("rn_image_picker_lib_temp_*.jpg"):
+        target = tel_dir / item.name
+        if not target.exists():
+            shutil.copy2(item, target)
+
+    # Resolve CSV files dynamically so any PaceDex date/circuit filename works
+    tl_summary_files = [p for p in tel_dir.glob("*_TL.csv") if not p.name.endswith("_laps_TL.csv")]
+    tl_laps_files = list(tel_dir.glob("*_laps_TL.csv"))
+    race_laps_files = [p for p in tel_dir.glob("*_laps.csv") if not p.name.endswith("_laps_TL.csv")]
+    race_summary_files = [
+        p for p in tel_dir.glob("*.csv")
+        if not p.name.endswith("_TL.csv") and not p.name.endswith("_laps.csv")
+    ]
+
+    tl_csv = tl_summary_files[0] if tl_summary_files else (tel_dir / "pacedex_catalunya-espanha_2026-10-17_TL.csv")
+    tl_laps_csv = tl_laps_files[0] if tl_laps_files else (tel_dir / "pacedex_catalunya-espanha_2026-10-17_laps_TL.csv")
+    race_csv = race_summary_files[0] if race_summary_files else (tel_dir / "pacedex_catalunya-espanha_2026-10-17.csv")
+    race_laps_csv = race_laps_files[0] if race_laps_files else (tel_dir / "pacedex_catalunya-espanha_2026-10-17_laps.csv")
+
+    if tl_csv.exists() and tl_laps_csv.exists():
+        fp_summary = parse_free_practice_summary(tl_csv, tl_laps_csv)
+        (tel_dir / "fp_telemetry_merged.json").write_text(
+            json.dumps(fp_summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        )
+
+    tv_overlay = json.loads((tel_dir / "tv_overlay_et10.json").read_text(encoding="utf-8"))
+    if race_csv.exists() and race_laps_csv.exists():
+        race_merged = merge_race_telemetry(race_csv, race_laps_csv, tv_overlay)
+    else:
+        race_merged = tv_overlay
+    (tel_dir / "race_telemetry_merged.json").write_text(
+        json.dumps(race_merged, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
+
+    standings_path = ROOT_DIR / "data" / "state" / "standings.json"
+    prev_standings = json.loads(standings_path.read_text(encoding="utf-8"))
+    if prev_standings.get("last_completed_round", 0) == 9:
+        updated_standings = update_championship_standings(
+            prev_standings,
+            race_merged,
+            round_number=10,
+            gp_name="GP da Espanha (Barcelona)",
+        )
+        (ROOT_DIR / "data" / "state" / "standings_et10.json").write_text(
+            json.dumps(updated_standings, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+
+    ledger = CanonLedgerManager(ROOT_DIR / "data" / "state" / "canon_ledger.json")
+    ledger.append_event(
+        event_id="ET10-ES-M5",
+        round_num=10,
+        module="M5_CORRIDA",
+        summary=(
+            "Terceiro pódio 100% brasileiro da história em Barcelona (2º consecutivo): "
+            "Sarah P1 + Pole + VR (1:17.035, batendo Davi por 0.004s); Davi P2 (estratégia "
+            "invertida M->S, colisão e aviso com Verstappen na Volta 2, assume 6º no Mundial "
+            "superando Leclerc nos critérios de desempate); Felipe P3 (pit stop mais rápido "
+            "do GP em 2.434s e aula de gestão térmica após 41.8% de desgaste no pneu macio)."
+        ),
+        entities=["sarah", "davi", "felipe", "verstappen", "leclerc", "piastri"],
+        status="OPEN",
+    )
+    print("Round 10 (Spain) telemetry merged and state updated successfully.")
+
+
+def deploy_portal_to_github_pages(commit_msg: str = "Auto-update F1 2026 Editorial Portal & FIA Wiki") -> Path:
+    """
+    Rebuild `portal/index.html` and root `index.html` from all current Markdown/JSON files in `data/`
+    and push directly to `https://github.com/tricman/f1-2026-portal.git` (GitHub Pages).
+    """
+    out_path = build_editorial_portal(ROOT_DIR)
+    git_target_dir = ROOT_DIR if (ROOT_DIR / ".git").exists() else (ROOT_DIR / "portal")
+    if (git_target_dir / ".git").exists():
+        if git_target_dir == ROOT_DIR:
+            subprocess.run(["git", "-C", str(git_target_dir), "add", "index.html", "portal/index.html", "data/"], check=True)
+        else:
+            subprocess.run(["git", "-C", str(git_target_dir), "add", "index.html"], check=True)
+        diff_res = subprocess.run(
+            ["git", "-C", str(git_target_dir), "diff", "--cached", "--quiet"],
+            check=False,
+        )
+        if diff_res.returncode != 0:
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(git_target_dir),
+                    "-c",
+                    "user.name=tricman",
+                    "-c",
+                    "user.email=tricman@gmail.com",
+                    "commit",
+                    "-m",
+                    commit_msg,
+                ],
+                check=True,
+            )
+            subprocess.run(["git", "-C", str(git_target_dir), "push", "origin", "HEAD:main"], check=True)
+            print("Portal pushed live to GitHub Pages: https://tricman.github.io/f1-2026-portal/")
+        else:
+            print("Portal is already up to date on GitHub Pages.")
+    return out_path
+
+
+def publish_round_to_discord(round_folder: str, teaser_mode: bool = True, base_portal_url: str = "") -> None:
+    round_dir = ROOT_DIR / "data" / "seasons" / "season_01" / round_folder
+    if not round_dir.exists():
+        raise FileNotFoundError(f"Round folder not found: {round_dir}")
+
+    # Always rebuild & deploy the Portal first so deep links are immediately live
+    deploy_portal_to_github_pages(f"Publish {round_folder} to F1 2026 Portal")
+
+    client = DiscordGatewayClient()
+    base_url = (base_portal_url or os.environ.get("PORTAL_PUBLIC_URL") or "https://tricman.github.io/f1-2026-portal/").rstrip("/")
+    r_num = ROUND_METADATA.get(round_folder, {}).get("num", 10)
+
+    # Sort strictly by F1 Weekend Chronological Order (M1 -> M2 -> M3 -> M4 -> M5 -> M6 -> M7 -> M8)
+    md_files = sorted(
+        round_dir.glob("*.md"),
+        key=lambda f: (classify_module_badge(f.name)[0], f.name),
+    )
+    for md_file in md_files:
+        order_num, short_tag, badge_label, _ = classify_module_badge(md_file.name)
+        persona = resolve_persona_for_filename(md_file.name)
+        if teaser_mode:
+            encoded_m = urllib.parse.quote(f"{round_folder}__{md_file.stem}")
+            deep_link = f"{base_url}/#r={r_num}&m={encoded_m}"
+            print(f"Publishing Teaser [{short_tag}: {md_file.name}] as '{persona}' -> {deep_link}...")
+            msg_id = client.publish_editorial_teaser(
+                markdown_text=md_file.read_text(encoding="utf-8"),
+                article_title=f"[{short_tag}] {md_file.stem}",
+                portal_url=deep_link,
+                persona_name=persona,
+            )
+            print(f"  -> Sent single Teaser message ({msg_id})")
+        else:
+            print(f"Publishing Full Report [{md_file.name}] as '{persona}'...")
+            msg_ids = client.publish_markdown_report(
+                md_file.read_text(encoding="utf-8"),
+                persona_name=persona,
+            )
+            print(f"  -> Sent {len(msg_ids)} chunks ({msg_ids})")
+        time.sleep(1.0)
+
+    if client.bot_token and client.ingest_channel_id:
+        meta = ROUND_METADATA.get(round_folder, {"name": f"Etapa {r_num}", "flag": "🏁"})
+        client.post_channel_message(
+            client.ingest_channel_id,
+            f"✅ **PUBLICAÇÃO CONCLUÍDA — {meta['flag']} Etapa {r_num}: {meta['name']}**\n"
+            f"• **{len(md_files)} Módulos Narrativos** publicados em ordem cronológica (`M1 ➔ M3 ➔ M4 ➔ M5 ➔ M6 ➔ M7 ➔ M8`) em <#{client.publish_channel_id}>!\n"
+            f"• 🌐 **Portal Editorial Mobile & FIA Wiki Atualizado:** <{base_url}/#r={r_num}>",
+        )
+
+
+def main() -> None:
+    load_dotenv_if_present()
+    parser = argparse.ArgumentParser(description="F1 24 Showrunner & FIA Orchestrator CLI")
+    parser.add_argument(
+        "--action",
+        choices=[
+            "process-et10",
+            "build-portal",
+            "deploy-portal",
+            "publish-discord",
+            "publish-teaser",
+            "publish-round",
+            "sync-ingest",
+            "watch-discord",
+            "autonomous-session",
+        ],
+        default="process-et10",
+        help="Action to execute",
+    )
+    parser.add_argument("--file", type=str, help="Markdown file to publish to Discord")
+    parser.add_argument("--round-folder", type=str, default="et_10_espanha", help="Season round folder name")
+    parser.add_argument("--persona", type=str, default=None)
+    parser.add_argument("--portal-url", type=str, default=None, help="Base public URL of the Editorial Portal")
+    parser.add_argument("--interval", type=int, default=15, help="Polling interval in seconds for watch-discord")
+    parser.add_argument("--max-hours", type=float, default=4.0, help="Max session listener duration in hours (default: 4h)")
+    parser.add_argument(
+        "--sentinel",
+        action="store_true",
+        help="Exit immediately on first poll if no active 'inicio da etapa' session is found; otherwise stay alive for up to --max-hours",
+    )
+    args = parser.parse_args()
+
+    if args.action == "process-et10":
+        process_round_10_telemetry()
+    elif args.action == "build-portal":
+        out_path = build_editorial_portal(ROOT_DIR)
+        print(f"Editorial Portal & Season Wiki built successfully at: {out_path}")
+    elif args.action == "deploy-portal":
+        out_path = deploy_portal_to_github_pages()
+        print(f"Editorial Portal deployed from: {out_path}")
+    elif args.action == "publish-discord":
+        if not args.file:
+            raise ValueError("--file is required when --action=publish-discord")
+        file_path = Path(args.file)
+        md_text = file_path.read_text(encoding="utf-8")
+        persona = args.persona or resolve_persona_for_filename(file_path.name)
+        client = DiscordGatewayClient()
+        msg_ids = client.publish_markdown_report(md_text, persona_name=persona)
+        print(f"Published {len(msg_ids)} chunks to Discord as '{persona}': {msg_ids}")
+    elif args.action == "publish-teaser":
+        if not args.file:
+            raise ValueError("--file is required when --action=publish-teaser")
+        deploy_portal_to_github_pages(f"Update portal for {Path(args.file).stem}")
+        file_path = Path(args.file)
+        md_text = file_path.read_text(encoding="utf-8")
+        persona = args.persona or resolve_persona_for_filename(file_path.name)
+        base_url = (args.portal_url or os.environ.get("PORTAL_PUBLIC_URL") or "https://tricman.github.io/f1-2026-portal/").rstrip("/")
+        folder_name = file_path.parent.name
+        r_num = ROUND_METADATA.get(folder_name, {}).get("num", 10)
+        encoded_m = urllib.parse.quote(f"{folder_name}__{file_path.stem}")
+        deep_link = f"{base_url}/#r={r_num}&m={encoded_m}"
+        client = DiscordGatewayClient()
+        msg_id = client.publish_editorial_teaser(
+            markdown_text=md_text,
+            article_title=file_path.stem,
+            portal_url=deep_link,
+            persona_name=persona,
+        )
+        print(f"Published single-message Teaser to Discord as '{persona}' (Message ID: {msg_id})")
+    elif args.action == "publish-round":
+        publish_round_to_discord(args.round_folder, teaser_mode=True, base_portal_url=args.portal_url or "")
+    elif args.action == "sync-ingest":
+        client = DiscordGatewayClient()
+        state_file = ROOT_DIR / "data" / "state" / "discord_session_state.json"
+        session_state = client.process_voice_channel_session(ROOT_DIR, state_file)
+        print(
+            f"Session Status: {session_state.get('status')} | "
+            f"Active Round: {session_state.get('active_round_folder')} | "
+            f"New Files: {session_state.get('last_poll_new_files')}"
+        )
+    elif args.action == "watch-discord":
+        client = DiscordGatewayClient()
+        state_file = ROOT_DIR / "data" / "state" / "discord_session_state.json"
+        if state_file.exists():
+            st = json.loads(state_file.read_text(encoding="utf-8"))
+            if st.get("status") == "READY_FOR_SIMULATION":
+                st["status"] = "IDLE"
+                state_file.write_text(json.dumps(st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        print(
+            f"[F1 Showrunner Bot] Escutando o Canal de Voz (#1457392708355096580) a cada {args.interval}s...\n"
+            f"  -> Digite 'inicio da etapa <N>' no chat do canal de voz para abrir o pacote da corrida.\n"
+            f"  -> Suba as fotos da TV, CSVs do PaceDex e áudios/textos de debriefing.\n"
+            f"  -> Digite 'final da etapa <N>' para encerrar a coleta e disparar o processamento!"
+        )
+        while True:
+            session_state = client.process_voice_channel_session(ROOT_DIR, state_file)
+            stage_ev = session_state.get("last_poll_stage_event")
+            new_f = session_state.get("last_poll_new_files", [])
+            if stage_ev:
+                print(f"[STAGE EVENT] {stage_ev} -> Status: {session_state.get('status')}")
+            if new_f:
+                print(f"[FILES DOWNLOADED] {len(new_f)} arquivos salvos: {new_f}")
+            if stage_ev and stage_ev.startswith("END_ROUND_") and session_state.get("status") == "READY_FOR_SIMULATION":
+                r_folder = session_state.get("active_round_folder") or args.round_folder
+                print(f"[READY FOR SIMULATION] Etapa encerrada no Discord ({r_folder})!")
+                break
+            time.sleep(args.interval)
+    elif args.action == "autonomous-session":
+        from src.ai_showrunner import (
+            GeminiFreeTierClient,
+            finalize_round_transition,
+            generate_post_race_modules,
+        )
+
+        client = DiscordGatewayClient()
+        state_file = ROOT_DIR / "data" / "state" / "discord_session_state.json"
+        if state_file.exists():
+            st = json.loads(state_file.read_text(encoding="utf-8"))
+            if st.get("status") == "READY_FOR_SIMULATION":
+                st["status"] = "IDLE"
+                state_file.write_text(json.dumps(st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+        max_seconds = int(args.max_hours * 3600)
+        deadline = time.time() + max_seconds
+        first_poll = True
+        print(
+            f"[Autonomous Showrunner Session] Sentinel={args.sentinel} | Janela máxima: {args.max_hours:.1f}h ({max_seconds}s) "
+            f"escutando #1457392708355096580 a cada {args.interval}s..."
+        )
+        while time.time() < deadline:
+            session_state = client.process_voice_channel_session(ROOT_DIR, state_file)
+            stage_ev = session_state.get("last_poll_stage_event")
+            new_f = session_state.get("last_poll_new_files", [])
+            status_now = session_state.get("status", "IDLE")
+            if stage_ev:
+                print(f"[STAGE EVENT] {stage_ev} -> Status: {status_now}")
+            if new_f:
+                print(f"[FILES DOWNLOADED] {len(new_f)} arquivos salvos: {new_f}")
+
+            # In --sentinel mode (scheduled pulse), exit in 2s if no round was started
+            if first_poll and args.sentinel and status_now == "IDLE":
+                print("[Sentinel Check] Nenhum 'inicio da etapa <N>' pendente no Canal de Voz. Encerrando em 2s (Scale-to-Zero).")
+                break
+            first_poll = False
+
+            if stage_ev and stage_ev.startswith("END_ROUND_") and status_now == "READY_FOR_SIMULATION":
+                r_folder = session_state.get("active_round_folder") or args.round_folder
+                r_num = int(session_state.get("active_round_num") or 10)
+                print(f"[AUTONOMOUS PIPELINE] Iniciando simulação 100% autônoma para {r_folder} (Etapa {r_num})...")
+                round_dir = ROOT_DIR / "data" / "seasons" / "season_01" / r_folder
+                debrief_dir = round_dir / "debriefing"
+                photos_dir = round_dir / "photos"
+                tel_dir = round_dir / "telemetry"
+                meta = ROUND_METADATA.get(r_folder, {"name": f"Etapa {r_num}"})
+                ai_client = GeminiFreeTierClient()
+                if ai_client.api_key:
+                    ai_client.transcribe_audio_debriefs(debrief_dir)
+                    if photos_dir.exists() and any(photos_dir.iterdir()):
+                        ai_client.extract_tv_overlay_from_photos(
+                            photos_dir=photos_dir,
+                            output_json_path=tel_dir / f"tv_overlay_et{r_num:02d}.json",
+                            round_num=r_num,
+                            round_name=meta["name"],
+                        )
+                if r_num == 10:
+                    process_round_10_telemetry()
+                if ai_client.api_key:
+                    if client.bot_token and client.ingest_channel_id:
+                        client.post_channel_message(
+                            client.ingest_channel_id,
+                            f"🤖 **[Gemini 3.8 Flash — Modo Autônomo]** Telemetria PaceDex fundida e pontuação da FIA calculada! "
+                            f"Redigindo os 6 Módulos Oficiais da Etapa {r_num} (`M3 ➔ M8`)... (~60s)",
+                        )
+                    generate_post_race_modules(ROOT_DIR, r_num, r_folder, ai_client)
+                finalize_round_transition(ROOT_DIR, r_num, r_folder, ai_client=ai_client)
+                publish_round_to_discord(r_folder, teaser_mode=True, base_portal_url=args.portal_url or "")
+                print(f"[AUTONOMOUS PIPELINE] Etapa {r_num} concluída e publicada! Encerrando sessão (Early Exit).")
+                break
+            time.sleep(args.interval)
+
+
+if __name__ == "__main__":
+    main()
+

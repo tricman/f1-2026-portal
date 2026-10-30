@@ -1,0 +1,18 @@
+# Secrets & local environment
+.env
+.env.*
+
+# Python bytecode & caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Root temporary uploads (tracked copies live inside data/seasons/season_01/et_XX/)
+/*.jpg
+/*.jpeg
+/*.png
+/*.csv
+/*.zip
+/takeout*
+/portal/portal_data.json
+/portal/et10_race_table_preview.png

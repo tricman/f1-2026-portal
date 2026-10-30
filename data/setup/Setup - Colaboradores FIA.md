@@ -1,0 +1,25 @@
+**O Alto Escalão: Política, Governança e Holofotes**
+
+- **Mohammed Ben Sulayem (Presidente da FIA):**  O  *showman*  imprevisível. Ex-campeão de rali, Ben Sulayem tem uma personalidade expansiva, combativa e gosta de atrair as câmeras. Ele bate de frente com a F1 frequentemente para lembrar a todos que "a FIA é a dona do campeonato". Seu foco oscila entre o marketing pessoal/institucional e o desejo de deixar um legado forte, mas muitas vezes sua abordagem política causa fricção no paddock.
+
+- **Carmelo Sanz de Barros (Presidente do Senado):**  O pacificador corporativo. Espanhol, discreto e polido. Enquanto Ben Sulayem atrai as manchetes, Sanz de Barros é o cara da governança e do  *compliance* . Ele não quer saber de marketing; sua personalidade é a de um auditor implacável que garante que os relatórios financeiros e as regras estatutárias não desmoronem nos bastidores.
+
+- **Robert Reid (Vice-Presidente de Esporte):**  O pragmático silencioso. Ex-copiloto de rali campeão do mundo, Reid é extremamente técnico e direto. Ele não tem paciência para jogos de mídia. Seu trabalho é puramente estrutural, conectando a visão do esporte com a sustentabilidade a longo prazo e a segurança.
+**A Engenharia e o Esporte: A Ponte entre a Regra e a Pista**
+
+- **Nikolas Tombazis (Diretor de Monopostos):**  O cérebro metodológico. Ex-projetista da Ferrari, Tombazis é a antítese do marketing.  *Low-profile* , cerebral e extremamente respeitado pelos chefes de equipe. Ele é o arquiteto principal dos regulamentos complexos de 2026. Sua personalidade é puramente analítica — ele fala em números, túneis de vento e fluxo de ar.
+
+- **Tim Malyon (Diretor Esportivo da F1):**  O "homem do sistema". Assumiu no início de 2024 após a saída turbulenta de Steve Nielsen. Ex-engenheiro da Red Bull, Malyon é "mão na massa" total. Sua obsessão é fazer o Centro de Operações Remotas (ROC) da FIA em Genebra funcionar como um relógio suíço, fornecendo retaguarda ao Diretor de Prova sem deixar margem para polêmicas no rádio.
+**A Mão na Massa: Pista, Comitês e Fiscalização Diária**
+
+- **Niels Wittich (Diretor de Corrida da F1):**  O xerife inflexível. Wittich tem a personalidade mais rígida do paddock atual. Ele não está lá para fazer amigos, engajar fãs ou ceder à pressão de Toto Wolff ou Christian Horner no rádio. Para ele, a regra é a letra fria da lei — seja para limites de pista milimétricos ou para a proibição de uso de joias no cockpit. Execução em sua forma mais crua.
+
+- **Emanuele Pirro (Presidente do Comitê de Monopostos):**  O sábio diplomata. Ex-piloto de F1 e multicampeão em Le Mans, Pirro é apaixonado, didático e tem uma aura de "paizão" no paddock. Seu comitê é vital para definir as rotas da base (F4, F3, F2) até a F1. Ele transita incrivelmente bem entre o lado humano dos pilotos e as exigências técnicas da Federação.
+
+- **Sam Michael (Presidente do Comitê de Segurança):**  O obcecado por dados. Lembrado por seu tempo como diretor técnico da Williams e McLaren, o australiano trata a segurança não como um conceito, mas como pura física. Ele não lida com o público; ele lida com vetores de força G, testes de impacto de halo e dissipação de energia cinética em barreiras TecPro.
+
+- **Burcu Çetinkaya (Presidente da Comissão de Mulheres no Automobilismo):**  A ativista de campo. Ex-piloto de rali turca que assumiu o cargo recentemente, ela tem uma abordagem  *boots on the ground*  (bota no chão). Menos jantares de gala e mais tempo nos kartódromos tentando criar funis de talento que alimentem iniciativas como a F1 Academy. É uma mistura de visão de expansão (marketing do esporte) com execução tática pesada.
+
+- **Fabiana Ecclestone (Vice-Presidente de Esporte - América do Sul):**  A articuladora regional. Focada no crescimento e networking. Ela herdou muito da visão comercial e diplomática do marido (Bernie Ecclestone), mas atua com uma leveza mais agregadora, tentando trazer mais eventos, categorias de base e investimentos da FIA para o cenário sul-americano.
+
+- **Jo Bauer (Delegado Técnico da F1): O Xerife do Parque Fechado:**  O Perfil: Alemão, rigoroso, frio e absolutamente discreto. Ele não dá entrevistas, foge das câmeras da Netflix e não tem a menor paciência para o lado "show business" da Liberty Media. O mundo dele é feito de paquímetros, termômetros de combustível, balanças de precisão e gabaritos de fibra de carbono. A Personalidade: Implacável e imune a pressões políticas. Ele é o pesadelo de diretores técnicos geniais como Adrian Newey ou James Allison. Bauer é o tipo de cara que, se desconfiar de uma trapaça, ordena que os mecânicos desmontem um motor inteiro no domingo à noite. Para ele, não importa se você é a Ferrari ou a Haas: a regra é cega. A Atuação Diária:É ele quem comanda a equipe de  *scrutineering*  (os escrutinadores locais e da FIA). Foi um relatório em PDF simples e direto, assinado por Jo Bauer, que desclassificou Lewis Hamilton e Charles Leclerc no GP de Austin em 2023 porque a prancha de madeira no assoalho dos carros estava gasta um milímetro além do permitido.

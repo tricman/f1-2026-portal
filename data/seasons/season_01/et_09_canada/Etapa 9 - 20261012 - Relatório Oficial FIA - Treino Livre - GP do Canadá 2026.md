@@ -1,0 +1,85 @@
+### **FEDERATION INTERNATIONALE DE L'AUTOMOBILE**
+
+##### **2026 FORMULA 1 GRAND PRIX DU CANADA — MONTREAL**
+
+***Circuit Gilles Villeneuve (4,361 km) — OFFICIAL FIA TECHNICAL & EVENT REPORT — FREE PRACTICE***  *(TREINO LIVRE)*
+
+##### **1. RELATÓRIO OFICIAL DE CLASSIFICAÇÃO E TEMPOS**
+
+**Condições da Pista: Pista Seca (com testes isolados de instalação/arrefecimento de freio no setor** final)  Temperatura do Ar: 22.4°C | Temperatura do Asfalto: 31.8°C | Umidade: 48
+**Pos Nº Piloto Equipe Pneu Melhor Tempo**
+**Dif. Voltas**
+**1 12 Sarah Mercedes-AMG S 1:13.509 — 11**
+**2 44 Lewis Hamilton Mercedes-AMG S 1:13.663 +0.154 10**
+**3 1 Max Verstappen Red Bull Racing S 1:14.007 +0.498 12**
+**4 43 Davi Williams Racing S 1:14.023 +0.514 11**
+**5 4 Lando Norris McLaren S 1:14.127 +0.618 10**
+**6 14 Fernando Alonso Aston Martin S 1:14.183 +0.674 9**
+**7 98 Felipe Kick Sauber S 1:14.379 +0.870 13**
+**8 81 Oscar Piastri McLaren S 1:14.412 +0.903 10**
+**9 63 George Russell Mercedes-AMG M 1:14.490 +0.981 12**
+**10 11 Sergio Pérez Red Bull Racing M 1:14.548 +1.039 11**
+**11 18 Lance Stroll Aston Martin S 1:14.602 +1.093 9**
+**Pos Nº Piloto Equipe Pneu Melhor Tempo**
+**Dif. Voltas**
+**12 23 Alexander Albon Williams Racing S 1:14.655 +1.146 10**
+**13 10 Pierre Gasly Alpine S 1:14.710 +1.201 11**
+**14 31 Esteban Ocon Haas S 1:14.780 +1.271 10**
+**15 27 Nico Hülkenberg Kick Sauber M 1:14.815 +1.306 12**
+**16 16 Charles Leclerc Scuderia Ferrari M 1:14.852 +1.343 14**
+**17 22 Yuki Tsunoda RB S 1:14.990 +1.481 11**
+**18 55 Carlos Sainz Scuderia Ferrari M 1:15.204 +1.695 13**
+**19 87 Oliver Bearman Haas M 1:15.340 +1.831 10**
+**20 30 Liam Lawson RB M 1:15.410 +1.901 12**
+
+##### **2. ANÁLISE DE TELEMETRIA E DADOS DE SETOR**
+
+A telemetria oficial extraída dos transmissores da FIA indica padrões claros de comportamento mecânico e velocidade em cada trecho do Circuit Gilles Villeneuve:
+
+##### **Setor 1 (Curvas 1 a 6 — MUDANÇAS DE DIRECIONAMENTO E CHICANES)**
+
+- **Líder do Setor 1: Sarah (Mercedes) — 20.617s**
+
+- **Destaques: Davi (Williams) cravou 20.813s e Lando Norris (McLaren) cravou 20.797s.**
+
+- **Diagnóstico Técnico: A nova caixa de direção B-Spec da Mercedes permitiu que Sarah**
+entrasse com agressividade cirúrgica na transição das Curvas 1 e 2. A Williams do novato Davi demonstrou excelente inserção de frente, superando os tempos de setor da Red Bull de  **Max Verstappen (20.952s).**
+
+##### **Setor 2 (Curvas 7 a 9 — CHICANE DO CASSINO E RETA DO RIO)**
+
+- **Líder do Setor 2: Lewis Hamilton (Mercedes) — 23.224s**
+
+- **Destaques: Fernando Alonso (Aston Martin) cravou 23.356s e Lando Norris (McLaren)**
+**cravou 23.427s.**
+
+- **Diagnóstico Técnico: O heptacampeão utilizou sua experiência mecânica no pedal de freio** para desacelerar com menor transferência de peso, mantendo o fluxo sob o assoalho do W17. Alonso comprovou a eficiência da nova asa traseira trazida de Silverstone.
+
+##### **Setor 3 (Curva 10 ao Muro dos Campeões — GRAMPO L'ÉPINGLE E RETA OPOSTA DE 320 KM/H)**
+
+- **Líder do Setor 3: Sarah (Mercedes) — 29.464s**
+
+- **Destaques: Lewis Hamilton (29.573s), Max Verstappen (29.600s), Davi (29.604s) e Felipe**
+**(29.606s).**
+
+- **Diagnóstico Técnico: A velocidade de ponta do motor Mercedes empurrou Sarah e Hamilton**
+**no topo do setor mais rápido. O chassi da Sauber de Felipe igualou a velocidade final de** Verstappen e Davi, confirmando a eficiência da suspensão flexível em titânio para devorar as zebras da Curva 13 sem desacoplar o difusor.
+
+##### **3. RELATÓRIO DO DELEGADO TÉCNICO DA FIA (JO BAUER)**
+
+**1. Inspeção Física Pós-Treino: Todos os 20 carros foram submetidos à checagem de peso**
+mínimo, dimensões do assoalho e conformidade da prancha de madeira sob o chassi. Nenhuma flexão excessiva ou irregularidade foi detectada.
+**2. Atualizações de Suspensão & Aerodinâmica: As revisões de suspensão dianteira B-Spec apresentadas por Mercedes-AMG, Stake F1 Team Kick Sauber, Red Bull Racing, Williams Racing e Aston Martin foram ratificadas e consideradas 100% dentro dos parâmetros do** Regulamento Técnico de 2026.
+***3. Sensores de Pista & Limites: Nenhum piloto ultrapassou o limite de atrito na zebra do Muro***  *dos Campeões de forma irresponsável durante a sessão.*
+
+##### **4. CRÔNICA DE PADDOCK & REAÇÕES DO SHOWRUNNER**
+
+O paddock de Montreal testemunhou um treino livre de altíssima intensidade técnica e narrativa:
+
+- **DOBRADINHA PRATEADA & DOMÍNIO DE SARAH: A líder do campeonato, Sarah (16 anos), ignorou o barulho dos bastidores e cravou a volta mais rápida da sessão com 1:13.509, impondo uma vantagem de +0.154s sobre seu companheiro Lewis Hamilton (1:13.663).** Toto Wolff deixou a garagem da Mercedes com um sorriso satisfeito: a suspensão B-Spec transformou o W17 em uma máquina de precisão sobre as zebras de Notre-Dame.
+
+- **VERSTAPPEN EM P3 & A RESPOSTA DE DAVI (P4): Max Verstappen cravou o 3º tempo (1:14.007), mas ficou a quase meio segundo da liderança prateada. A grande sensação da sessão foi o jovem Davi (Williams), que cravou 1:14.023 (P4), ficando a insignificantes 0.016s de Verstappen e desbancando a McLaren de Lando Norris (1:14.127 - P5) e a Aston**
+**Martin do vencedor de Mônaco, Fernando Alonso (1:14.183 - P6). James Vowles** comemorou efusivamente na mureta de boxes da Williams.
+
+- **MARATONA TÉCNICA DE FELIPE (SAUBER - P7): O vice-líder do Mundial, Felipe, liderou a contagem de voltas do treino com 13 voltas completas de desenvolvimento, cravando 1:14.379 (P7). Trabalhando com seu rigor analítico habitual, o "Professor" dedicou o treino a** testar o comportamento do novo assoalho de titânio no piso ondulado de Montreal, garantindo que a Sauber chegue para o treino classificatório com um acerto impecável.
+
+- **PROGRAMA DISCRETO DE FERRARI E RED BULL #2: A Scuderia Ferrari optou por um** programa focado exclusivamente no composto médio (M), deixando Charles Leclerc em P16  **(1:14.852) e Carlos Sainz em P18 (1:15.204). Sergio Pérez (Red Bull) também andou de pneus médios e ficou em P10 (1:14.548).**

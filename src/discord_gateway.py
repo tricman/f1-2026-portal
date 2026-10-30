@@ -1,0 +1,578 @@
+import os
+import re
+import time
+import json
+import uuid
+import urllib.request
+import urllib.error
+from pathlib import Path
+from typing import List, Dict, Any, Optional, Tuple
+from src.table_renderer import transform_markdown_tables_for_discord
+from src.portal_builder import ROUND_METADATA
+
+DISCORD_GUILD_ID = "1457392707604578460"
+DISCORD_VOICE_INGEST_CHANNEL_ID = "1457392708355096580"
+DISCORD_MEDIA_PUBLISH_CHANNEL_ID = "1536416375969685524"
+DISCORD_API_BASE = "https://discord.com/api/v10"
+
+INGEST_ALLOWED_EXTENSIONS = (
+    ".csv",
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".webp",
+    ".ogg",
+    ".mp3",
+    ".wav",
+    ".m4a",
+    ".opus",
+    ".txt",
+)
+
+ROUND_NUMBER_TO_FOLDER: Dict[int, str] = {
+    meta["num"]: folder for folder, meta in ROUND_METADATA.items()
+}
+
+
+def detect_stage_command(text: str) -> Optional[Tuple[str, Optional[int]]]:
+    """
+    Detect stage lifecycle commands in a Discord message, e.g.:
+      - 'inicio da etapa 10' / 'início da etapa 11' / '!iniciar 10' -> ('START', 10)
+      - 'final da etapa 10' / 'fim da etapa' / 'finalizar etapa 10' -> ('END', 10)
+    Returns (command_type, round_number_or_None) or None.
+    """
+    clean = text.strip().lower()
+    start_match = re.search(
+        r"\b(?:inicio|início|iniciar|start)\s+(?:da\s+|de\s+)?etapa(?:\s+#?(\d+))?",
+        clean,
+    )
+    if start_match:
+        r_num = int(start_match.group(1)) if start_match.group(1) else None
+        return ("START", r_num)
+
+    end_match = re.search(
+        r"\b(?:final|fim|finalizar|encerrar|end)\s+(?:da\s+|de\s+)?etapa(?:\s+#?(\d+))?",
+        clean,
+    )
+    if end_match:
+        r_num = int(end_match.group(1)) if end_match.group(1) else None
+        return ("END", r_num)
+
+    return None
+
+
+def split_markdown_for_discord(content: str, max_chars: int = 1950) -> List[str]:
+    """
+    Semantically chunk a Markdown document so every chunk is <= max_chars,
+    splitting strictly on paragraph/line boundaries and preserving code blocks/tables.
+    """
+    if len(content) <= max_chars:
+        return [content.strip()]
+
+    lines = content.splitlines(keepends=True)
+    chunks: List[str] = []
+    current: List[str] = []
+    current_len = 0
+    in_code_block = False
+
+    for line in lines:
+        if line.strip().startswith("```"):
+            in_code_block = not in_code_block
+
+        if current_len + len(line) > max_chars and current:
+            chunk_str = "".join(current).rstrip()
+            if in_code_block:
+                chunk_str += "\n```"
+            chunks.append(chunk_str)
+            current = ["```\n"] if in_code_block else []
+            current_len = len(current[0]) if current else 0
+
+        current.append(line)
+        current_len += len(line)
+
+    if current:
+        final_str = "".join(current).strip()
+        if final_str:
+            chunks.append(final_str)
+
+    return chunks
+
+
+class DiscordGatewayClient:
+    """
+    Fault-tolerant Discord REST v10 & Webhook client with exponential backoff,
+    configured for the F1 Simulator channels.
+    """
+
+    def __init__(
+        self,
+        bot_token: Optional[str] = None,
+        webhook_url: Optional[str] = None,
+        guild_id: str = DISCORD_GUILD_ID,
+        ingest_channel_id: str = DISCORD_VOICE_INGEST_CHANNEL_ID,
+        publish_channel_id: str = DISCORD_MEDIA_PUBLISH_CHANNEL_ID,
+    ):
+        self.bot_token = bot_token or os.environ.get("DISCORD_BOT_TOKEN")
+        self.webhook_url = webhook_url or os.environ.get("DISCORD_WEBHOOK_URL")
+        self.guild_id = guild_id
+        self.ingest_channel_id = ingest_channel_id
+        self.publish_channel_id = publish_channel_id
+
+    def _request_with_backoff(
+        self,
+        url: str,
+        method: str = "GET",
+        payload: Optional[Dict[str, Any]] = None,
+        max_retries: int = 3,
+    ) -> Any:
+        headers = {
+            "User-Agent": "F1SimulatorBot (https://antigravity.google, 1.0)",
+            "Content-Type": "application/json",
+        }
+        if self.bot_token:
+            headers["Authorization"] = f"Bot {self.bot_token}"
+
+        data_bytes = json.dumps(payload).encode("utf-8") if payload is not None else None
+
+        for attempt in range(max_retries):
+            req = urllib.request.Request(url, data=data_bytes, headers=headers, method=method)
+            try:
+                with urllib.request.urlopen(req, timeout=15) as resp:
+                    raw = resp.read().decode("utf-8")
+                    return json.loads(raw) if raw else {}
+            except urllib.error.HTTPError as e:
+                if e.code == 429:  # Rate limited
+                    retry_after = float(e.headers.get("Retry-After", 2 ** (attempt + 1)))
+                    time.sleep(retry_after)
+                    continue
+                if attempt == max_retries - 1:
+                    raise
+                time.sleep(2 ** attempt)
+            except urllib.error.URLError:
+                if attempt == max_retries - 1:
+                    raise
+                time.sleep(2 ** attempt)
+
+    def post_channel_message(self, channel_id: str, content: str) -> Dict[str, Any]:
+        """Post a message directly to a Discord channel using the Bot Token."""
+        if not self.bot_token:
+            raise PermissionError("DISCORD_BOT_TOKEN is required to post channel messages.")
+        url = f"{DISCORD_API_BASE}/channels/{channel_id}/messages"
+        res = self._request_with_backoff(url, method="POST", payload={"content": content})
+        return res if isinstance(res, dict) else {}
+
+    def fetch_recent_ingest_attachments(self, limit: int = 25) -> List[Dict[str, Any]]:
+        """
+        Poll the voice channel's text chat (#1457392708355096580) for uploaded
+        PaceDex CSVs (.csv), TV screenshots (.jpg/.png), and debriefing audio/text (.ogg/.mp3/.wav/.m4a/.txt).
+        """
+        if not self.bot_token:
+            raise PermissionError("DISCORD_BOT_TOKEN is required to read channel messages.")
+        url = f"{DISCORD_API_BASE}/channels/{self.ingest_channel_id}/messages?limit={limit}"
+        messages = self._request_with_backoff(url, method="GET")
+        attachments = []
+        for msg in messages:
+            for att in msg.get("attachments", []):
+                fname = att.get("filename", "")
+                if fname.lower().endswith(INGEST_ALLOWED_EXTENSIONS):
+                    attachments.append({
+                        "message_id": msg["id"],
+                        "author": msg.get("author", {}).get("username"),
+                        "timestamp": msg.get("timestamp"),
+                        "filename": fname,
+                        "url": att["url"],
+                    })
+        return attachments
+
+    def process_voice_channel_session(
+        self,
+        root_dir: Path,
+        state_file: Path,
+        limit: int = 50,
+        send_bot_replies: bool = True,
+    ) -> Dict[str, Any]:
+        """
+        Stateful Race-Weekend Session Machine for the Voice Channel (#1457392708355096580):
+          1. Watches for 'inicio da etapa <N>' -> opens session for Round N (e.g. et_10_espanha / et_11_austria).
+          2. While session is COLLECTING, downloads all uploaded .csv (PaceDex), .jpg/.png (TV),
+             and .ogg/.mp3/.wav/.m4a (audio debriefs), plus saves text debrief messages into `debriefing_notes.md`.
+          3. Watches for 'final da etapa' -> marks session READY_FOR_SIMULATION and returns summary.
+        """
+        state: Dict[str, Any] = {
+            "status": "IDLE",
+            "active_round_num": None,
+            "active_round_folder": None,
+            "last_message_id": None,
+            "downloaded_keys": [],
+            "debrief_messages": [],
+        }
+        if state_file.exists():
+            loaded = json.loads(state_file.read_text(encoding="utf-8"))
+            state.update(loaded)
+
+        processed_keys = set(state.get("downloaded_keys", []))
+        processed_msg_ids = set(state.get("processed_msg_ids", []))
+
+        url = f"{DISCORD_API_BASE}/channels/{self.ingest_channel_id}/messages?limit={limit}"
+        messages = self._request_with_backoff(url, method="GET")
+        if not isinstance(messages, list):
+            return state
+
+        # Process in chronological order (oldest -> newest)
+        new_files: List[str] = []
+        new_debriefs: List[str] = []
+        stage_event: Optional[str] = None
+
+        for msg in reversed(messages):
+            msg_id = msg.get("id", "")
+            author_obj = msg.get("author", {})
+            if author_obj.get("bot"):
+                continue
+
+            author_name = author_obj.get("global_name") or author_obj.get("username") or "Piloto"
+            raw_content = (msg.get("content") or "").strip()
+            # Clean any @Bot mentions (<@123456> or <@!123456>) so both mentioned and plain text work
+            content = re.sub(r"<@!?\d+>", "", raw_content).strip()
+            cmd = detect_stage_command(content) if content else None
+
+            if cmd and msg_id not in processed_msg_ids:
+                cmd_type, cmd_round = cmd
+                processed_msg_ids.add(msg_id)
+                if cmd_type == "START":
+                    r_num = cmd_round or state.get("active_round_num") or 10
+                    r_folder = ROUND_NUMBER_TO_FOLDER.get(r_num, f"et_{r_num:02d}")
+                    state["status"] = "COLLECTING"
+                    state["active_round_num"] = r_num
+                    state["active_round_folder"] = r_folder
+                    state["start_message_id"] = msg_id
+                    state["session_files"] = []
+                    state["debrief_messages"] = []
+                    stage_event = f"START_ROUND_{r_num}"
+                    if send_bot_replies:
+                        meta = ROUND_METADATA.get(r_folder, {"name": f"Etapa {r_num}", "flag": "🏁"})
+                        self.post_channel_message(
+                            self.ingest_channel_id,
+                            f"🟢 **SESSÃO INICIADA — {meta['flag']} Etapa {r_num}: {meta['name']}** (`{r_folder}`)\n"
+                            f"Estou escutando este canal! Podem subir:\n"
+                            f"• 📸 **Fotos da TV** (TL, Classificação e 4 abas da Corrida)\n"
+                            f"• 📊 **Arquivos `.csv` do PaceDex** (TL e Corrida)\n"
+                            f"• 🎙️ **Áudios ou Textos de Debriefing** (sensações pós-corrida de Felipe, Davi e Sarah)\n"
+                            f"Quando terminarem tudo, digitem **`final da etapa {r_num}`**!",
+                        )
+                    continue
+
+                if cmd_type == "END" and state.get("status") == "COLLECTING":
+                    r_num = cmd_round or state.get("active_round_num") or 10
+                    r_folder = state.get("active_round_folder") or ROUND_NUMBER_TO_FOLDER.get(r_num, f"et_{r_num:02d}")
+                    state["status"] = "READY_FOR_SIMULATION"
+                    state["active_round_num"] = r_num
+                    state["active_round_folder"] = r_folder
+                    stage_event = f"END_ROUND_{r_num}"
+                    total_session_files = len(state.get("session_files", []))
+                    if send_bot_replies:
+                        self.post_channel_message(
+                            self.ingest_channel_id,
+                            f"🏁 **ETAPA {r_num} ENCERRADA (`{r_folder}`) — PACOTE RECEBIDO!**\n"
+                            f"• Total de arquivos baixados na sessão: `{total_session_files}` (`{state.get('session_files', [])}`)\n"
+                            f"• Relatos de Debriefing capturados: `{len(state.get('debrief_messages', []))}`\n"
+                            f"⚙️ Iniciando fusão de telemetria PaceDex, cálculo oficial da FIA, geração dos relatórios e publicação no Portal Mobile + `#repercussao-midia`!",
+                        )
+                    continue
+
+            # Only collect attachments and debrief notes sent AFTER the current session's `start_message_id`
+            start_id = state.get("start_message_id")
+            if state.get("status") != "COLLECTING" or (start_id and int(msg_id) <= int(start_id)):
+                continue
+
+            active_folder = state.get("active_round_folder") or "et_10_espanha"
+            tel_dir = root_dir / "data" / "seasons" / "season_01" / active_folder / "telemetry"
+            photos_dir = root_dir / "data" / "seasons" / "season_01" / active_folder / "photos"
+            debrief_dir = root_dir / "data" / "seasons" / "season_01" / active_folder / "debriefing"
+
+            # 1. Download any attachments (.csv -> telemetry/, .jpg/.png -> photos/, audio -> debriefing/)
+            msg_photos: List[str] = []
+            msg_csvs: List[str] = []
+            msg_audios: List[str] = []
+            for att in msg.get("attachments", []):
+                fname = att.get("filename", "")
+                lower_f = fname.lower()
+                if not lower_f.endswith(INGEST_ALLOWED_EXTENSIONS):
+                    continue
+                unique_key = f"{msg_id}_{fname}"
+                if unique_key in processed_keys:
+                    continue
+                if lower_f.endswith((".ogg", ".mp3", ".wav", ".m4a", ".opus")):
+                    dest_dir = debrief_dir
+                    msg_audios.append(fname)
+                elif lower_f.endswith(".csv"):
+                    dest_dir = tel_dir
+                    msg_csvs.append(fname)
+                else:
+                    dest_dir = photos_dir
+                    msg_photos.append(fname)
+                dest_path = dest_dir / fname
+                self.download_attachment(att["url"], dest_path)
+                processed_keys.add(unique_key)
+                new_files.append(fname)
+                state.setdefault("session_files", []).append(fname)
+
+            if send_bot_replies and (msg_photos or msg_csvs or msg_audios):
+                ack_parts: List[str] = []
+                if msg_photos:
+                    ack_parts.append(f"📸 **{len(msg_photos)} foto(s) da TV** arquivadas em `photos/`")
+                if msg_csvs:
+                    ack_parts.append(f"📊 **{len(msg_csvs)} telemetria(s) PaceDex (`.csv`)** arquivadas em `telemetry/` (`{', '.join(msg_csvs)}`)")
+                if msg_audios:
+                    ack_parts.append(f"🎙️ **{len(msg_audios)} áudio(s) de debriefing** arquivados em `debriefing/`")
+                self.post_channel_message(
+                    self.ingest_channel_id,
+                    f"📥 **Recebido de {author_name}:** " + " | ".join(ack_parts),
+                )
+
+            # 2. Capture non-command text messages as driver debriefing notes
+            if content and not cmd and msg_id not in processed_msg_ids and state.get("status") == "COLLECTING":
+                processed_msg_ids.add(msg_id)
+                note_entry = f"- **[{msg.get('timestamp', '')}] {author_name}:** {content}"
+                state.setdefault("debrief_messages", []).append(note_entry)
+                new_debriefs.append(note_entry)
+                debrief_dir.mkdir(parents=True, exist_ok=True)
+                notes_file = debrief_dir / "debriefing_notes.md"
+                existing_notes = notes_file.read_text(encoding="utf-8") if notes_file.exists() else "# Relatos de Debriefing Pós-Corrida (Discord Voice Chat)\n\n"
+                notes_file.write_text(existing_notes + note_entry + "\n", encoding="utf-8")
+                if send_bot_replies:
+                    self.post_channel_message(
+                        self.ingest_channel_id,
+                        f"📝 **Debriefing de {author_name} registrado!** (`\"{content[:80]}{'...' if len(content) > 80 else ''}\"`)",
+                    )
+
+        state["downloaded_keys"] = sorted(processed_keys)
+        state["processed_msg_ids"] = sorted(processed_msg_ids)
+        state["last_poll_new_files"] = new_files
+        state["last_poll_stage_event"] = stage_event
+
+        state_file.parent.mkdir(parents=True, exist_ok=True)
+        state_file.write_text(json.dumps(state, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        return state
+
+    def download_attachment(self, url: str, target_path: Path) -> Path:
+        """
+        Download a Discord CDN attachment (.csv, .jpg, .png) to local disk.
+        """
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        headers = {"User-Agent": "F1SimulatorBot (https://antigravity.google, 1.0)"}
+        req = urllib.request.Request(url, headers=headers, method="GET")
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            target_path.write_bytes(resp.read())
+        return target_path
+
+    def sync_ingest_channel_to_dir(
+        self,
+        target_dir: Path,
+        state_file: Path,
+        limit: int = 50,
+    ) -> List[Path]:
+        """
+        Idempotently scan the Voice Channel's text chat (#1457392708355096580),
+        download any new PaceDex CSVs and TV screenshots not yet in state_file,
+        and record their message_id + filename to prevent duplicate downloads.
+        """
+        seen: Dict[str, Any] = {}
+        if state_file.exists():
+            seen = json.loads(state_file.read_text(encoding="utf-8"))
+        processed_keys = set(seen.get("downloaded_keys", []))
+
+        attachments = self.fetch_recent_ingest_attachments(limit=limit)
+        downloaded_files: List[Path] = []
+
+        for att in reversed(attachments):
+            unique_key = f"{att['message_id']}_{att['filename']}"
+            if unique_key in processed_keys:
+                continue
+            dest = target_dir / att["filename"]
+            self.download_attachment(att["url"], dest)
+            downloaded_files.append(dest)
+            processed_keys.add(unique_key)
+
+        state_file.parent.mkdir(parents=True, exist_ok=True)
+        state_file.write_text(
+            json.dumps({"downloaded_keys": sorted(processed_keys)}, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+        return downloaded_files
+
+    def _post_multipart_with_files(
+        self,
+        url: str,
+        payload_json: Dict[str, Any],
+        files: List[Tuple[str, bytes, str]],
+        max_retries: int = 3,
+    ) -> Any:
+        """
+        Send a multipart/form-data POST request to Discord Webhook or REST API
+        with `payload_json` and binary file attachments (e.g. PNG tables).
+        """
+        boundary = f"----F1SimBoundary{uuid.uuid4().hex}"
+        body_parts: List[bytes] = []
+
+        # Part 1: payload_json
+        body_parts.append(f"--{boundary}\r\n".encode("utf-8"))
+        body_parts.append(b'Content-Disposition: form-data; name="payload_json"\r\n')
+        body_parts.append(b"Content-Type: application/json\r\n\r\n")
+        body_parts.append(json.dumps(payload_json).encode("utf-8"))
+        body_parts.append(b"\r\n")
+
+        # Part 2..N: files[i]
+        for idx, (filename, file_bytes, mime_type) in enumerate(files):
+            body_parts.append(f"--{boundary}\r\n".encode("utf-8"))
+            body_parts.append(
+                f'Content-Disposition: form-data; name="files[{idx}]"; filename="{filename}"\r\n'.encode("utf-8")
+            )
+            body_parts.append(f"Content-Type: {mime_type}\r\n\r\n".encode("utf-8"))
+            body_parts.append(file_bytes)
+            body_parts.append(b"\r\n")
+
+        body_parts.append(f"--{boundary}--\r\n".encode("utf-8"))
+        body_bytes = b"".join(body_parts)
+
+        headers = {
+            "User-Agent": "F1SimulatorBot (https://antigravity.google, 1.0)",
+            "Content-Type": f"multipart/form-data; boundary={boundary}",
+        }
+        if self.bot_token and "webhooks" not in url:
+            headers["Authorization"] = f"Bot {self.bot_token}"
+
+        for attempt in range(max_retries):
+            req = urllib.request.Request(url, data=body_bytes, headers=headers, method="POST")
+            try:
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    raw = resp.read().decode("utf-8")
+                    return json.loads(raw) if raw else {}
+            except urllib.error.HTTPError as e:
+                if e.code == 429:
+                    retry_after = float(e.headers.get("Retry-After", 2 ** (attempt + 1)))
+                    time.sleep(retry_after)
+                    continue
+                if attempt == max_retries - 1:
+                    raise
+                time.sleep(2 ** attempt)
+
+    def publish_markdown_report(
+        self,
+        markdown_text: str,
+        persona_name: str = "FIA Official Media Center",
+        avatar_url: Optional[str] = None,
+        render_tables: bool = True,
+    ) -> List[str]:
+        """
+        Transform Markdown pipe tables into Mobile-First Cards + F1 TV PNG graphics,
+        chunk the text, and publish to #repercussao-midia (#1536416375969685524).
+        """
+        table_images: List[Tuple[str, bytes]] = []
+        if render_tables:
+            markdown_text, table_images = transform_markdown_tables_for_discord(markdown_text)
+
+        chunks = split_markdown_for_discord(markdown_text, max_chars=1950)
+        message_ids: List[str] = []
+
+        for chunk in chunks:
+            if self.webhook_url:
+                payload: Dict[str, Any] = {"content": chunk, "username": persona_name}
+                if avatar_url:
+                    payload["avatar_url"] = avatar_url
+                res = self._request_with_backoff(f"{self.webhook_url}?wait=true", method="POST", payload=payload)
+                if isinstance(res, dict) and "id" in res:
+                    message_ids.append(res["id"])
+            elif self.bot_token:
+                url = f"{DISCORD_API_BASE}/channels/{self.publish_channel_id}/messages"
+                res = self._request_with_backoff(url, method="POST", payload={"content": chunk})
+                if isinstance(res, dict) and "id" in res:
+                    message_ids.append(res["id"])
+            else:
+                raise PermissionError("Either DISCORD_WEBHOOK_URL or DISCORD_BOT_TOKEN must be configured.")
+            time.sleep(0.5)
+
+        # Attach high-res F1 TV PNG tables at the end of the report
+        if table_images:
+            files_payload = [(fname, fbytes, "image/png") for fname, fbytes in table_images]
+            caption = "📊 **Painéis Oficiais FIA / F1 TV (Alta Resolução — Toque para ampliar):**"
+            if self.webhook_url:
+                payload = {"content": caption, "username": persona_name}
+                if avatar_url:
+                    payload["avatar_url"] = avatar_url
+                res = self._post_multipart_with_files(
+                    f"{self.webhook_url}?wait=true", payload_json=payload, files=files_payload
+                )
+                if isinstance(res, dict) and "id" in res:
+                    message_ids.append(res["id"])
+            elif self.bot_token:
+                url = f"{DISCORD_API_BASE}/channels/{self.publish_channel_id}/messages"
+                res = self._post_multipart_with_files(
+                    url, payload_json={"content": caption}, files=files_payload
+                )
+                if isinstance(res, dict) and "id" in res:
+                    message_ids.append(res["id"])
+
+        return message_ids
+
+    def publish_editorial_teaser(
+        self,
+        markdown_text: str,
+        article_title: str,
+        portal_url: str,
+        persona_name: str = "FIA Official Media Center",
+        avatar_url: Optional[str] = None,
+    ) -> str:
+        """
+        Publish a single zero-scroll Breaking News Teaser to Discord (#repercussao-midia)
+        containing:
+          - Headline & Top 3 / Executive Bullet Summary
+          - Direct Mobile Link to the Editorial Portal & Season Wiki
+          - High-Resolution F1 TV / FIA PNG Table attachments (if any)
+        """
+        transformed_md, table_images = transform_markdown_tables_for_discord(markdown_text)
+
+        # Extract the first 3 mobile cards or first 2 paragraphs as an executive teaser
+        lines = [ln.strip() for ln in transformed_md.splitlines() if ln.strip()]
+        quote_lines = [ln for ln in lines if ln.startswith("> ")][:9]
+        body_paragraphs = [
+            ln for ln in lines if not ln.startswith(("#", "*", ">", "---", "📱"))
+        ][:2]
+
+        teaser_parts = [f"🚨 **{article_title.upper()}**"]
+        if body_paragraphs:
+            teaser_parts.append("\n".join(body_paragraphs)[:450])
+        if quote_lines:
+            teaser_parts.append("\n".join(quote_lines)[:750])
+
+        teaser_parts.append(
+            f"📖 **Leia a matéria completa, crônica de pista e tabelas interativas no Portal Mobile:**\n"
+            f"👉 {portal_url}"
+        )
+        content_str = "\n\n".join(teaser_parts)[:1950]
+
+        files_payload = [(fname, fbytes, "image/png") for fname, fbytes in table_images[:4]]
+
+        if self.webhook_url:
+            payload: Dict[str, Any] = {"content": content_str, "username": persona_name}
+            if avatar_url:
+                payload["avatar_url"] = avatar_url
+            if files_payload:
+                res = self._post_multipart_with_files(
+                    f"{self.webhook_url}?wait=true", payload_json=payload, files=files_payload
+                )
+            else:
+                res = self._request_with_backoff(f"{self.webhook_url}?wait=true", method="POST", payload=payload)
+            return res.get("id", "") if isinstance(res, dict) else ""
+
+        if self.bot_token:
+            url = f"{DISCORD_API_BASE}/channels/{self.publish_channel_id}/messages"
+            if files_payload:
+                res = self._post_multipart_with_files(
+                    url, payload_json={"content": content_str}, files=files_payload
+                )
+            else:
+                res = self._request_with_backoff(url, method="POST", payload={"content": content_str})
+            return res.get("id", "") if isinstance(res, dict) else ""
+
+        raise PermissionError("Either DISCORD_WEBHOOK_URL or DISCORD_BOT_TOKEN must be configured.")
+

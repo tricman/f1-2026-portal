@@ -1,0 +1,21 @@
+{
+  "status": "IDLE",
+  "active_round_num": null,
+  "active_round_folder": null,
+  "last_message_id": null,
+  "downloaded_keys": [],
+  "debrief_messages": [],
+  "processed_msg_ids": [
+    "1565736951112405063",
+    "1565737450448355500",
+    "1565740539628757053",
+    "1565740783120949419",
+    "1565745769632239747",
+    "1565746103649968281",
+    "1565746182192500797"
+  ],
+  "last_poll_new_files": [],
+  "last_poll_stage_event": "",
+  "start_message_id": null,
+  "session_files": []
+}

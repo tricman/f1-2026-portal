@@ -1,0 +1,75 @@
+name: F1 2026 Showrunner — Autonomous Discord Listener (4h Session)
+
+on:
+  # 1. Gatilho Automático via Discord: verifica a cada 5 min se alguém digitou "inicio da etapa <N>" no Canal de Voz.
+  #    - Se ninguém iniciou etapa, encerra em 2 segundos.
+  #    - Se alguém digitou "inicio da etapa <N>", trava a sessão aberta por até 4h (14.400s) até o "final da etapa <N>"!
+  schedule:
+    - cron: "*/5 * * * *"
+  # 2. Também permite acionamento imediato manual se desejado
+  workflow_dispatch:
+    inputs:
+      round_folder:
+        description: "Pasta da Etapa (ex: et_10_espanha, et_11_austria)"
+        required: false
+        default: "et_11_austria"
+      max_hours:
+        description: "Janela máxima de escuta do Canal de Voz em horas (até 4h)"
+        required: false
+        default: "4"
+
+# Garante que enquanto uma sessão de 4h estiver ativa escutando uma corrida, novos ticks do cron não criem instâncias duplicadas
+concurrency:
+  group: f1-discord-voice-session
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  f1-showrunner-session:
+    runs-on: ubuntu-latest
+    timeout-minutes: 250 # 4 horas (240 min) + 10 min de margem para geração e publicação
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies (Pillow for F1 TV PNG Graphics)
+        run: |
+          sudo apt-get update && sudo apt-get install -y fonts-dejavu-core
+          pip install Pillow
+
+      - name: Run Sentinel / 4h Autonomous Discord Session Listener
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_GUILD_ID: "1457392707604578460"
+          DISCORD_VOICE_INGEST_CHANNEL_ID: "1457392708355096580"
+          DISCORD_MEDIA_PUBLISH_CHANNEL_ID: "1536416375969685524"
+          PORTAL_PUBLIC_URL: "https://tricman.github.io/f1-2026-portal/"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            python -m src.orchestrator_cli --action autonomous-session --sentinel --max-hours 4 --interval 5
+          else
+            python -m src.orchestrator_cli --action autonomous-session --round-folder "${{ inputs.round_folder || 'et_11_austria' }}" --max-hours "${{ inputs.max_hours || '4' }}" --interval 5
+          fi
+
+      - name: Commit & Push Updated State, Reports and Portal (Git-as-a-Database)
+        run: |
+          git config user.name "F1 Showrunner Bot"
+          git config user.email "tricman@gmail.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Auto-sync F1 2026 Season State, Reports & Portal"
+            git push origin HEAD:main
+          fi
