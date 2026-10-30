@@ -132,36 +132,39 @@ def deploy_portal_to_github_pages(commit_msg: str = "Auto-update F1 2026 Editori
     and push directly to `https://github.com/tricman/f1-2026-portal.git` (GitHub Pages).
     """
     out_path = build_editorial_portal(ROOT_DIR)
-    git_target_dir = ROOT_DIR if (ROOT_DIR / ".git").exists() else (ROOT_DIR / "portal")
-    if (git_target_dir / ".git").exists():
-        if git_target_dir == ROOT_DIR:
-            subprocess.run(["git", "-C", str(git_target_dir), "add", "index.html", "portal/index.html", "data/"], check=True)
-        else:
-            subprocess.run(["git", "-C", str(git_target_dir), "add", "index.html"], check=True)
-        diff_res = subprocess.run(
-            ["git", "-C", str(git_target_dir), "diff", "--cached", "--quiet"],
-            check=False,
-        )
-        if diff_res.returncode != 0:
-            subprocess.run(
-                [
-                    "git",
-                    "-C",
-                    str(git_target_dir),
-                    "-c",
-                    "user.name=tricman",
-                    "-c",
-                    "user.email=tricman@gmail.com",
-                    "commit",
-                    "-m",
-                    commit_msg,
-                ],
-                check=True,
+    try:
+        git_target_dir = ROOT_DIR if (ROOT_DIR / ".git").exists() else (ROOT_DIR / "portal")
+        if (git_target_dir / ".git").exists():
+            if git_target_dir == ROOT_DIR:
+                subprocess.run(["git", "-C", str(git_target_dir), "add", "index.html", "portal/index.html", "data/"], check=True)
+            else:
+                subprocess.run(["git", "-C", str(git_target_dir), "add", "index.html"], check=True)
+            diff_res = subprocess.run(
+                ["git", "-C", str(git_target_dir), "diff", "--cached", "--quiet"],
+                check=False,
             )
-            subprocess.run(["git", "-C", str(git_target_dir), "push", "origin", "HEAD:main"], check=True)
-            print("Portal pushed live to GitHub Pages: https://tricman.github.io/f1-2026-portal/")
-        else:
-            print("Portal is already up to date on GitHub Pages.")
+            if diff_res.returncode != 0:
+                subprocess.run(
+                    [
+                        "git",
+                        "-C",
+                        str(git_target_dir),
+                        "-c",
+                        "user.name=tricman",
+                        "-c",
+                        "user.email=tricman@gmail.com",
+                        "commit",
+                        "-m",
+                        commit_msg,
+                    ],
+                    check=True,
+                )
+                subprocess.run(["git", "-C", str(git_target_dir), "push", "origin", "HEAD:main"], check=True)
+                print("Portal pushed live to GitHub Pages: https://tricman.github.io/f1-2026-portal/")
+            else:
+                print("Portal is already up to date on GitHub Pages.")
+    except Exception as exc:
+        print(f"[Portal Git Warning] Git push skipped or failed in container: {exc}")
     return out_path
 
 

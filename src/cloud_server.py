@@ -15,8 +15,13 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from src.ai_showrunner import GeminiFreeTierClient, finalize_round_transition
+from src.ai_showrunner import (
+    GeminiFreeTierClient,
+    finalize_round_transition,
+    generate_post_race_modules,
+)
 from src.discord_gateway import DiscordGatewayClient
+from src.logger import info, warning, error
 from src.orchestrator_cli import (
     ROOT_DIR,
     load_dotenv_if_present,
@@ -33,6 +38,52 @@ ACTIVE_LISTENER_STATUS: Dict[str, Any] = {
 }
 
 FOUR_HOURS_SECONDS = 4 * 3600  # 14,400 seconds
+
+
+def _execute_round_pipeline(r_folder: str, r_num: int) -> None:
+    """
+    Executes the full post-round pipeline with structured Cloud Logging:
+    Vision OCR -> Telemetry Merge -> AI Editorial Generation -> State Transition -> Discord Teasers & Portal
+    """
+    load_dotenv_if_present()
+    debrief_dir = ROOT_DIR / "data" / "seasons" / "season_01" / r_folder / "debriefing"
+    photos_dir = ROOT_DIR / "data" / "seasons" / "season_01" / r_folder / "photos"
+    tel_dir = ROOT_DIR / "data" / "seasons" / "season_01" / r_folder / "telemetry"
+    ai_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    ai_client = GeminiFreeTierClient(api_key=ai_key)
+
+    try:
+        info(f"Iniciando pipeline autônomo para {r_folder}...", event="PIPELINE_START", round_folder=r_folder, round_num=r_num)
+
+        if ai_key:
+            if debrief_dir.exists() and any(debrief_dir.iterdir()):
+                info("Transcrevendo relatos de áudio e notas...", stage="AUDIO_TRANSCRIPTION", round_num=r_num)
+                ai_client.transcribe_audio_debriefs(debrief_dir)
+            if photos_dir.exists() and any(photos_dir.iterdir()):
+                info("Extraindo dados da TV via Vision OCR...", stage="VISION_OCR", round_num=r_num)
+                ai_client.extract_tv_overlay_from_photos(
+                    photos_dir=photos_dir,
+                    output_json_path=tel_dir / f"tv_overlay_et{r_num:02d}.json",
+                    round_num=r_num,
+                    round_name=r_folder,
+                )
+
+        if r_num == 10:
+            info("Executando fusão de telemetria da Etapa 10...", stage="TELEMETRY_MERGE", round_num=10)
+            process_round_10_telemetry()
+
+        if ai_key:
+            info("Gerando módulos narrativos da FIA via Gemini...", stage="AI_GENERATION", round_num=r_num)
+            generate_post_race_modules(ROOT_DIR, r_num, r_folder, ai_client)
+
+        info("Finalizando transição de campeonato para próxima etapa...", stage="STATE_TRANSITION", round_num=r_num)
+        finalize_round_transition(ROOT_DIR, r_num, r_folder, ai_client=ai_client)
+
+        info("Publicando teasers e tabelas no Discord...", stage="DISCORD_PUBLISH", round_num=r_num)
+        publish_round_to_discord(r_folder, teaser_mode=True)
+        info(f"Etapa {r_num} publicada com sucesso no Discord e Portal!", event="ROUND_PUBLISHED", round_num=r_num)
+    except Exception as exc:
+        error(f"Erro fatal durante execução do pipeline para {r_folder}: {exc}", exc=exc, round_folder=r_folder, round_num=r_num)
 
 
 def _run_4h_session_listener(
@@ -67,23 +118,14 @@ def _run_4h_session_listener(
                 ACTIVE_LISTENER_STATUS["active_round_folder"] = r_folder
 
             if stage_ev and stage_ev.startswith("END_ROUND_") and session_state.get("status") == "READY_FOR_SIMULATION":
-                print(f"[Cloud Session Listener] END_ROUND detectado para {r_folder}! Iniciando pipeline autônomo...")
-                debrief_dir = ROOT_DIR / "data" / "seasons" / "season_01" / r_folder / "debriefing"
-                ai_key = os.environ.get("GEMINI_API_KEY", "").strip()
-                ai_client: Optional[GeminiFreeTierClient] = None
-                if ai_key:
-                    ai_client = GeminiFreeTierClient(api_key=ai_key)
-                    ai_client.transcribe_audio_debriefs(debrief_dir)
-
-                if r_num == 10:
-                    process_round_10_telemetry()
-
-                finalize_round_transition(ROOT_DIR, r_num, r_folder, ai_client=ai_client)
-                publish_round_to_discord(r_folder, teaser_mode=True)
-                print(f"[Cloud Session Listener] Etapa {r_num} publicada com sucesso! Executando Early Exit.")
+                info(f"END_ROUND detectado para {r_folder}. Executando pipeline...", event="END_ROUND", round_num=r_num)
+                _execute_round_pipeline(r_folder, r_num)
+                info(f"Etapa {r_num} concluída. Encerrando sessão (Early Exit).", event="SESSION_COMPLETED", round_num=r_num)
                 break
 
             time.sleep(poll_interval)
+    except Exception as exc:
+        error(f"Erro fatal durante a sessão do Cloud Run: {exc}", exc=exc)
     finally:
         with ACTIVE_LISTENER_LOCK:
             ACTIVE_LISTENER_STATUS["running"] = False
@@ -117,6 +159,25 @@ class CloudRunRequestHandler(BaseHTTPRequestHandler):
         # Discord Webhook PING verification (type == 1)
         if data.get("type") == 1:
             self._send_json(200, {"type": 1})
+            return
+
+        if self.path.startswith("/round/execute") or self.path.startswith("/session/simulate"):
+            r_num = int(data.get("round_num", 10))
+            r_folder = data.get("round_folder", f"et_{r_num:02d}_espanha")
+            worker = threading.Thread(
+                target=_execute_round_pipeline,
+                args=(r_folder, r_num),
+                daemon=True,
+            )
+            worker.start()
+            self._send_json(
+                202,
+                {
+                    "status": "simulation_started",
+                    "round_folder": r_folder,
+                    "round_num": r_num,
+                },
+            )
             return
 
         if self.path.startswith("/session/start") or self.path.startswith("/discord/webhook"):
