@@ -71,6 +71,33 @@
         "verstappen"
       ],
       "status": "OPEN"
+    },
+    {
+      "event_id": "ET10-ES-M5",
+      "round": 10,
+      "module": "M5_CORRIDA",
+      "summary": "Terceiro pódio 100% brasileiro da história em Barcelona (2º consecutivo): Sarah P1 + Pole + VR (1:17.035, batendo Davi por 0.004s); Davi P2 (estratégia invertida M->S, colisão e aviso com Verstappen na Volta 2, assume 6º no Mundial superando Leclerc nos critérios de desempate); Felipe P3 (pit stop mais rápido do GP em 2.434s e aula de gestão térmica após 41.8% de desgaste no pneu macio).",
+      "entities": [
+        "sarah",
+        "davi",
+        "felipe",
+        "verstappen",
+        "leclerc",
+        "piastri"
+      ],
+      "status": "OPEN"
+    },
+    {
+      "event_id": "ET10-AUTO-M5",
+      "round": 10,
+      "module": "M5_CORRIDA",
+      "summary": "Sarah (Mercedes) dominou o GP da Espanha com hat-trick, liderando o pódio 100% brasileiro ao lado de Davi (Williams) e Felipe (Sauber). A pista pegou fogo com dividida na Curva 1 entre Davi e Sarah, enquanto a telemetria revelou a superioridade letal do W17 no Setor 3 e o desgaste crítico gerido por Felipe. O gancho dramático fica com o ultimato da Red Bull a Pérez e a ascensão de Davi, que desempata com Leclerc assumindo o 6º lugar geral.",
+      "entities": [
+        "sarah",
+        "davi",
+        "felipe"
+      ],
+      "status": "OPEN"
     }
   ]
 }
