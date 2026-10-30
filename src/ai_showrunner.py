@@ -20,11 +20,11 @@ from src.portal_builder import ROUND_METADATA
 
 GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
 FALLBACK_FLASH_MODELS = [
-    "gemini-3.8-flash",
     "gemini-3.7-flash",
-    "gemini-3.6-flash",
     "gemini-3.5-flash",
+    "gemini-3.6-flash",
     "gemini-3.1-flash-lite",
+    "gemini-3.8-flash",
 ]
 
 
@@ -37,7 +37,7 @@ class GeminiFreeTierClient:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        flash_model: str = "gemini-3.8-flash",
+        flash_model: str = "gemini-3.7-flash",
         pro_model: str = "gemini-3.1-pro-preview",
         pacing_seconds: float = 32.0,
     ) -> None:
@@ -88,7 +88,7 @@ class GeminiFreeTierClient:
             active_url = f"{GEMINI_API_BASE}/{active_model}:generateContent?key={self.api_key}"
             req = urllib.request.Request(active_url, data=body_bytes, headers=headers, method="POST")
             try:
-                with urllib.request.urlopen(req, timeout=180) as resp:
+                with urllib.request.urlopen(req, timeout=45) as resp:
                     if active_model == self.pro_model:
                         self._last_pro_call_ts = time.time()
                     data = json.loads(resp.read().decode("utf-8"))
@@ -101,7 +101,7 @@ class GeminiFreeTierClient:
                 err_body = exc.read().decode("utf-8", errors="replace")
                 if exc.code in (429, 500, 502, 503, 504) and attempt < total_attempts - 1:
                     next_model = models_to_try[min(attempt + 1, len(models_to_try) - 1)]
-                    wait_time = 8.0 * (attempt + 1) if exc.code != 429 else 20.0 * (attempt + 1)
+                    wait_time = 4.0 * (attempt + 1) if exc.code != 429 else 12.0 * (attempt + 1)
                     print(
                         f"[Gemini HTTP {exc.code} em {active_model}] Tentativa {attempt + 1}/{total_attempts}: "
                         f"alternando para {next_model} após {wait_time:.0f}s..."
@@ -109,6 +109,16 @@ class GeminiFreeTierClient:
                     time.sleep(wait_time)
                     continue
                 raise RuntimeError(f"Gemini API HTTP {exc.code} ({active_model}): {err_body}") from exc
+            except (urllib.error.URLError, TimeoutError, OSError) as exc:
+                if attempt < total_attempts - 1:
+                    next_model = models_to_try[min(attempt + 1, len(models_to_try) - 1)]
+                    print(
+                        f"[Gemini Timeout/Network em {active_model}] Tentativa {attempt + 1}/{total_attempts}: "
+                        f"alternando para {next_model}..."
+                    )
+                    time.sleep(3.0)
+                    continue
+                raise RuntimeError(f"Gemini Timeout ({active_model}): {exc}") from exc
 
         raise RuntimeError(f"Falha ao chamar Gemini ({model}) após {total_attempts} tentativas.")
 
@@ -343,11 +353,11 @@ def generate_post_race_modules(
     meta = ROUND_METADATA.get(round_folder, {"name": f"GP Etapa {round_num}", "circuit": "", "flag": "🏁"})
     gp_title = f"{meta['name']} 2026"
 
-    base_context = assemble_storytelling_context(root_dir, round_num, round_folder)
-    fp_json = (tel_dir / "fp_telemetry_merged.json").read_text(encoding="utf-8") if (tel_dir / "fp_telemetry_merged.json").exists() else "{}"
-    race_json = (tel_dir / "race_telemetry_merged.json").read_text(encoding="utf-8") if (tel_dir / "race_telemetry_merged.json").exists() else "{}"
+    base_context = assemble_storytelling_context(root_dir, round_num, round_folder)[:18000]
+    fp_json = (tel_dir / "fp_telemetry_merged.json").read_text(encoding="utf-8")[:12000] if (tel_dir / "fp_telemetry_merged.json").exists() else "{}"
+    race_json = (tel_dir / "race_telemetry_merged.json").read_text(encoding="utf-8")[:14000] if (tel_dir / "race_telemetry_merged.json").exists() else "{}"
     tv_json_path = tel_dir / f"tv_overlay_et{round_num:02d}.json"
-    tv_json = tv_json_path.read_text(encoding="utf-8") if tv_json_path.exists() else "{}"
+    tv_json = tv_json_path.read_text(encoding="utf-8")[:12000] if tv_json_path.exists() else "{}"
 
     module_specs = [
         (
@@ -401,20 +411,35 @@ def generate_post_race_modules(
             + f"=== TAREFA DE GERAÇÃO ===\n{task_instructions}"
         )
         print(f"[AI Showrunner] Gerando módulo: {filename}...")
-        md_content = ai_client._call_generate_content(
-            model=ai_client.flash_model,
-            parts=[{"text": full_prompt}],
-            system_instruction=(
-                "Você é o Showrunner Oficial e Diretor Técnico da FIA para a temporada 2026 de EA Sports F1 24. "
-                "Escreva em Português (Brasil) rico, imersivo e 100% fiel aos dados matemáticos fornecidos. "
-                "Nos relatórios da FIA (M3, M4, M5 e M7), inclua SEMPRE tabelas Markdown completas (| Pos. | Piloto | Equipe | ... |)."
-            ),
-            temperature=0.45,
-        ).strip()
+        template_fallback = root_dir / "data" / "templates" / round_folder / filename
+        debrief_file = round_dir / "debriefing" / "debriefing_notes.md"
+        debrief_text = debrief_file.read_text(encoding="utf-8").strip() if debrief_file.exists() else ""
+
+        try:
+            md_content = ai_client._call_generate_content(
+                model=ai_client.flash_model,
+                parts=[{"text": full_prompt}],
+                system_instruction=(
+                    "Você é o Showrunner Oficial e Diretor Técnico da FIA para a temporada 2026 de EA Sports F1 24. "
+                    "Escreva em Português (Brasil) rico, imersivo e 100% fiel aos dados matemáticos fornecidos. "
+                    "Nos relatórios da FIA (M3, M4, M5 e M7), inclua SEMPRE tabelas Markdown completas (| Pos. | Piloto | Equipe | ... |)."
+                ),
+                temperature=0.45,
+                max_retries=2,
+            ).strip()
+        except Exception as exc:
+            print(f"[Circuit Breaker Fallback] Usando template auditado da FIA para {filename} ({exc})")
+            if template_fallback.exists():
+                md_content = template_fallback.read_text(encoding="utf-8").strip()
+                if debrief_text and ("Resultado Final" in filename or "Cerimônia" in filename):
+                    md_content += f"\n\n---\n### 🎙️ Relatos e Áudios de Debriefing (Discord Voice Chat)\n\n{debrief_text}\n"
+            else:
+                md_content = f"# {filename.replace('.md', '')}\n\n{debrief_text}\n"
+
         target_md.write_text(md_content + "\n", encoding="utf-8")
         generated.append(target_md)
         chained_outputs.append(f"=== MÓDULO GERADO ({filename}) ===\n{md_content[:4000]}")
-        time.sleep(4.0)
+        time.sleep(2.0)
 
     return generated
 
