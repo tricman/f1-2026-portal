@@ -196,7 +196,7 @@
         <button onclick="openStandingsModal()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-xs font-semibold text-amber-400 border border-amber-500/30 transition">
           <span>🏆</span>
           <span class="hidden xs:inline">Mundial</span>
-          <span class="font-mono-code text-[11px] text-white">R10</span>
+          <span id="topStandingsRoundBadge" class="font-mono-code text-[11px] text-white">R10</span>
         </button>
         <button onclick="openSetupWiki()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-xs font-semibold text-emerald-400 border border-emerald-500/30 transition">
           <span>📚</span>
@@ -236,25 +236,14 @@
         <input id="mobileSearchInput" oninput="handleSearch(this.value)" type="text" placeholder="🔍 Buscar em toda a temporada..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
       </div>
 
-      <!-- Brazilian Storm Quick Telemetry Trio Card -->
+      <!-- Brazilian Storm Quick Telemetry Trio Card (Dynamic from latest Standings) -->
       <div class="mb-4 p-3 rounded-xl bg-gradient-to-br from-slate-900 via-[#141a29] to-slate-900 border border-slate-800/90 shadow-lg">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-[11px] font-f1 font-bold uppercase tracking-wider text-emerald-400">🇧🇷 Brazilian Storm • Pós-R10</span>
+          <span id="stormWidgetHeader" class="text-[11px] font-f1 font-bold uppercase tracking-wider text-emerald-400">🇧🇷 Brazilian Storm</span>
           <span class="text-[10px] font-mono-code text-slate-400">2026</span>
         </div>
-        <div class="space-y-1.5 text-xs">
-          <div class="flex items-center justify-between py-1 px-2 rounded bg-slate-800/60 border-l-2 border-[#00d2be]">
-            <span class="font-semibold text-white">1º Sarah <span class="text-slate-400 font-mono-code">#24</span></span>
-            <span class="font-mono-code font-bold text-[#00d2be]">197 pts (6V)</span>
-          </div>
-          <div class="flex items-center justify-between py-1 px-2 rounded bg-slate-800/60 border-l-2 border-[#00e64d]">
-            <span class="font-semibold text-white">2º Felipe <span class="text-slate-400 font-mono-code">#5</span></span>
-            <span class="font-mono-code font-bold text-[#00e64d]">146 pts (2V)</span>
-          </div>
-          <div class="flex items-center justify-between py-1 px-2 rounded bg-slate-800/60 border-l-2 border-[#00a0ff]">
-            <span class="font-semibold text-white">6º Davi <span class="text-slate-400 font-mono-code">#15</span></span>
-            <span class="font-mono-code font-bold text-[#00a0ff]">83 pts (4P)</span>
-          </div>
+        <div id="stormWidgetRows" class="space-y-1.5 text-xs">
+          <!-- Populated dynamically by JS -->
         </div>
       </div>
 
@@ -636,10 +625,37 @@
       }
     }
 
+    function renderStormWidget() {
+      const st = PORTAL_DATA.standings || {};
+      const lastR = st.last_completed_round || PORTAL_DATA.rounds.length || 10;
+      const topBadge = document.getElementById('topStandingsRoundBadge');
+      if (topBadge) topBadge.textContent = `R${lastR}`;
+      const header = document.getElementById('stormWidgetHeader');
+      if (header) header.textContent = `🇧🇷 Brazilian Storm • Pós-R${lastR}`;
+
+      const colors = { sarah: '#00d2be', felipe: '#00e64d', davi: '#00a0ff' };
+      const brDrivers = (st.drivers_standings || []).filter(d => ['sarah', 'felipe', 'davi'].includes(d.id));
+      const container = document.getElementById('stormWidgetRows');
+      if (!container) return;
+      container.innerHTML = brDrivers.map(d => {
+        const c = colors[d.id] || '#38bdf8';
+        const shortName = d.name.split(' ')[0];
+        const statTag = d.wins > 0 ? `${d.wins}V` : `${d.podiums}P`;
+        return `
+          <div class="flex items-center justify-between py-1 px-2 rounded bg-slate-800/60" style="border-left: 2px solid ${c}">
+            <span class="font-semibold text-white">${d.pos}º ${shortName} <span class="text-slate-400 font-mono-code">#${d.car_number}</span></span>
+            <span class="font-mono-code font-bold" style="color: ${c}">${d.points} pts (${statTag})</span>
+          </div>
+        `;
+      }).join('');
+    }
+
     function parseUrlHashAndNavigate() {
+      renderStormWidget();
+      const latestRound = PORTAL_DATA.rounds.length ? PORTAL_DATA.rounds[PORTAL_DATA.rounds.length - 1].num : 10;
       const hash = (window.location.hash || '').replace(/^#/, '');
       if (!hash) {
-        selectRound(10);
+        selectRound(latestRound);
         return;
       }
       const params = new URLSearchParams(hash);
@@ -647,9 +663,9 @@
         openSetupWiki(params.get('setup'));
         return;
       }
-      const rNum = parseInt(params.get('r') || '10', 10);
+      const rNum = parseInt(params.get('r') || String(latestRound), 10);
       const artId = params.get('m') || null;
-      selectRound(isNaN(rNum) ? 10 : rNum, artId);
+      selectRound(isNaN(rNum) ? latestRound : rNum, artId);
     }
 
     // Initialize on URL Hash or Round 10 (GP da Espanha)
