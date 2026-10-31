@@ -58,6 +58,14 @@ def detect_stage_command(text: str) -> Optional[Tuple[str, Optional[int]]]:
         r_num = int(end_match.group(1)) if end_match.group(1) else None
         return ("END", r_num)
 
+    pre_match = re.search(
+        r"\b(?:pre|pré|semana|bastidores|preview)\s+(?:da\s+|de\s+)?etapa(?:\s+#?(\d+))?",
+        clean,
+    )
+    if pre_match:
+        r_num = int(pre_match.group(1)) if pre_match.group(1) else None
+        return ("PRE", r_num)
+
     return None
 
 
@@ -247,6 +255,21 @@ class DiscordGatewayClient:
             if cmd and msg_id not in processed_msg_ids:
                 cmd_type, cmd_round = cmd
                 processed_msg_ids.add(msg_id)
+                if cmd_type == "PRE":
+                    r_num = cmd_round or state.get("active_round_num") or 10
+                    r_folder = ROUND_NUMBER_TO_FOLDER.get(r_num, f"et_{r_num:02d}")
+                    stage_event = f"PRE_ROUND_{r_num}"
+                    state["active_round_num"] = r_num
+                    state["active_round_folder"] = r_folder
+                    if should_reply:
+                        meta = ROUND_METADATA.get(r_folder, {"name": f"Etapa {r_num}", "flag": "🏁"})
+                        self.post_channel_message(
+                            self.ingest_channel_id,
+                            f"📰 **DOSSIÊ SILLY SEASON DISPARADO — {meta['flag']} Etapa {r_num}: {meta['name']}** (`{r_folder}`)\n"
+                            f"Coletando fofocas de fábrica, contratos e sorteando temas RNG. Gerando 'A Semana da F1' (Módulo #1) para o Portal e `#repercussao-midia`!",
+                        )
+                    continue
+
                 if cmd_type == "START":
                     r_num = cmd_round or state.get("active_round_num") or 10
                     r_folder = ROUND_NUMBER_TO_FOLDER.get(r_num, f"et_{r_num:02d}")

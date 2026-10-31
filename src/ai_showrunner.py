@@ -444,3 +444,69 @@ def generate_post_race_modules(
     return generated
 
 
+def generate_pre_race_m1(
+    root_dir: Path,
+    round_num: int,
+    round_folder: str,
+    ai_client: GeminiFreeTierClient,
+    force_regenerate: bool = False,
+) -> Path:
+    """
+    Generate or load M1 (A F1 Que Você Não Vê — Quadro: A Semana da F1) for Round N,
+    grounded on Round N-1 standings, canon ledger events and deterministically sampled RNG weekly themes.
+    """
+    from src.canon_ledger import sample_weekly_themes
+
+    round_dir = root_dir / "data" / "seasons" / "season_01" / round_folder
+    round_dir.mkdir(parents=True, exist_ok=True)
+    target_file = round_dir / f"ET{round_num:02d}_PRE_A_Semana_da_F1.md"
+
+    if target_file.exists() and target_file.stat().st_size > 1000 and not force_regenerate:
+        print(f"[M1 Showrunner] M1 já existe para {round_folder} ({target_file.name})")
+        return target_file
+
+    prompt_file = root_dir / "prompts" / "01_semana_equipes.md"
+    prompt_template = prompt_file.read_text(encoding="utf-8") if prompt_file.exists() else ""
+    base_context = assemble_storytelling_context(root_dir, round_num, round_folder)[:18000]
+
+    # Sample RNG themes for major teams
+    rb_themes = sample_weekly_themes(round_num, "red_bull")
+    merc_themes = sample_weekly_themes(round_num, "mercedes")
+    sauber_themes = sample_weekly_themes(round_num, "sauber")
+    williams_themes = sample_weekly_themes(round_num, "williams")
+
+    rng_context = (
+        f"\n\n=== TEMAS RNG SORTEADOS PARA A SEMANA (ETAPA {round_num}) ===\n"
+        f"- Red Bull Racing: Seg={rb_themes['monday']}, Ter={rb_themes['tuesday']}, Qua={rb_themes['wednesday']}, Qui={rb_themes['thursday']}\n"
+        f"- Mercedes: Seg={merc_themes['monday']}, Ter={merc_themes['tuesday']}, Qua={merc_themes['wednesday']}, Qui={merc_themes['thursday']}\n"
+        f"- Sauber: Seg={sauber_themes['monday']}, Ter={sauber_themes['tuesday']}, Qua={sauber_themes['wednesday']}, Qui={sauber_themes['thursday']}\n"
+        f"- Williams: Seg={williams_themes['monday']}, Ter={williams_themes['tuesday']}, Qua={williams_themes['wednesday']}, Qui={williams_themes['thursday']}\n"
+    )
+
+    full_prompt = (
+        f"{base_context}\n{rng_context}\n\n=== DIRETRIZ DE GERAÇÃO DO MÓDULO 1 ===\n{prompt_template}\n\n"
+        f"Gere o Módulo 1 completo cobrindo as 10 equipes da temporada 2026 de Segunda a Quinta-feira, "
+        f"amarrando a tabela real da última etapa e a reputação dos pilotos."
+    )
+
+    print(f"[M1 Showrunner] Gerando Módulo 1 (A Semana da F1) para {round_folder}...")
+    try:
+        md_content = ai_client._call_generate_content(
+            model=ai_client.flash_model,
+            parts=[{"text": full_prompt}],
+            system_instruction=(
+                "Você é o coletivo de jornalistas insiders 'A F1 Que Você Não Vê'. "
+                "Escreva crônicas mordazes, dinâmicas e ricas sobre os bastidores da F1 de Segunda a Quinta."
+            ),
+            temperature=0.5,
+            max_retries=2,
+        ).strip()
+    except Exception as exc:
+        print(f"[M1 Fallback] Falha na geração do Gemini: {exc}")
+        md_content = f"# 🏁 A F1 QUE VOCÊ NÃO VÊ — A Semana da F1 (Etapa {round_num})\n\nBastidores e intrigas no Paddock pré-{round_folder}.\n"
+
+    target_file.write_text(md_content + "\n", encoding="utf-8")
+    return target_file
+
+
+

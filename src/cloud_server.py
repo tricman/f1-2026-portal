@@ -86,6 +86,42 @@ def _execute_round_pipeline(r_folder: str, r_num: int) -> None:
         error(f"Erro fatal durante execução do pipeline para {r_folder}: {exc}", exc=exc, round_folder=r_folder, round_num=r_num)
 
 
+def _execute_m1_pipeline(r_folder: str, r_num: int, force_regenerate: bool = False) -> None:
+    """
+    Generates or loads M1 (A Semana da F1), builds portal and publishes teaser to Discord.
+    """
+    from src.ai_showrunner import GeminiFreeTierClient, generate_pre_race_m1
+    from src.orchestrator_cli import deploy_portal_to_github_pages
+    import urllib.parse
+
+    load_dotenv_if_present()
+    ai_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    ai_client = GeminiFreeTierClient(api_key=ai_key)
+
+    try:
+        info(f"Iniciando produção do Módulo 1 (Pré-Semana) para {r_folder}...", event="M1_START", round_folder=r_folder, round_num=r_num)
+        m1_path = generate_pre_race_m1(ROOT_DIR, r_num, r_folder, ai_client, force_regenerate=force_regenerate)
+        info(f"Módulo 1 consolidado em {m1_path.name}. Atualizando Portal...", stage="PORTAL_BUILD", round_num=r_num)
+
+        deploy_portal_to_github_pages(f"Publish M1 {r_folder} to F1 2026 Portal")
+
+        client = DiscordGatewayClient()
+        base_url = (os.environ.get("PORTAL_PUBLIC_URL") or "https://tricman.github.io/f1-2026-portal/").rstrip("/")
+        encoded_m = urllib.parse.quote(f"{r_folder}__{m1_path.stem}")
+        deep_link = f"{base_url}/#r={r_num}&m={encoded_m}"
+
+        info("Publicando Teaser do M1 no Discord (#repercussao-midia)...", stage="DISCORD_TEASER", round_num=r_num)
+        msg_id = client.publish_editorial_teaser(
+            markdown_text=m1_path.read_text(encoding="utf-8"),
+            article_title=f"[M1 · PRÉ-SEMANA] {m1_path.stem}",
+            portal_url=deep_link,
+            persona_name="F1 Paddock Insider | Blog 'A F1 Que Você Não Vê'",
+        )
+        info(f"Teaser do M1 publicado com sucesso ({msg_id})!", event="M1_PUBLISHED", round_num=r_num)
+    except Exception as exc:
+        error(f"Erro fatal na produção do M1 para {r_folder}: {exc}", exc=exc, round_folder=r_folder, round_num=r_num)
+
+
 def _run_4h_session_listener(
     max_duration_seconds: int = FOUR_HOURS_SECONDS,
     poll_interval: int = 6,
@@ -116,6 +152,10 @@ def _run_4h_session_listener(
 
             with ACTIVE_LISTENER_LOCK:
                 ACTIVE_LISTENER_STATUS["active_round_folder"] = r_folder
+
+            if stage_ev and stage_ev.startswith("PRE_ROUND_"):
+                info(f"PRE_ROUND detectado para {r_folder}. Executando Módulo 1...", event="PRE_ROUND", round_num=r_num)
+                _execute_m1_pipeline(r_folder, r_num)
 
             if stage_ev and stage_ev.startswith("END_ROUND_") and session_state.get("status") == "READY_FOR_SIMULATION":
                 info(f"END_ROUND detectado para {r_folder}. Executando pipeline...", event="END_ROUND", round_num=r_num)
@@ -159,6 +199,26 @@ class CloudRunRequestHandler(BaseHTTPRequestHandler):
         # Discord Webhook PING verification (type == 1)
         if data.get("type") == 1:
             self._send_json(200, {"type": 1})
+            return
+
+        if self.path.startswith("/round/m1") or self.path.startswith("/session/m1"):
+            r_num = int(data.get("round_num", 10))
+            r_folder = data.get("round_folder", f"et_{r_num:02d}_espanha")
+            force = bool(data.get("force", False))
+            worker = threading.Thread(
+                target=_execute_m1_pipeline,
+                args=(r_folder, r_num, force),
+                daemon=True,
+            )
+            worker.start()
+            self._send_json(
+                202,
+                {
+                    "status": "m1_generation_started",
+                    "round_folder": r_folder,
+                    "round_num": r_num,
+                },
+            )
             return
 
         if self.path.startswith("/round/execute") or self.path.startswith("/session/simulate"):

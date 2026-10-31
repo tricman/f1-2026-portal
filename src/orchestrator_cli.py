@@ -233,6 +233,7 @@ def main() -> None:
             "sync-ingest",
             "watch-discord",
             "autonomous-session",
+            "generate-m1",
         ],
         default="process-et10",
         help="Action to execute",
@@ -287,6 +288,25 @@ def main() -> None:
             persona_name=persona,
         )
         print(f"Published single-message Teaser to Discord as '{persona}' (Message ID: {msg_id})")
+    elif args.action == "generate-m1":
+        from src.ai_showrunner import GeminiFreeTierClient, generate_pre_race_m1
+        r_num = ROUND_METADATA.get(args.round_folder, {}).get("num", 10)
+        ai_client = GeminiFreeTierClient()
+        m1_file = generate_pre_race_m1(ROOT_DIR, r_num, args.round_folder, ai_client, force_regenerate=getattr(args, "force", False))
+        print(f"M1 consolidado com sucesso: {m1_file}")
+        deploy_portal_to_github_pages(f"Publish M1 {args.round_folder} to F1 2026 Portal")
+        client = DiscordGatewayClient()
+        base_url = (args.portal_url or os.environ.get("PORTAL_PUBLIC_URL") or "https://tricman.github.io/f1-2026-portal/").rstrip("/")
+        import urllib.parse
+        encoded_m = urllib.parse.quote(f"{args.round_folder}__{m1_file.stem}")
+        deep_link = f"{base_url}/#r={r_num}&m={encoded_m}"
+        msg_id = client.publish_editorial_teaser(
+            markdown_text=m1_file.read_text(encoding="utf-8"),
+            article_title=f"[M1 · PRÉ-SEMANA] {m1_file.stem}",
+            portal_url=deep_link,
+            persona_name="F1 Paddock Insider | Blog 'A F1 Que Você Não Vê'",
+        )
+        print(f"M1 Teaser publicado no Discord: {msg_id} -> {deep_link}")
     elif args.action == "publish-round":
         publish_round_to_discord(args.round_folder, teaser_mode=True, base_portal_url=args.portal_url or "")
     elif args.action == "sync-ingest":
