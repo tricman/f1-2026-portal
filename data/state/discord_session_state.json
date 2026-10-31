@@ -1,13 +1,15 @@
 {
-  "status": "IDLE",
-  "active_round_num": null,
-  "active_round_folder": null,
+  "status": "SEMANA_ACTIVE",
+  "active_round_num": 10,
+  "active_round_folder": "et_10_espanha",
   "last_message_id": null,
   "downloaded_keys": [],
   "debrief_messages": [],
-  "semana_day": 0,
-  "processed_msg_ids": [],
+  "semana_day": 1,
+  "processed_msg_ids": [
+    "1566178663144095829"
+  ],
   "last_poll_new_files": [],
-  "last_poll_stage_event": null,
+  "last_poll_stage_event": "SEMANA_TICK_10_1",
   "session_files": []
 }
