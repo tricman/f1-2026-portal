@@ -3,32 +3,196 @@
   "reputation": {
     "sarah": {
       "score": 45,
-      "archetype": "Ice Queen / Prod├¡gio Implac├ível",
-      "public_perception": "Admirada pela genialidade t├®cnica em Brackley e frieza cir├║rgica; respeitada e temida pelos veteranos."
+      "archetype": "Ice Queen / Prodígio Implacável",
+      "public_perception": "Admirada pela genialidade técnica em Brackley e frieza cirúrgica; respeitada e temida pelos veteranos da Mercedes e do grid.",
+      "victories": 5,
+      "poles": 5,
+      "fastest_laps": 4,
+      "points_et09": 171
     },
     "felipe": {
       "score": 70,
       "archetype": "O Professor / Monge de Hinwil",
-      "public_perception": "Her├│i t├®cnico do Paddock; visto como mentor da Brazilian Storm e milagreiro da KICK Sauber."
+      "public_perception": "Herói técnico do Paddock; visto como mentor da Brazilian Storm e milagreiro da KICK Sauber frente aos gigantes.",
+      "victories": 2,
+      "poles": 1,
+      "fastest_laps": 3,
+      "points_et09": 131
     },
     "davi": {
       "score": 30,
-      "archetype": "O Le├úo de Grove / Showman Agressivo",
-      "public_perception": "Amado pela velocidade bruta e ultrapassagens no limite, mas visado pelos comiss├írios e pela Red Bull."
+      "archetype": "O Leão de Grove / Showman Agressivo",
+      "public_perception": "Amado pela velocidade bruta em volta única e ultrapassagens viscerais, mas visado pelos comissários e pelo clã Red Bull.",
+      "victories": 0,
+      "poles": 1,
+      "fastest_laps": 2,
+      "points_et09": 65
+    }
+  },
+  "relationships": {
+    "brazilian_storm_core": {
+      "felipe_to_davi_and_sarah": "Postura de pai protetor e mentor de engenharia, porém bem-humorado e até bobo em alguns momentos de descontração fora do carro. Embora seja um novato na F1, usa sua maturidade de 43 anos para blindar os garotos da pressão tóxica do paddock. Na pista, não abre espaço e cobra foco.",
+      "davi_to_felipe": "Confiança cega de filho/discípulo. Pede conselhos de acerto de pneus e diferencial, mas costuma brincar e implicar com as 'gentilezas de engenheiro' de Felipe nas brigas roda a roda.",
+      "davi_to_sarah": "Relação de irmão mais velho elétrico: é o 'mais' em tudo (mais animado, mais nervoso, mais impulsivo). Implica, compete ferozmente na pista, mas ama, cuida e tem orgulho infinito da velocidade da garota.",
+      "sarah_to_felipe": "Respeito reverencial e filial. Sarah é introspectiva e quieta com quase todo o grid, mas com Felipe ela se abre, ouve atentamente seus conselhos de corrida e o enxerga como uma figura paterna protetora.",
+      "sarah_to_davi": "Relação de irmã caçula altamente competitiva e sarcástica. Sarah demonstra imenso afeto por Davi, mas adora estocá-lo com tiradas ácidas sobre erros de frenagem ('obrigada pelo P2, Leão de Grove')."
+    },
+    "grid_rivalries_and_dynamics": {
+      "felipe_davi_vs_verstappen": "Rancor e guerra declarada pós-Mônaco. O choque intencional de Max na traseira de Felipe no túnel (+12% de acelerador na telemetria) destruiu a Sauber e espalhou detritos que quebraram a asa de Davi. Felipe manteve compostura pública mas acionou advogados da Audi; Davi chamou publicamente de 'barbeirada' e promete revanche nas pistas. Max os enxerga como 'insolentes'.",
+      "sarah_vs_verstappen": "Guerra fria e psicológica pura. Max tenta desestabilizar Sarah insinuando na imprensa que seu sucesso se deve unicamente ao W17 da Mercedes; Sarah responde com desdém silencioso e voltas rápidas incontestáveis na pista (a verdadeira 'Ice Queen').",
+      "sarah_and_hamilton": "Respeito mútuo com tensão geracional velada. Lewis defende publicamente Sarah contra manobras políticas da FIA (como no protesto do pódio de Mônaco), mas sente a pressão de ver uma estreante de 16 anos ser mais rápida na mesma garagem.",
+      "felipe_and_alonso": "Cumplicidade tática entre os dois veteranos mais velhos do grid (43 e 44 anos). Respeito mútuo de quem sabe extrair o limite de carros intermediários sem cometer erros infantis.",
+      "davi_and_vowles": "James Vowles trata Davi como a jóia da coroa da Williams, construindo a equipe ao seu redor e rechaçando agressivamente as investidas de Helmut Marko (Red Bull) e Flavio Briatore (Alpine)."
     }
   },
   "events": [
     {
+      "event_id": "ET00-PRE-01",
+      "round": 0,
+      "module": "PRE_SEASON",
+      "summary": "Estreia da Brazilian Storm na F1 2026: Sarah (16 anos) assina com Mercedes sob gestão de Jules Moreau e tutela de Toto Wolff; Felipe (43 anos) assume cockpit e desenvolvimento da KICK Sauber para transição Audi 2027 com Marcus Thorne; Davi (20 anos) é promovido pela Williams sob o comando de James Vowles e assessoria de Chloe Vance.",
+      "entities": [
+        "sarah",
+        "felipe",
+        "davi",
+        "mercedes",
+        "sauber",
+        "williams",
+        "audi"
+      ],
+      "status": "RESOLVED"
+    },
+    {
+      "event_id": "ET01-BH-01",
+      "round": 1,
+      "module": "M5_CORRIDA",
+      "summary": "GP do Bahrein (Sakhir): Estreia lendária da Brazilian Storm. Sarah vence em sua corrida de estreia na F1 com Pole Position e Volta Mais Rápida (1:33.517). Davi faz um P2 histórico para a Williams, suportando a pressão de Lewis Hamilton (P3). Felipe enfrenta tráfego pesado e fecha em P11 na estreia da Sauber.",
+      "entities": [
+        "sarah",
+        "davi",
+        "felipe",
+        "hamilton",
+        "mercedes",
+        "williams"
+      ],
+      "status": "RESOLVED"
+    },
+    {
+      "event_id": "ET02-AS-01",
+      "round": 2,
+      "module": "M5_CORRIDA",
+      "summary": "GP da Arábia Saudita (Jeddah): Aula tática do 'Professor' Felipe, que vence de forma sensacional nas ruas de Jeddah com a Sauber e anota a Volta Mais Rápida (1:35.094), superando Hamilton (P2) e Alonso (P3). Davi sofre punições no tráfego e fecha em P14; Sarah raspa no muro, danifica a asa e termina em P20.",
+      "entities": [
+        "felipe",
+        "hamilton",
+        "alonso",
+        "sarah",
+        "davi",
+        "sauber"
+      ],
+      "status": "RESOLVED"
+    },
+    {
+      "event_id": "ET03-AU-01",
+      "round": 3,
+      "module": "M5_CORRIDA",
+      "summary": "GP da Austrália (Melbourne): Primeira dobradinha brasileira de 2026 em Albert Park. Sarah vence com autoridade (P1) e Felipe chega em P2 com a Volta Mais Rápida (1:23.517), deixando Verstappen em P3. Davi sofre pane mecânica prematura e abandona (DNF) na 4ª volta.",
+      "entities": [
+        "sarah",
+        "felipe",
+        "verstappen",
+        "davi",
+        "mercedes",
+        "sauber"
+      ],
+      "status": "RESOLVED"
+    },
+    {
+      "event_id": "ET04-JP-01",
+      "round": 4,
+      "module": "M5_CORRIDA",
+      "summary": "GP do Japão (Suzuka): Domínio absoluto de Sarah na chuva torrencial de Suzuka, conquistando Pole, Vitória e Volta Mais Rápida (1:43.378). Felipe tem atuação limpa e segura o P4 para a Sauber; Alonso é P2 e Norris P3. Davi abandona na volta inicial após toque que quebrou sua suspensão dianteira.",
+      "entities": [
+        "sarah",
+        "felipe",
+        "alonso",
+        "norris",
+        "davi",
+        "mercedes"
+      ],
+      "status": "RESOLVED"
+    },
+    {
+      "event_id": "ET05-CN-01",
+      "round": 5,
+      "module": "M5_CORRIDA",
+      "summary": "GP da China (Xangai): Nova dobradinha Sarah (P1) e Felipe (P2) no pódio chinês. Davi protagoniza corrida de recuperação eletrizante do fundo do grid até o P4, cravando a Volta Mais Rápida da prova (1:37.249). Leclerc completa o pódio em P3 para a Ferrari.",
+      "entities": [
+        "sarah",
+        "felipe",
+        "davi",
+        "leclerc",
+        "mercedes",
+        "sauber",
+        "williams"
+      ],
+      "status": "RESOLVED"
+    },
+    {
+      "event_id": "ET06-MI-01",
+      "round": 6,
+      "module": "M5_CORRIDA",
+      "summary": "GP de Miami: PÓDIO 100% BRASILEIRO INÉDITO NA HISTÓRIA DA F1. Davi (#15 Williams) crava sua primeira Pole Position da carreira. Na corrida, Felipe (#5 Sauber) vence com ritmo cirúrgico e faz a Volta Mais Rápida (1:32.120). Sarah (#24 Mercedes) chega em P2 e Davi completa o pódio histórico em P3, comemorando juntos na reta dos boxes.",
+      "entities": [
+        "felipe",
+        "sarah",
+        "davi",
+        "sauber",
+        "mercedes",
+        "williams"
+      ],
+      "status": "RESOLVED"
+    },
+    {
+      "event_id": "ET06-MI-02",
+      "round": 6,
+      "module": "M6_PODIO",
+      "summary": "Pacto e Intimidade da Brazilian Storm na Cooldown Room de Miami: Câmera da FIA registra a cumplicidade do trio — Davi brinca com Felipe sobre toques na asa, Sarah alfineta o P2 de Davi com sarcasmo afetuoso, e Felipe abraça ambos como um pai orgulhoso, antes de tomarem o pódio com banho coletivo de champanhe.",
+      "entities": [
+        "felipe",
+        "sarah",
+        "davi"
+      ],
+      "status": "RESOLVED"
+    },
+    {
+      "event_id": "ET07-IM-01",
+      "round": 7,
+      "module": "M5_CORRIDA",
+      "summary": "GP da Emília-Romanha (Ímola): Grand Chelem de Sarah em território ferrarista com Pole, Vitória e Volta Mais Rápida (1:19.398). Felipe faz escalada heroica partindo do 15º posto do grid para o P3. Charles Leclerc termina em P2 para a Ferrari; Davi abandona com quebra de bico dianteiro após disputa com a McLaren.",
+      "entities": [
+        "sarah",
+        "felipe",
+        "leclerc",
+        "davi",
+        "mercedes",
+        "sauber",
+        "ferrari"
+      ],
+      "status": "RESOLVED"
+    },
+    {
       "event_id": "ET08-MC-01",
       "round": 8,
       "module": "M5_CORRIDA",
-      "summary": "Toque de Verstappen na traseira de Felipe na sa├¡da do T├║nel em M├┤naco causou DNF de Felipe e perda de asa de Davi; WMSC deduziu -10 pts de Construtores da Red Bull.",
+      "summary": "Incidente do Túnel em Mônaco: Max Verstappen atingiu a traseira de Felipe na saída do Túnel durante a relargada sob chuva (+12% de acelerador na telemetria da Red Bull), causando abandono de Felipe (NC) e danos que deixaram Davi em P17. O Tribunal Mundial de Automobilismo da FIA (WMSC) julgou o recurso e puniu a Red Bull Racing com a dedução de -10 pontos no Mundial de Construtores.",
       "entities": [
         "felipe",
         "verstappen",
         "davi",
         "sauber",
-        "red_bull"
+        "red_bull",
+        "fia"
       ],
       "status": "OPEN"
     },
@@ -36,10 +200,13 @@
       "event_id": "ET08-MC-02",
       "round": 8,
       "module": "M5_CORRIDA",
-      "summary": "Sarah foi desclassificada (DSQ) em M├┤naco quando liderava com Pole e Volta Mais R├ípida por suposto desrespeito a bandeira amarela; Mercedes recorreu em Paris.",
+      "summary": "Dossiê de Mônaco & Desclassificação de Sarah: Sarah fez Pole e Volta Mais Rápida (1:24.672) sob chuva extrema, mas foi desclassificada (DSQ) pelos comissários após suposta ultrapassagem em bandeira amarela. Alonso herdou a vitória com a Aston Martin, Hamilton foi P2 e Verstappen P3. A Mercedes entrou com apelação no Tribunal Internacional da FIA em Paris.",
       "entities": [
         "sarah",
         "mercedes",
+        "alonso",
+        "hamilton",
+        "verstappen",
         "fia"
       ],
       "status": "OPEN"
@@ -48,12 +215,15 @@
       "event_id": "ET09-CA-01",
       "round": 9,
       "module": "M5_CORRIDA",
-      "summary": "Segundo p├│dio 100% brasileiro da hist├│ria no Canad├í: Sarah P1, Davi P2 (+VR 1:13.846 pressionando at├® o fim) e Felipe P3 segurando Hamilton.",
+      "summary": "GP do Canadá (Montreal): SEGUNDO PÓDIO 100% BRASILEIRO DA HISTÓRIA. Sarah domina e vence de ponta a ponta (P1). Davi faz atuação formidável na chuva leve, pressiona Sarah até a última curva, crava a Volta Mais Rápida (1:13.846) e conquista o P2. Felipe segura Lewis Hamilton por 14 voltas consecutivas para selar o P3 da Sauber.",
       "entities": [
         "sarah",
         "davi",
         "felipe",
-        "hamilton"
+        "hamilton",
+        "mercedes",
+        "williams",
+        "sauber"
       ],
       "status": "RESOLVED"
     },
@@ -61,47 +231,23 @@
       "event_id": "ET10-ES-M1",
       "round": 10,
       "module": "M1_SEMANA_EQUIPES",
-      "summary": "Semana pr├®-Espanha fervendo: Toto Wolff e Jules Moreau alinharam blindagem de 80 milh├Áes de euros para Sarah; Helmut Marko levou porta na cara de James Vowles ao sondar Davi; estafe de Sainz jantou com executivos da Audi/Sauber; ultimato sobre Checo P├®rez.",
+      "summary": "A Semana Pré-Corrida da Espanha (Etapa 10) escancarou um tabuleiro de xadrez em ebulição na *Silly Season* de 2026. A Red Bull sofre os impactos da punição da FIA e da crise em torno da performance de Sergio Pérez, enquanto a Mercedes blindou agressivamente a liderança e o futuro de Sarah com exigências contratuais pesadas de Jules Moreau. Paralelamente, o assédio de rivais sobre Davi (Williams) e a consolidação do \"Monge\" Felipe como o cérebro da Audi para 2027 redefiniram as dinâmicas de poder no Paddock.",
       "entities": [
         "sarah",
-        "davi",
         "felipe",
-        "sainz",
+        "davi",
+        "verstappen",
         "perez",
-        "verstappen"
-      ],
-      "status": "OPEN"
-    },
-    {
-      "event_id": "ET11-M2-Q2",
-      "round": 11,
-      "module": "M2_COLETIVA",
-      "summary": "Na Coletiva Oficial FIA da Etapa 11, Felipe declarou à imprensa: 'O futuro nunca se sabe. O que tenho que fazer agora é lidar bem com o presente e trabalhar forte para manter a minha equipe na melhor posição possível.'",
-      "entities": [
-        "felipe",
-        "fia"
-      ],
-      "status": "OPEN"
-    },
-    {
-      "event_id": "ET11-M2-Q3",
-      "round": 11,
-      "module": "M2_COLETIVA",
-      "summary": "Na Coletiva Oficial FIA da Etapa 11, Davi declarou à imprensa: 'Bem, como sempre eu dei o meu melhor na pista e com relação aos rumores, eu me mantenho focado no que importa e agora só a temporada importa'",
-      "entities": [
-        "davi",
-        "fia"
-      ],
-      "status": "OPEN"
-    },
-    {
-      "event_id": "ET11-M2-Q5",
-      "round": 11,
-      "module": "M2_COLETIVA",
-      "summary": "Na Coletiva Oficial FIA da Etapa 11, Sarah declarou à imprensa: 'Não, não sinto que preciso provar algo para ninguém. Eu sei que o sucesso na pista vem de muito treino e dedicação. Se outras pessoas acham que é por conta do meu carro, eu não posso fazer nada.'",
-      "entities": [
-        "sarah",
-        "fia"
+        "horner",
+        "wolff",
+        "thorne",
+        "vance",
+        "moreau",
+        "red_bull",
+        "mercedes",
+        "audi",
+        "williams",
+        "sauber"
       ],
       "status": "OPEN"
     }
