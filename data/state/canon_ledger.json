@@ -71,6 +71,39 @@
         "verstappen"
       ],
       "status": "OPEN"
+    },
+    {
+      "event_id": "ET11-M2-Q2",
+      "round": 11,
+      "module": "M2_COLETIVA",
+      "summary": "Na Coletiva Oficial FIA da Etapa 11, Felipe declarou à imprensa: 'O futuro nunca se sabe. O que tenho que fazer agora é lidar bem com o presente e trabalhar forte para manter a minha equipe na melhor posição possível.'",
+      "entities": [
+        "felipe",
+        "fia"
+      ],
+      "status": "OPEN"
+    },
+    {
+      "event_id": "ET11-M2-Q3",
+      "round": 11,
+      "module": "M2_COLETIVA",
+      "summary": "Na Coletiva Oficial FIA da Etapa 11, Davi declarou à imprensa: 'Bem, como sempre eu dei o meu melhor na pista e com relação aos rumores, eu me mantenho focado no que importa e agora só a temporada importa'",
+      "entities": [
+        "davi",
+        "fia"
+      ],
+      "status": "OPEN"
+    },
+    {
+      "event_id": "ET11-M2-Q5",
+      "round": 11,
+      "module": "M2_COLETIVA",
+      "summary": "Na Coletiva Oficial FIA da Etapa 11, Sarah declarou à imprensa: 'Não, não sinto que preciso provar algo para ninguém. Eu sei que o sucesso na pista vem de muito treino e dedicação. Se outras pessoas acham que é por conta do meu carro, eu não posso fazer nada.'",
+      "entities": [
+        "sarah",
+        "fia"
+      ],
+      "status": "OPEN"
     }
   ]
 }
