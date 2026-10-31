@@ -85,3 +85,96 @@
 * **O Fato de Bastidor:** Lanternas isoladas no Mundial de Construtores com zero pontos, a VCARB viveu uma segunda-feira de silêncio sepulcral em Faenza. Yuki Tsunoda e Liam Lawson foram trancados em debriefings técnicos intermináveis ao lado dos engenheiros da casa-mãe. A pressão interna para justificar o fracasso absoluto do pacote aerodinâmico atual gerou discussões ríspidas nos corredores, com relatos de monitores de telemetria sendo desligados no meio de análises de ritmo de corrida.
 * **O comentário ácido do Insider:**
 > *“Zero pontos na tabela é uma obra de arte do sofrimento esportivo. Tsunoda grita em japonês, Lawson tenta entender por que aceitou voltar para o programa da Red Bull, e a Faenza inteira finge que o carro não existe.”* — **Il Cavallino Spia**
+
+---
+
+## 📅 DIA 2/4: TERÇA-FEIRA
+
+### 🗞️ A F1 QUE VOCÊ NÃO VÊ
+*O consórcio internacional de jornalistas investigativos que prefere perder o acesso ao paddock a perder a piada.*
+
+---
+
+**MÓDULO 1 · DIA 2 DE 4 (TERÇA-FEIRA)**  
+*Foco: Eventos VIP, Micos de Marketing & Bastidores*  
+*Calmaria pré-GP da Espanha (Barcelona-Catalunya)? Só para quem é ingênuo. Os microfones estão abertos, os garçons estão fofocando e as marcas estão passando vergonha.*
+
+---
+
+#### 1. 🥈 Mercedes-AMG Petronas (Sarah & Hamilton)
+* **Local / Cidade:** Barcelona, Espanha (Restaurante de frutos do mar à beira-mar em Port Olímpic)
+* **O Fato de Bastidor:** A paz na Mercedes durou exatamente até o prato principal. O que era para ser um jantar de alinhamento tático entre a líder isolada Sarah (171 pontos) e Lewis Hamilton virou uma sessão de terapia forçada após um garçom vascular os gritos vindos do reservado. Um microfone de lapela esquecido por uma equipe de TV captou Sarah explicando, com a frieza de uma cirurgiã plástica, por que ela não vai aliviar o pé nas curvas de alta de Barcelona só porque o heptacampeão está reclamando de desgaste de pneus. Hamilton foi ouvido murmurando sobre "respeito geracional" antes de pedir a conta sozinho.
+> *"A 'Ice Queen' tem dezesseis anos e a alma de uma executiva da máfia russa. Ela olhou para o Hamilton, mexeu na taça de água com gás e disse: 'Lewis, o W17 responde ao meu pedal esquerdo, não às suas memórias afetivas'. O homem quase engasgou com a lula."*  
+> **— The Silver Bullet / Lady Paddock**
+
+---
+
+#### 2. 🟢 Stake F1 Team Kick Sauber / Audi (Felipe & Hülkenberg)
+* **Local / Cidade:** Hinwil / Barcelona (Box improvisado no Circuito da Catalunha)
+* **O Fato de Bastidor:** O "Professor" Felipe mal desembarcou em Barcelona e já virou alvo de um vazamento de áudio explosivo. Enquanto conversava no rádio interno (supostamente privado) com Marcus Thorne, seu implacável agente conhecido como "O Tubarão de Silverstone", Felipe detonou a falta de confiabilidade das atualizações aerodinâmicas planejadas para a transição da Audi em 2027. O áudio foi captado por um microfone ambiente da FIA que estava "por engano" na frequência errada. Hülkenberg, ao fundo, apenas ria da desgraceira enquanto ajustava o banco.
+> *"O Felipe não corre, ele dá expediente e ainda revisa a contabilidade da fábrica à noite. Ele pegou o telefone e disse para o Thorne: 'Se esses engenheiros alemães não acertarem o assoalho até sexta, eu mesmo pego a Dremel e recorto o difusor'. O pânico na mesa da diretoria técnica foi imediato."*  
+> **— The Paddock Mole / Lady Paddock**
+
+---
+
+#### 3. 🔴 Red Bull Racing (Verstappen & Pérez)
+* **Local / Cidade:** Marbella / Barcelona (Cobertura de luxo e iate particular)
+* **O Fato de Bastidor:** Com a Red Bull perdendo terreno e ocupando agora o amargo 3º lugar nos Construtores (com direito a -10 pontos de punição por causa do strike em Mônaco), Max Verstappen decidiu ignorar o simulador de Milton Keynes na terça-feira para participar de um lançamento ultra-exclusivo de uma grife de relógios suíços em um iate ancorado na Costa Brava. Enquanto isso, Sergio Pérez foi flagrado por paparazzi locais comendo um sanduíche de presunto cru num posto de gasolina na rodovia AP-7, com uma expressão de quem assinou um contrato vitalício com a angústia.
+> *"Enquanto o Max finge que se importa com desfiles de moda ao lado de influencers europeias, o pobre do Checo está calculando quantas etapas faltam para o contrato dele expirar. A Red Bull está ruindo por dentro, mas pelo menos os relógios de ouro brilham sob o sol."*  
+> **— The Paddock Mole**
+
+---
+
+#### 4. 🟧 McLaren F1 Team (Norris & Piastri)
+* **Local / Cidade:** Barcelona, Espanha (Hotel W Barcelona)
+* **O Fato de Bastidor:** Um jornalista espanhol encostou na mesa de Lando Norris na recepção do hotel para perguntar sobre as chances da McLaren em Barcelona. O que o repórter não sabia é que o gravador do celular já estava ligado no bolso e captou uma conversa impublicável entre Lando e Oscar Piastri sobre o comportamento errático do MCL38 nas curvas de baixa velocidade. Lando chamou o carro de "uma britadeira com aerofólio", gerando pânico na assessoria de imprensa da equipe de Woking, que tentou confiscar o aparelho à base de tapinhas nos ombros e sorrisos amarelos.
+> *"A McLaren gasta milhões em marketing de 'família unida', mas os dois pilotos conversam como estagiários de TI fudidos num escritório sem ar-condicionado. Piastri tem a expressão de quem foi forçado a assinar um acordo de silêncio com sangue."*  
+> **— The Paddock Mole**
+
+---
+
+#### 5. 🟢 Aston Martin Aramco (Alonso & Stroll)
+* **Local / Cidade:** Oviedo / Barcelona (Um bistrô escondido no Bairro Gótico)
+* **O Fato de Bastidor:** Fernando Alonso, o herói local e vencedor do caos em Mônaco, escolheu um restaurante estritamente familiar e discreto em Barcelona para jantar na terça à noite. O que ele não contava era com a presença de um comissário técnico da FIA na mesa ao lado. O clima esquentou quando Alonso, gesticulando fervorosamente com as mãos, cobrou explicações em alto e bom som sobre as novas diretrizes de assoalho para o GP da Espanha. Pratos de tapas voaram metaforicamente enquanto o garçom servia vinho da casa fingindo ser invisível.
+> *"El Nano está endiabrado. Ele subiu para 3º no campeonato e agora acha que tem passe livre para dar bronca até no papa. O comissário tentou comer a tortilha de patatas dele em silêncio, mas Alonso não deixou um segundo de paz."*  
+> **— El Chisme de Montmeló**
+
+---
+
+#### 6. 🐎 Scuderia Ferrari HP (Leclerc & Sainz)
+* **Local / Cidade:** Barcelona, Espanha (Festa privada da Ferrari com patrocinadores de luxo)
+* **O Fato de Bastidor:** Em crise no Mundial de Construtores (caindo para 6º lugar e sob pressão colossal da diretoria em Maranello), a Ferrari tentou abafar a fossa com uma festa de gala em uma vinílica exclusiva nos arredores de Barcelona. Charles Leclerc e Carlos Sainz foram obrigados a sorrir ao lado de executivos engatados em campanhas de grifes de alta-costura. No entanto, um vídeo vazado no TikTok mostra Sainz recusando-se a vestir um casaco de paetês da nova coleção da escuderia, murmurando em italiano clássico: *"Io sono un pilota, non un manichino di plastica"*.
+> *"Maranello está pegando fogo, os tifosi estão mandando cartas com ameaças de jejum de massas, e a diretoria acha que vai resolver o déficit de meio segundo no motor colocando os pilotos para desfilar com blazers de veludo. É de rir para não chorar."*  
+> **— Il Cavallino Spia**
+
+---
+
+#### 7. 🔷 Williams Racing (Davi & Albon)
+* **Local / Cidade:** Grove (fábrica) / Barcelona (Paddock da Catalunha)
+* **O Fato de Bastidor:** A "Brazilian Storm" continua aterrorizando os graúdos. Davi, embalado pelo P2 épico e pela Volta Mais Rápida em Montreal, chegou a Barcelona cercado por Chloe Vance, sua implacável agente ("A Máquina de Hype"). Chloe já fechou três contratos de patrocínio com marcas globais de tecnologia antes mesmo do primeiro treino livre. Enquanto isso, Alexander Albon tentava explicar aos engenheiros por que o carro dele continua zerado enquanto o companheiro brasileiro brilha na 7ª posição geral.
+> *"A Chloe Vance não anda, ela desfila como se o paddock fosse a passarela de Milão. Ela colocou o Davi para gravar um TikTok de três segundos que já tem mais visualizações que o canal oficial da Fórmula 1 inteira. A Williams virou uma agência de influencers com motor Mercedes."*  
+> **— The Paddock Mole / Lady Paddock**
+
+---
+
+#### 8. 🟦 BWT Alpine F1 Team (Gasly & Doohan)
+* **Local / Cidade:** Paris / Barcelona (Hangar VIP do aeroporto de Barcelona-El Prat)
+* **O Fato de Bastidor:** A Alpine tentou surfar na onda do glamour e organizou uma recepção chique no aeroporto para receber celebridades locais. O problema? Nenhuma celebridade de peso apareceu. Para salvar o evento corporativo, os chefes da equipe colocaram Pierre Gasly e Jack Doohan para posar abraçados a influenciadores de viagens de Instagram com menos de quinhentos seguidores. O constrangimento foi tão palpável que o reflexo das câmeras parecia captar o desespero nas córneas de Gasly.
+> *"A Alpine é um meme ambulante que insiste em usar terno azul-choque. O Pierre Gasly tem a exata cara de quem preferia estar trocando o pneu de um trator na Normandia a fingir que gosta de sorvete gourmet com uma blogueira de turismo."*  
+> **— El Chisme de Montmeló**
+
+---
+
+#### 9. ⬜ MoneyGram Haas F1 Team (Bearman & Ocon)
+* **Local / Cidade:** Kannapolis / Barcelona (Pitlane da Catalunha)
+* **O Fato de Bastidor:** A Haas atingiu um novo fundo do poço corporativo ao obrigar Oliver Bearman e Esteban Ocon a gravarem um vídeo promocional de dez minutos com danças coreografadas do TikTok para promover um patrocinador de criptomoedas falido. Ocon ameaçou fazer greve de capacete fechado, enquanto Bearman, com apenas 20 anos e tentando sobreviver na F1, executou os passos de dança com a rigidez de um autômato soviético. O vídeo vazou internamente e virou motivo de chacota em todos os chats de WhatsApp dos engenheiros.
+> *"Se você quer torturar um piloto de elite, não precisa bater o carro a 300 por hora na barreira TecPro. Basta colocá-lo para rebolar em frente a uma ring light com uma camisa cheia de logos de empréstimo consignado."*  
+> **— The Paddock Mole**
+
+---
+
+#### 10. 🐂 Visa Cash App RB (Tsunoda & Lawson)
+* **Local / Cidade:** Faenza / Barcelona (Restaurante de massa perto do circuito)
+* **O Fato de Bastidor:** A lanterna solitária do campeonato (0 pontos) gerou um clima de velório antecipado na VCARB. Yuki Tsunoda e Liam Lawson foram vistos em uma mesa de canto de um restaurante italiano discutindo asperamente quem estava "atrapalhando mais as simulações de acerto". O garçom, que falava um pouco de japonês e inglês, relatou à nossa equipe de investigação que Yuki bateu com a mão na mesa a ponto de derramar o azeite, exigindo que Liam "aprendesse a frear como gente".
+> *"A VCARB é o purgatório oficial da Red Bull. O Yuki está gritando em três línguas diferentes há quatro dias, e o Lawson só olha para o prato de nhoque com a alma completamente vazia. A única coisa zero ali não são só os pontos no construtores, é a esperança."*  
+> **— Il Cavallino Spia**
