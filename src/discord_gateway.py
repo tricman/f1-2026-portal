@@ -36,12 +36,45 @@ ROUND_NUMBER_TO_FOLDER: Dict[int, str] = {
 
 def detect_stage_command(text: str) -> Optional[Tuple[str, Optional[int]]]:
     """
-    Detect stage lifecycle commands in a Discord message, e.g.:
-      - 'inicio da etapa 10' / 'início da etapa 11' / '!iniciar 10' -> ('START', 10)
-      - 'final da etapa 10' / 'fim da etapa' / 'finalizar etapa 10' -> ('END', 10)
+    Detect stage lifecycle commands in a Discord message:
+      - 'inicio semana etapa 11' -> ('START_SEMANA', 11)
+      - 'avancar dia' / 'dia 2 etapa 11' -> ('TICK_SEMANA_2', 11) or ('TICK_SEMANA', None)
+      - 'coletiva etapa 11' / 'coletiva fia etapa 11' -> ('START_PRESS_CONF', 11)
+      - 'inicio da etapa 10' / '!iniciar 10' -> ('START', 10)
+      - 'final da etapa 10' / 'fim da etapa' -> ('END', 10)
+      - 'pre etapa 10' / 'preview etapa 10' -> ('PRE', 10)
     Returns (command_type, round_number_or_None) or None.
     """
     clean = text.strip().lower()
+
+    # 1. Weekly Silly Season Schedule
+    semana_start = re.search(
+        r"\b(?:inicio|início|iniciar|start)\s+(?:da\s+|de\s+)?semana(?:\s+(?:da\s+|de\s+)?etapa)?(?:\s+#?(\d+))?",
+        clean,
+    )
+    if semana_start:
+        r_num = int(semana_start.group(1)) if semana_start.group(1) else None
+        return ("START_SEMANA", r_num)
+
+    day_match = re.search(
+        r"\b(?:avancar|avançar|proximo|próximo)\s+dia\b|\bdia\s+(\d+)(?:\s+(?:da\s+|de\s+)?etapa\s+(\d+))?",
+        clean,
+    )
+    if day_match:
+        day_num = int(day_match.group(1)) if day_match.group(1) else None
+        r_num = int(day_match.group(2)) if day_match.group(2) else None
+        return (f"TICK_SEMANA_{day_num}" if day_num else "TICK_SEMANA", r_num)
+
+    # 2. Interactive FIA Press Conference
+    press_match = re.search(
+        r"\b(?:coletiva|press)\s+(?:da\s+|de\s+|fia\s+)?(?:etapa)?(?:\s+#?(\d+))?",
+        clean,
+    )
+    if press_match:
+        r_num = int(press_match.group(1)) if press_match.group(1) else None
+        return ("START_PRESS_CONF", r_num)
+
+    # 3. Standard Race Weekend Ingest
     start_match = re.search(
         r"\b(?:inicio|início|iniciar|start)\s+(?:da\s+|de\s+)?etapa(?:\s+#?(\d+))?",
         clean,
@@ -255,6 +288,60 @@ class DiscordGatewayClient:
             if cmd and msg_id not in processed_msg_ids:
                 cmd_type, cmd_round = cmd
                 processed_msg_ids.add(msg_id)
+                if cmd_type == "START_SEMANA":
+                    r_num = cmd_round or state.get("active_round_num") or 10
+                    r_folder = ROUND_NUMBER_TO_FOLDER.get(r_num, f"et_{r_num:02d}")
+                    state["status"] = "SEMANA_ACTIVE"
+                    state["semana_day"] = 1
+                    state["active_round_num"] = r_num
+                    state["active_round_folder"] = r_folder
+                    stage_event = f"SEMANA_TICK_{r_num}_1"
+                    if should_reply:
+                        meta = ROUND_METADATA.get(r_folder, {"name": f"Etapa {r_num}", "flag": "🏁"})
+                        self.post_channel_message(
+                            self.ingest_channel_id,
+                            f"📅 **AGENDADOR DIÁRIO DA SILLY SEASON ATIVADO — {meta['flag']} Etapa {r_num}: {meta['name']}**!\n"
+                            f"• Simulando a cobertura de Segunda a Quinta-feira.\n"
+                            f"• 🚨 **Disparando Dia 1/4 (Segunda-Feira: Ressaca & Diagnóstico Técnico)**...\n"
+                            f"💡 *Para avançar de dia rapidamente no teste, digite `avancar dia` ou `dia 2`.*",
+                        )
+                    continue
+
+                if cmd_type.startswith("TICK_SEMANA"):
+                    r_num = cmd_round or state.get("active_round_num") or 10
+                    r_folder = ROUND_NUMBER_TO_FOLDER.get(r_num, f"et_{r_num:02d}")
+                    parts = cmd_type.split("_")
+                    target_day = int(parts[-1]) if len(parts) >= 3 and parts[-1].isdigit() else min(state.get("semana_day", 1) + 1, 4)
+                    state["status"] = "SEMANA_ACTIVE"
+                    state["semana_day"] = target_day
+                    state["active_round_num"] = r_num
+                    state["active_round_folder"] = r_folder
+                    stage_event = f"SEMANA_TICK_{r_num}_{target_day}"
+                    if should_reply:
+                        meta = ROUND_METADATA.get(r_folder, {"name": f"Etapa {r_num}", "flag": "🏁"})
+                        self.post_channel_message(
+                            self.ingest_channel_id,
+                            f"⏩ **AVANÇANDO SILLY SEASON: DIA {target_day}/4 — {meta['flag']} Etapa {r_num}: {meta['name']}**!\n"
+                            f"• Gerando dossiê de bastidores e publicando no Portal + `#repercussao-midia`...",
+                        )
+                    continue
+
+                if cmd_type == "START_PRESS_CONF":
+                    r_num = cmd_round or state.get("active_round_num") or 10
+                    r_folder = ROUND_NUMBER_TO_FOLDER.get(r_num, f"et_{r_num:02d}")
+                    stage_event = f"START_PRESS_CONF_{r_num}"
+                    state["active_round_num"] = r_num
+                    state["active_round_folder"] = r_folder
+                    if should_reply:
+                        meta = ROUND_METADATA.get(r_folder, {"name": f"Etapa {r_num}", "flag": "🏁"})
+                        self.post_channel_message(
+                            self.ingest_channel_id,
+                            f"🏛️ **COLETIVA OFICIAL DA FIA CONVOCADA — {meta['flag']} Etapa {r_num}: {meta['name']}**!\n"
+                            f"• Convocando Sarah, Felipe, Davi e rivais para a bancada oficial.\n"
+                            f"• 🎙️ A imprensa mundial fará perguntas aos pilotos humanos com **Trava de Turno** no chat!",
+                        )
+                    continue
+
                 if cmd_type == "PRE":
                     r_num = cmd_round or state.get("active_round_num") or 10
                     r_folder = ROUND_NUMBER_TO_FOLDER.get(r_num, f"et_{r_num:02d}")
@@ -360,6 +447,27 @@ class DiscordGatewayClient:
                     self.ingest_channel_id,
                     f"📥 **Recebido de {author_name}:** " + " | ".join(ack_parts),
                 )
+
+            # Interactive Press Conference Answer Detection (Trava de Turno)
+            active_r_num = int(state.get("active_round_num") or 10)
+            press_conf_file = root_dir / "data" / "state" / f"press_conf_et{active_r_num:02d}.json"
+            if content and not cmd and msg_id not in processed_msg_ids and press_conf_file.exists():
+                try:
+                    pc_data = json.loads(press_conf_file.read_text(encoding="utf-8"))
+                    if pc_data.get("status") == "AWAITING_PILOT_REPLY":
+                        processed_msg_ids.add(msg_id)
+                        waiting_driver = pc_data.get("waiting_for_driver") or "felipe"
+                        from src.press_conference import PressConferenceSession
+                        pc_sess = PressConferenceSession(root_dir, active_r_num, active_folder)
+                        ack_msg = pc_sess.submit_pilot_answer(waiting_driver, content)
+                        if should_reply:
+                            self.post_channel_message(self.ingest_channel_id, ack_msg)
+                        next_msg, is_lock, next_driver = pc_sess.advance_to_next_question()
+                        if should_reply and next_msg:
+                            self.post_channel_message(self.ingest_channel_id, next_msg)
+                        continue
+                except Exception as exc:
+                    print(f"[Press Conf Answer Warning] {exc}")
 
             # 2. Capture non-command text messages as driver debriefing notes
             if content and not cmd and msg_id not in processed_msg_ids and state.get("status") == "COLLECTING":

@@ -383,6 +383,37 @@ def main() -> None:
                 break
             first_poll = False
 
+            if stage_ev and stage_ev.startswith("SEMANA_TICK_"):
+                parts = stage_ev.split("_")
+                day = int(parts[-1]) if len(parts) >= 4 and parts[-1].isdigit() else 1
+                r_num = int(session_state.get("active_round_num") or 10)
+                r_folder = session_state.get("active_round_folder") or f"et_{r_num:02d}"
+                from src.ai_showrunner import generate_m1_daily_episode
+                ai_client = GeminiFreeTierClient()
+                m1_path, teaser = generate_m1_daily_episode(ROOT_DIR, r_num, r_folder, day, ai_client)
+                deploy_portal_to_github_pages(f"Publish M1 Day {day} {r_folder} to F1 2026 Portal")
+                import urllib.parse
+                base_url = (args.portal_url or os.environ.get("PORTAL_PUBLIC_URL") or "https://tricman.github.io/f1-2026-portal/").rstrip("/")
+                encoded_m = urllib.parse.quote(f"{r_folder}__{m1_path.stem}")
+                deep_link = f"{base_url}/#r={r_num}&m={encoded_m}"
+                client.publish_editorial_teaser(
+                    markdown_text=f"{teaser}\n\n📖 **Leia o dossiê completo atualizado no Portal:**\n{deep_link}",
+                    article_title=f"[M1 · DIA {day}/4] A Semana da F1 ({r_folder})",
+                    portal_url=deep_link,
+                    persona_name="F1 Paddock Insider | Blog 'A F1 Que Você Não Vê'",
+                )
+
+            if stage_ev and stage_ev.startswith("START_PRESS_CONF_"):
+                r_num = int(session_state.get("active_round_num") or 10)
+                r_folder = session_state.get("active_round_folder") or f"et_{r_num:02d}"
+                from src.press_conference import PressConferenceSession
+                sess = PressConferenceSession(ROOT_DIR, r_num, r_folder)
+                opening = sess.start_session()
+                client.post_channel_message(client.ingest_channel_id, opening)
+                time.sleep(2.0)
+                q1_text, is_lock, driver = sess.advance_to_next_question()
+                client.post_channel_message(client.ingest_channel_id, q1_text)
+
             if stage_ev and stage_ev.startswith("END_ROUND_") and status_now == "READY_FOR_SIMULATION":
                 r_folder = session_state.get("active_round_folder") or args.round_folder
                 r_num = int(session_state.get("active_round_num") or 10)

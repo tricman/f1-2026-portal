@@ -122,6 +122,56 @@ def _execute_m1_pipeline(r_folder: str, r_num: int, force_regenerate: bool = Fal
         error(f"Erro fatal na produção do M1 para {r_folder}: {exc}", exc=exc, round_folder=r_folder, round_num=r_num)
 
 
+def _execute_m1_day_pipeline(r_folder: str, r_num: int, day_num: int) -> None:
+    """
+    Generates an episodic daily installment of M1 and publishes teaser to Discord.
+    """
+    from src.ai_showrunner import GeminiFreeTierClient, generate_m1_daily_episode
+    from src.orchestrator_cli import deploy_portal_to_github_pages
+    import urllib.parse
+
+    load_dotenv_if_present()
+    ai_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    ai_client = GeminiFreeTierClient(api_key=ai_key)
+
+    try:
+        info(f"Iniciando Módulo 1 (Dia {day_num}/4) para {r_folder}...", event="M1_DAY_START", day=day_num, round_folder=r_folder, round_num=r_num)
+        m1_path, teaser_text = generate_m1_daily_episode(ROOT_DIR, r_num, r_folder, day_num, ai_client)
+
+        deploy_portal_to_github_pages(f"Publish M1 Day {day_num} {r_folder} to F1 2026 Portal")
+
+        client = DiscordGatewayClient()
+        base_url = (os.environ.get("PORTAL_PUBLIC_URL") or "https://tricman.github.io/f1-2026-portal/").rstrip("/")
+        encoded_m = urllib.parse.quote(f"{r_folder}__{m1_path.stem}")
+        deep_link = f"{base_url}/#r={r_num}&m={encoded_m}"
+
+        info(f"Publicando Teaser do M1 Dia {day_num} no Discord...", stage="DISCORD_TEASER", day=day_num, round_num=r_num)
+        msg_id = client.publish_editorial_teaser(
+            markdown_text=f"{teaser_text}\n\n📖 **Leia o dossiê completo atualizado no Portal:**\n{deep_link}",
+            article_title=f"[M1 · DIA {day_num}/4] A Semana da F1 ({r_folder})",
+            portal_url=deep_link,
+            persona_name="F1 Paddock Insider | Blog 'A F1 Que Você Não Vê'",
+        )
+        info(f"Teaser do M1 Dia {day_num} publicado ({msg_id})!", event="M1_DAY_PUBLISHED", day=day_num, round_num=r_num)
+    except Exception as exc:
+        error(f"Erro no M1 Dia {day_num} para {r_folder}: {exc}", exc=exc, round_folder=r_folder, round_num=r_num)
+
+
+def _start_press_conference(r_folder: str, r_num: int) -> None:
+    """Starts interactive FIA Press Conference and asks Question 1."""
+    from src.press_conference import PressConferenceSession
+
+    load_dotenv_if_present()
+    client = DiscordGatewayClient()
+    sess = PressConferenceSession(ROOT_DIR, r_num, r_folder)
+    opening = sess.start_session()
+    client.post_channel_message(client.ingest_channel_id, opening)
+
+    time.sleep(2.0)
+    q1_text, is_lock, driver = sess.advance_to_next_question()
+    client.post_channel_message(client.ingest_channel_id, q1_text)
+
+
 def _run_4h_session_listener(
     max_duration_seconds: int = FOUR_HOURS_SECONDS,
     poll_interval: int = 6,
@@ -156,6 +206,16 @@ def _run_4h_session_listener(
             if stage_ev and stage_ev.startswith("PRE_ROUND_"):
                 info(f"PRE_ROUND detectado para {r_folder}. Executando Módulo 1...", event="PRE_ROUND", round_num=r_num)
                 _execute_m1_pipeline(r_folder, r_num)
+
+            if stage_ev and stage_ev.startswith("SEMANA_TICK_"):
+                parts = stage_ev.split("_")
+                day = int(parts[-1]) if len(parts) >= 4 and parts[-1].isdigit() else 1
+                info(f"SEMANA_TICK detectado para {r_folder} (Dia {day}). Executando M1 diário...", event="SEMANA_TICK", round_num=r_num, day=day)
+                _execute_m1_day_pipeline(r_folder, r_num, day)
+
+            if stage_ev and stage_ev.startswith("START_PRESS_CONF_"):
+                info(f"START_PRESS_CONF detectado para {r_folder}. Convocando coletiva interativa...", event="START_PRESS_CONF", round_num=r_num)
+                _start_press_conference(r_folder, r_num)
 
             if stage_ev and stage_ev.startswith("END_ROUND_") and session_state.get("status") == "READY_FOR_SIMULATION":
                 info(f"END_ROUND detectado para {r_folder}. Executando pipeline...", event="END_ROUND", round_num=r_num)
@@ -199,6 +259,46 @@ class CloudRunRequestHandler(BaseHTTPRequestHandler):
         # Discord Webhook PING verification (type == 1)
         if data.get("type") == 1:
             self._send_json(200, {"type": 1})
+            return
+
+        if self.path.startswith("/round/m1/day"):
+            r_num = int(data.get("round_num", 10))
+            r_folder = data.get("round_folder", f"et_{r_num:02d}_espanha")
+            day_num = int(data.get("day", 1))
+            worker = threading.Thread(
+                target=_execute_m1_day_pipeline,
+                args=(r_folder, r_num, day_num),
+                daemon=True,
+            )
+            worker.start()
+            self._send_json(
+                202,
+                {
+                    "status": "m1_day_generation_started",
+                    "round_folder": r_folder,
+                    "round_num": r_num,
+                    "day": day_num,
+                },
+            )
+            return
+
+        if self.path.startswith("/round/coletiva"):
+            r_num = int(data.get("round_num", 10))
+            r_folder = data.get("round_folder", f"et_{r_num:02d}_espanha")
+            worker = threading.Thread(
+                target=_start_press_conference,
+                args=(r_folder, r_num),
+                daemon=True,
+            )
+            worker.start()
+            self._send_json(
+                202,
+                {
+                    "status": "press_conference_started",
+                    "round_folder": r_folder,
+                    "round_num": r_num,
+                },
+            )
             return
 
         if self.path.startswith("/round/m1") or self.path.startswith("/session/m1"):

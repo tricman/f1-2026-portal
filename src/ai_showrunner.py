@@ -509,4 +509,80 @@ def generate_pre_race_m1(
     return target_file
 
 
+def generate_m1_daily_episode(
+    root_dir: Path,
+    round_num: int,
+    round_folder: str,
+    day_num: int,
+    ai_client: GeminiFreeTierClient,
+) -> Tuple[Path, str]:
+    """
+    Generates an episodic daily installment of M1 (A Semana da F1):
+    day_num: 1=Segunda, 2=Terça, 3=Quarta, 4=Quinta.
+    Appends or updates ET{round_num:02d}_PRE_A_Semana_da_F1.md and returns (file_path, teaser_text).
+    """
+    from src.canon_ledger import sample_weekly_themes
+
+    day_names = {
+        1: ("SEGUNDA-FEIRA", "A Ressaca da Corrida Anterior & Diagnóstico"),
+        2: ("TERÇA-FEIRA", "Eventos VIP, Micos de Marketing & Bastidores"),
+        3: ("QUARTA-FEIRA", "Simulador, Fábricas & Crises Contratuais"),
+        4: ("QUINTA-FEIRA", "Desembarque no Paddock, Farpas & Comentários da Internet"),
+    }
+    day_label, day_theme_focus = day_names.get(day_num, ("SEGUNDA-FEIRA", "Bastidores da F1"))
+
+    round_dir = root_dir / "data" / "seasons" / "season_01" / round_folder
+    round_dir.mkdir(parents=True, exist_ok=True)
+    target_file = round_dir / f"ET{round_num:02d}_PRE_A_Semana_da_F1.md"
+
+    base_context = assemble_storytelling_context(root_dir, round_num, round_folder)[:15000]
+
+    # Deterministic RNG for this day
+    rb_themes = sample_weekly_themes(round_num, "red_bull")
+    merc_themes = sample_weekly_themes(round_num, "mercedes")
+    sauber_themes = sample_weekly_themes(round_num, "sauber")
+    williams_themes = sample_weekly_themes(round_num, "williams")
+    day_key = {1: "monday", 2: "tuesday", 3: "wednesday", 4: "thursday"}.get(day_num, "monday")
+
+    daily_prompt = (
+        f"{base_context}\n\n"
+        f"=== DIRETRIZ EPISÓDICA: MÓDULO 1 · DIA {day_num} DE 4 ({day_label}) ===\n"
+        f"Foco do Dia: {day_theme_focus}\n"
+        f"Temas Sorteados (RNG):\n"
+        f"- Red Bull: {rb_themes[day_key]}\n"
+        f"- Mercedes: {merc_themes[day_key]}\n"
+        f"- Kick Sauber: {sauber_themes[day_key]}\n"
+        f"- Williams: {williams_themes[day_key]}\n\n"
+        f"Escreva o episódio de {day_label} cobrindo os acontecimentos destas equipes e dos pilotos principais (Felipe, Davi, Sarah, Verstappen, Alonso).\n"
+        f"Para cada equipe, use os insiders (*The Paddock Mole*, *Lady Paddock*, etc.), cite o local, o detalhamento dramático e o comentário ácido do insider.\n"
+        + ("Como é Quinta-Feira (Dia 4), inclua também a síntese dos insiders e 5 comentários ácidos de internautas (@fans)." if day_num == 4 else "")
+    )
+
+    try:
+        episode_md = ai_client._call_generate_content(
+            model=ai_client.flash_model,
+            parts=[{"text": daily_prompt}],
+            system_instruction=(
+                "Você é o consórcio de jornalistas investigativos 'A F1 Que Você Não Vê'. "
+                "Escreva em Português (Brasil) com humor mordaz, alta imersão e fidelidade à tabela real."
+            ),
+            temperature=0.45,
+        ).strip()
+    except Exception as exc:
+        episode_md = f"### 📝 {day_label}: {day_theme_focus}\n\nBastidores das equipes em ritmo de preparação para a Etapa {round_num}.\n"
+
+    existing_content = target_file.read_text(encoding="utf-8") if target_file.exists() else f"# 🏁 A F1 QUE VOCÊ NÃO VÊ — A Semana da F1 (Etapa {round_num})\n## 💣 ESPECIAL SILLY SEASON PRÉ-{round_folder.upper()}\n\n"
+    updated_content = existing_content + f"\n\n---\n\n## 📅 DIA {day_num}/4: {day_label}\n\n" + episode_md + "\n"
+    target_file.write_text(updated_content, encoding="utf-8")
+
+    clean_snippet = re.sub(r"[#*`]", "", episode_md)[:180].strip()
+    teaser_summary = (
+        f"🚨 **[M1 · DIA {day_num}/4] A SEMANA DA F1: {day_label}**\n"
+        f"• **Foco:** *{day_theme_focus}*\n"
+        f"> *\"{clean_snippet}...\"*"
+    )
+    return target_file, teaser_summary
+
+
+
 

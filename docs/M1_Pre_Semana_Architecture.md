@@ -96,15 +96,25 @@ sequenceDiagram
 
 ### Gatilho A: Mensagem no Discord (Interativo)
 No mesmo canal de voz `#1457392708355096580`:
-* Comando: **`pre etapa <N>`** ou **`semana etapa <N>`**
-* O bot identifica o comando via Regex, confirma o início da produção pré-GP e devolve a publicação no canal `#repercussao-midia`.
+* `inicio semana etapa 11`: Ativa o agendador episódico da Silly Season (dispara o Dia 1 imediatamente).
+* `avancar dia` ou `dia 2 etapa 11`: Avança o episódio diário subsequente (Dia 1 a 4).
+* `pre etapa 11`: Gera a edição consolidada completa do Módulo 1 em bloco único.
+* `coletiva etapa 11`: Convoca a **Coletiva Interativa da FIA** com Trava de Turno no Discord.
 
-### Gatilho B: Encadeamento Autônomo Pós-Etapa
-Na função `finalize_round_transition()`, logo após calcular a nova tabela da FIA e promover os pontos da Etapa $N-1$, o motor inicia automaticamente a síntese da Pré-Semana da Etapa $N$.
-
-### Gatilho C: Endpoint HTTP (Cloud Run)
+### Gatilho B: Endpoint HTTP (Cloud Run)
 ```bash
-POST https://f1-showrunner-service-267450575916.southamerica-east1.run.app/round/m1
+# Episódio Diário do M1 (1 a 4)
+POST https://f1-showrunner-service-267450575916.southamerica-east1.run.app/round/m1/day
+Content-Type: application/json
+
+{
+  "round_num": 11,
+  "round_folder": "et_11_austria",
+  "day": 1
+}
+
+# Iniciar Coletiva Interativa (M2)
+POST https://f1-showrunner-service-267450575916.southamerica-east1.run.app/round/coletiva
 Content-Type: application/json
 
 {
@@ -115,10 +125,24 @@ Content-Type: application/json
 
 ---
 
-## 5. Próximo Passo na Linha do Tempo: Módulo #2 (Coletiva FIA)
+## 5. Calendário Episódico da Silly Season (M1 Diário)
 
-Assim que o M1 é publicado:
-1. Os pilotos leem as fofocas e os vazamentos da semana no Portal Mobile.
-2. O **Módulo #2 (Coletiva de Imprensa Oficial da FIA - Quinta-feira)** entra em cena, convocando 5 a 6 pilotos para a bancada oficial (`prompts/02_coletiva_pre_gp.md`).
-3. Os jornalistas confrontam diretamente os pilotos com base nos vazamentos revelados no M1!
-4. Só então a sessão de pista é aberta com o comando `inicio da etapa <N>`.
+| Dia | Fase Semanal | Foco Narrativo | Gatilho Rápido |
+| :--- | :--- | :--- | :--- |
+| **Dia 1** | Segunda-Feira | **Ressaca & Diagnóstico Técnico:** Danos da etapa anterior, protestos de telemetria, desgaste de PU. | `dia 1` |
+| **Dia 2** | Terça-Feira | **Galas VIP & Bastidores de Patrocinador:** Jantares corporativos, pressões de acionistas, marcas ativadas. | `dia 2` |
+| **Dia 3** | Quarta-Feira | **Fábrica & Crises Contratuais:** Sessões de simulador, rumores de cláusulas de rescisão e reuniões a portas fechadas. | `dia 3` |
+| **Dia 4** | Quinta-Feira | **Desembarque & Clima Pré-Pista:** Farpas no paddock, memes e reações de internautas/Reddit. | `dia 4` |
+
+---
+
+## 6. Coletiva de Imprensa Oficial da FIA (M2 Interativo com Trava de Turno)
+
+1. **Convocação da Bancada:** 5 a 6 pilotos sorteados (Sarah, Felipe, Davi + rivais da IA como Verstappen, Leclerc ou Norris).
+2. **Perguntas Jornalísticas:** Mariana Becker, Erik van Haren, Martin Brundle, Julianne Cerasoli e Roberto Chinchero.
+3. **Trava de Turno para Pilotos Humanos:**
+   - Para pilotos da IA, o Showrunner gera resposta instantânea com base no humor e perfil psicológico.
+   - Para pilotos humanos (**@frdsilva83**, **@DaviMSSon**, **@SarahMarinsS**), o bot marca o piloto e **trava o turno**, aguardando a resposta real no chat do Discord.
+   - Assim que o piloto digita sua resposta, o Gemini avalia o impacto na sala de imprensa (reação dos jornalistas, sorrisos amarelos dos rivais, cochichos) e prossegue para a próxima pergunta.
+4. **Relatório Oficial:** Ao término da rodada de perguntas, o relatório completo formatado pela FIA é gerado, salvo em Markdown e commitado no Portal!
+
