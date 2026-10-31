@@ -1,22 +1,9 @@
 {
-  "status": "IDLE",
+  "status": "COLLECTING",
   "active_round_num": 10,
   "active_round_folder": "et_10_espanha",
   "last_message_id": null,
-  "downloaded_keys": [
-    "1565772279592394792_rn_image_picker_lib_temp_0adfd101-e5c9-4454-9e83-532873f6ce77.jpg",
-    "1565772279592394792_rn_image_picker_lib_temp_0f35fe54-e237-4a97-b212-18f514740ef3.jpg",
-    "1565772279592394792_rn_image_picker_lib_temp_0ffaa949-5533-4612-a6a8-c84c40cd1050.jpg",
-    "1565772279592394792_rn_image_picker_lib_temp_22fc1ff9-807b-4122-98a1-052b58961a5c.jpg",
-    "1565772279592394792_rn_image_picker_lib_temp_a3bf872d-e02e-40c2-b390-baf05974aab0.jpg",
-    "1565772279592394792_rn_image_picker_lib_temp_b9535f1f-8269-432f-9cd2-4d4448c29640.jpg",
-    "1565772279592394792_rn_image_picker_lib_temp_d02492a7-8a5f-4040-a23b-414352467939.jpg",
-    "1565772314405245130_pacedex_catalunya-espanha_2026-10-17.csv",
-    "1565772314405245130_pacedex_catalunya-espanha_2026-10-17_TL.csv",
-    "1565772314405245130_pacedex_catalunya-espanha_2026-10-17_laps.csv",
-    "1565772314405245130_pacedex_catalunya-espanha_2026-10-17_laps_TL.csv",
-    "1565772632043954292_voice-message.ogg"
-  ],
+  "downloaded_keys": [],
   "debrief_messages": [],
   "processed_msg_ids": [
     "1565736951112405063",
@@ -31,19 +18,6 @@
   ],
   "last_poll_new_files": [],
   "last_poll_stage_event": null,
-  "start_message_id": "1565772170993467503",
-  "session_files": [
-    "rn_image_picker_lib_temp_0f35fe54-e237-4a97-b212-18f514740ef3.jpg",
-    "rn_image_picker_lib_temp_22fc1ff9-807b-4122-98a1-052b58961a5c.jpg",
-    "rn_image_picker_lib_temp_d02492a7-8a5f-4040-a23b-414352467939.jpg",
-    "rn_image_picker_lib_temp_0ffaa949-5533-4612-a6a8-c84c40cd1050.jpg",
-    "rn_image_picker_lib_temp_0adfd101-e5c9-4454-9e83-532873f6ce77.jpg",
-    "rn_image_picker_lib_temp_b9535f1f-8269-432f-9cd2-4d4448c29640.jpg",
-    "rn_image_picker_lib_temp_a3bf872d-e02e-40c2-b390-baf05974aab0.jpg",
-    "pacedex_catalunya-espanha_2026-10-17_laps.csv",
-    "pacedex_catalunya-espanha_2026-10-17.csv",
-    "pacedex_catalunya-espanha_2026-10-17_laps_TL.csv",
-    "pacedex_catalunya-espanha_2026-10-17_TL.csv",
-    "voice-message.ogg"
-  ]
+  "start_message_id": "1566116967750963352",
+  "session_files": []
 }
