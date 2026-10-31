@@ -9,6 +9,7 @@ import base64
 import json
 import mimetypes
 import os
+import re
 import time
 import urllib.error
 import urllib.request
@@ -20,11 +21,10 @@ from src.portal_builder import ROUND_METADATA
 
 GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
 FALLBACK_FLASH_MODELS = [
-    "gemini-3.7-flash",
-    "gemini-3.5-flash",
-    "gemini-3.6-flash",
-    "gemini-3.1-flash-lite",
+    "gemini-flash-lite-latest",
+    "gemini-3.5-flash-lite",
     "gemini-3.8-flash",
+    "gemini-3.1-flash-lite",
 ]
 
 
@@ -37,7 +37,7 @@ class GeminiFreeTierClient:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        flash_model: str = "gemini-3.7-flash",
+        flash_model: str = "gemini-flash-lite-latest",
         pro_model: str = "gemini-3.1-pro-preview",
         pacing_seconds: float = 32.0,
     ) -> None:

@@ -300,3 +300,4 @@ class PressConferenceSession:
             f"👉 O fim de semana de corrida está aberto! Quando prontos, digitem **`inicio da etapa {self.round_num}`** no canal de voz!"
         )
         return (closing_msg, False, None)
+

@@ -278,6 +278,12 @@ class DiscordGatewayClient:
             if author_obj.get("bot"):
                 continue
 
+            # If this message was posted before the bot's latest reply, it belongs to a past session:
+            # mark as processed and do not re-trigger actions.
+            if last_bot_msg_id and int(msg_id) <= last_bot_msg_id:
+                processed_msg_ids.add(msg_id)
+                continue
+
             should_reply = send_bot_replies and (int(msg_id) > last_bot_msg_id)
             author_name = author_obj.get("global_name") or author_obj.get("username") or "Piloto"
             raw_content = (msg.get("content") or "").strip()

@@ -205,23 +205,21 @@ def _run_4h_session_listener(
 
             if stage_ev and stage_ev.startswith("PRE_ROUND_"):
                 info(f"PRE_ROUND detectado para {r_folder}. Executando Módulo 1...", event="PRE_ROUND", round_num=r_num)
-                _execute_m1_pipeline(r_folder, r_num)
+                threading.Thread(target=_execute_m1_pipeline, args=(r_folder, r_num), daemon=True).start()
 
             if stage_ev and stage_ev.startswith("SEMANA_TICK_"):
                 parts = stage_ev.split("_")
                 day = int(parts[-1]) if len(parts) >= 4 and parts[-1].isdigit() else 1
                 info(f"SEMANA_TICK detectado para {r_folder} (Dia {day}). Executando M1 diário...", event="SEMANA_TICK", round_num=r_num, day=day)
-                _execute_m1_day_pipeline(r_folder, r_num, day)
+                threading.Thread(target=_execute_m1_day_pipeline, args=(r_folder, r_num, day), daemon=True).start()
 
             if stage_ev and stage_ev.startswith("START_PRESS_CONF_"):
                 info(f"START_PRESS_CONF detectado para {r_folder}. Convocando coletiva interativa...", event="START_PRESS_CONF", round_num=r_num)
-                _start_press_conference(r_folder, r_num)
+                threading.Thread(target=_start_press_conference, args=(r_folder, r_num), daemon=True).start()
 
             if stage_ev and stage_ev.startswith("END_ROUND_") and session_state.get("status") == "READY_FOR_SIMULATION":
                 info(f"END_ROUND detectado para {r_folder}. Executando pipeline...", event="END_ROUND", round_num=r_num)
-                _execute_round_pipeline(r_folder, r_num)
-                info(f"Etapa {r_num} concluída. Encerrando sessão (Early Exit).", event="SESSION_COMPLETED", round_num=r_num)
-                break
+                threading.Thread(target=_execute_round_pipeline, args=(r_folder, r_num), daemon=True).start()
 
             time.sleep(poll_interval)
     except Exception as exc:
