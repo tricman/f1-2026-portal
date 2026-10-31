@@ -160,3 +160,40 @@ Apertem os cintos. Barcelona costuma ser a pista onde os carros mostram suas ver
 
 *Até o próximo vácuo,*  
 **Consórcio de Jornalistas Investigativos 'A F1 Que Você Não Vê'** 🕵️‍♂️🏎️🇧🇷
+
+
+---
+
+## 📅 DIA 2/4: TERÇA-FEIRA
+
+Aqui é o consórcio **'A F1 Que Você Não Vê'**. Esqueça os comunicados oficiais polidos e as entrevistas de "foquei no meu trabalho". A terça-feira pré-GP da Espanha foi um verdadeiro hospício a céu aberto. Enquanto o asfalto de Barcelona ainda esfria, os bastidores estão em ebulição.
+
+Aqui está o que apuramos:
+
+---
+
+### 🔴 Red Bull: O "Efeito Mônaco" e o Fim da Linha
+**Local:** Motorhome da Red Bull, portas trancadas.
+**O Flagrante:** Christian Horner foi visto gesticulando freneticamente enquanto o empresário de Sergio Pérez, Julian Jakobi, entrava com uma pasta que parecia conter um pedido de rescisão (ou um ultimato). A punição de -10 pontos em Mônaco não foi apenas um erro de telemetria; foi o estopim para uma guerra civil.
+**Insider (*The Paddock Mole*):** *"O clima ali dentro é de velório com música de circo. Verstappen não fala com a equipe técnica, e Pérez está mais preocupado em garantir que sua multa rescisória seja paga em dia do que em acertar o carro. A Red Bull está implodindo, e o pessoal de Milton Keynes já está sondando nomes que nem deveriam estar na lista. O desespero tem cheiro de combustível queimado e café frio."*
+
+### ⚪ Mercedes: A "Ice Queen" e a Política de Brackley
+**Local:** Motorhome da Mercedes, área VIP privativa.
+**O Flagrante:** Jules Moreau, empresário de Sarah, foi visto em uma conversa de quase duas horas com Toto Wolff. O assunto? A extensão do contrato da "Ice Queen" e a garantia de que, mesmo com a liderança isolada, ela não será "sacrificada" para favorecer o marketing de Hamilton.
+**Insider (*Lady Paddock*):** *"Sarah é a joia da coroa, mas a Mercedes é um ninho de cobras. Jules é um estrategista nato; ele não quer apenas vitórias, ele quer o controle total sobre o desenvolvimento do W17. Enquanto Hamilton tenta manter a pose de veterano, Sarah nem pisca. Ela quer o título, e se a equipe tentar qualquer 'ordem de box' para favorecer o inglês, o motorhome vai abaixo."*
+
+### 🟢 Kick Sauber: O "Monge" sob Pressão
+**Local:** Sim-Center da Sauber, Hinwil (remoto).
+**O Flagrante:** Felipe, o "Professor", passou 14 horas seguidas no simulador. A telemetria vazada mostra que ele está testando configurações de diferencial que a própria equipe considera "arriscadas demais". Marcus Thorne, o "Tubarão de Silverstone", foi visto discutindo com os engenheiros da Audi sobre a falta de peças de reposição de alta performance.
+**Insider (*The Paddock Mole*):** *"Felipe não é um piloto, é um algoritmo com consciência. Ele está humilhando a fábrica ao provar que o carro tem potencial para lutar com a Mercedes, mas a Sauber ainda opera como uma equipe de meio de pelotão. O 'Monge' está perdendo a paciência com a burocracia. Se a Audi não entregar o que ele quer, ele vai embora com o conhecimento técnico na cabeça."*
+
+### 🔵 Williams: O Mico do Marketing
+**Local:** Paddock de Barcelona, estúdio improvisado.
+**O Flagrante:** Davi foi obrigado pela equipe de marketing a gravar um vídeo de TikTok dançando uma trend duvidosa com um patrocinador de bebidas energéticas enquanto vestia um chapéu de toureiro. O vídeo foi deletado 10 minutos depois, após Davi, visivelmente irritado, ter pedido para Chloe Vance intervir.
+**Insider (*Lady Paddock*):** *"Chloe Vance quase teve um colapso nervoso. Ela quer o Davi como um ícone global, não como um palhaço de rede social. A Williams está desesperada por dinheiro e está vendendo a dignidade do garoto a preço de banana. Davi é um leão na pista, mas fora dela, a gestão da marca dele está virando uma comédia pastelão. O 'Leão de Grove' está rugindo, e não é de alegria."*
+
+---
+
+**Nota do Editor:** Enquanto os figurões brigam por contratos e os pilotos tentam manter a sanidade, Fernando Alonso observa tudo do seu motorhome na Aston Martin, rindo por último. Ele sabe que, no caos, a experiência sempre vence. 
+
+**Amanhã tem mais. Fiquem atentos às sombras do paddock.**
