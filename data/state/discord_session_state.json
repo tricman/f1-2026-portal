@@ -5,7 +5,7 @@
   "last_message_id": null,
   "downloaded_keys": [],
   "debrief_messages": [],
-  "semana_day": 2,
+  "semana_day": 4,
   "processed_msg_ids": [
     "1558925686171766785",
     "1558925698981437626",
@@ -47,9 +47,11 @@
     "1566137704016781483",
     "1566139612986875905",
     "1566141075465179400",
-    "1566145347900932228"
+    "1566145347900932228",
+    "1566145695315009776",
+    "1566145872448720998"
   ],
   "last_poll_new_files": [],
-  "last_poll_stage_event": null,
+  "last_poll_stage_event": "SEMANA_TICK_11_4",
   "session_files": []
 }

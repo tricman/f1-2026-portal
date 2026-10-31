@@ -272,3 +272,71 @@ Abaixo, o dossiê completo, equipe por equipe, da quarta-feira mais tensa da tem
 * **O Fato de Bastidor:** A lanterna solitária do campeonato (zero pontos) gerou um clima de velório italiano na fábrica de Faenza. Yuki Tsunoda e Liam Lawson foram flagrados em silêncio sepulcral dividindo uma pizza fria na cantina da fábrica, ignorando-se mutuamente enquanto assistiam na TV a repetição do pódio de Felipe e Sarah. Nenhum dos dois trocou uma única palavra por mais de duas horas, refletindo o fracasso absoluto do projeto aerodinâmico da equipe júnior da Red Bull.
 * **O comentário ácido do Insider (*Il Cavallino Spia*):**
 > *"A VCARB está no fundo do poço sem corda para subir. Zero pontos na tabela, motores que parecem cortadores de grama requintados e uma dupla de pilotos que não se suporta mais. Se Helmut Marko aparecer em Faenza nesta semana, é capaz de fechar as portas da fábrica e demitir até o cozinheiro."*
+
+
+---
+
+## 📅 DIA 4/4: QUINTA-FEIRA
+
+**A F1 Que Você Não Vê**  
+*Módulo 1 · Dia 4 de 4 (Quinta-feira)*  
+*Local: Circuit de Barcelona-Catalunya (Montmeló) / Paddock do GP da Espanha*
+
+---
+
+### O Circo Armado, os Microfones Abertos e o Champanhe de Iate: A Quinta-Feira em Barcelona
+
+Boa tarde, fãs da velocidade e abutres do submundo da Fórmula 1. O asfalto de Barcelona ainda está esfriando da umidade catalã, mas o paddock já está pegando fogo. Entramos oficialmente no **Dia 4 de 4 (Quinta-feira)**, o dia sagrado das coletivas de imprensa, das caretas fingidas de amizade na Curva 1 e, claro, do festival de fofocas que os chefes de equipe tentam esconder debaixo de panos quentes de fibra de carbono. 
+
+Com 9 etapas na bagagem, a temporada 2026 já separou os homens dos meninos — e, no caso da *Brazilian Storm*, os fenômenos dos mortais. Sarah lidera com folga na Mercedes (171 pts), Felipe é o vice-líder cirúrgico na Sauber (131 pts) e Davi empilha pódios e poles na Williams (65 pts). 
+
+Abaixo, o consórcio destrincha o que os microfones abertos e os paparazzi capturaram nas entranhas do paddock catalão nas últimas 24 horas.
+
+---
+
+### 🔴 Red Bull Racing: O Desabafo no Rádio e o Pânico em Milton Keynes
+* **Local:** Motorhome da Red Bull, Sala de Briefing dos Engenheiros (Portas semi-abertas)
+* **O Flagra:** *The Paddock Mole* (nosso espião que sobrevive a base de café superfaturado da F1) estava encostado na divisória acústica do motorhome taurino quando o microfone ambiente de Christian Horner ficou "acidentalmente" aberto na frequência interna de testes de simulador. Max Verstappen, irritado com a perda da liderança e os 10 pontos tomados pela FIA após o carrossel em Mônaco, não economizou no holandês carregado de xingamentos.
+* **Detalhamento Dramático:** Verstappen foi ouvido esmurrando a mesa de vidro: *"Se essa carroça continuar saindo de frente na saída da curva 4, podem botar o Pérez para guiar essa merda sozinho, porque eu não vou arriscar minha licença super com esse lixo aerodinâmico!"*. Christian Horner tentou apagar o incêndio murmurando algo sobre "correções no assoalho para Silverstone", mas o clima interno em Milton Keynes está mais azedo do que leite deixado no sol de julho. 
+* **O Comentário do Insider (*The Paddock Mole*):**  
+  > *"O Max está parecendo aquela criança que perdeu o videogame na última fase. A Red Bull perdeu o rumo do desenvolvimento de 2026 e o Christian passa mais tempo tentando convencer a imprensa que 'está tudo sob controle' do que ajustando a asa traseira. Se o carro continuar pulando desse jeito em Barcelona, vão precisar de um quiroprático exclusivo para o pescoço do holandês."*
+
+---
+
+### 🥈 Mercedes-AMG Petronas: O Iate, o Estreito e a "Ice Queen" de Vestido de Alta Costura
+* **Local:** Marina Port Vell, Barcelona (Festa exclusiva de lançamento da parceria Mercedes & Balenciaga)
+* **O Flagra:** Enquanto a concorrência sofre com a falta de peças, a Mercedes transformou o cais de Barcelona em um desfile de moda particular. Sarah (a *Ice Queen*, líder do mundial com 16 anos e uma conta bancária que faria inveja a sheiks) foi flagrada a bordo de um iate de 60 metros conversando pé com pé com um astro de Hollywood cuja identidade o nosso departamento jurídico preferiu não revelar (digamos apenas que ele usa capas pretas nos cinemas).
+* **Detalhamento Dramático:** Fria como um bloco de gelo siberiano, Sarah ignorou solenemente os fotógrafos que gritavam seu nome, limitando-se a tomar água com gás e a discutir telemetria de freio de motor com Jules Moreau (seu agente) usando um tablet no meio da festa de R$ 10 milhões. Lewis Hamilton, o companheiro de equipe e 4º no campeonato, tentou roubar a cena chegando de óculos escuros à noitinha, mas foi ofuscado pela serenidade assustadora da adolescente brasileira que simplesmente engoliu a pressão da *Silly Season*.
+* **O Comentário da Insider (*Lady Paddock*):**  
+  > *"A menina tem 16 anos, mas parece uma CEO da Fortune 500 que joga pôquer com a máfia russa. Enquanto a concorrência chora no motorhome por causa de punição da FIA, a Sarah está assinando contrato de grife internacional e rindo da cara de quem acha que a idade dela é fraqueza. Toto Wolff está criando um monstro sagrado em Brackley."*
+
+---
+
+### 🟢 Stake F1 Team Kick Sauber: O Professor Resmunga e o "Tubarão" Ataca nos Bastidores
+* **Local:** Hospitality da Sauber, Área Restrita dos Engenheiros
+* **O Flagra:** Felipe (o *Monge de Hinwil*, vice-líder com 131 pontos) foi capturado por um microfone de lapela esquecido sobre a mesa de engenharia enquanto discutia telemetria de diferencial com seus mecânicos. O áudio vazado capturou a indignação metódica do veterano de 43 anos.
+* **Detalhamento Dramático:** Com a tranquilidade de quem já viu de tudo na categoria, Felipe disparava contra a falta de confiabilidade do motor: *"Se o mapeamento do ERS cortar na entrada da reta oposta mais uma vez amanhã nos treinos livres, eu mesmo pego a chave de fenda e refaço a solda dessa central elétrica. Não cheguei até aqui para perder pódio por causa de economia de botão de rádio"*. Do lado de fora, Marcus Thorne (o temido *Tubarão de Silverstone* e empresário de Felipe) já circulava pelo paddock com uma maleta preta, murmurando aos quatro ventos que "a Audi precisa abrir a carteira para 2027 se quiser segurar o vice-líder do campeonato".
+* **O Comentário do Insider (*The Paddock Mole*):**  
+  > *"O Felipe é um absurdo. O cara tem idade para ser pai da metade do grid, mas guia como um jovem faminto com os reflexos de um cirurgião. E o Marcus Thorne? Esse advogado britânico é um tubarão branco vestindo terno Giorgio Armani. Ele já está jantando com a diretoria da Audi todanoite para garantir que o bônus de contrato do Felipe venha com juros e correção monetária."*
+
+---
+
+### 🔷 Williams Racing: A Máquina de Hype e o Glamour em Pedralbes
+* **Local:** Mansão Histórica em Pedralbes, Festa Beneficente Privada
+* **O Flagra:** Davi (o *Leão de Grove*, 7º no mundial, dono de uma Pole em Miami e três pódios avassaladores) não apareceu no paddock durante a tarde de ontem. O motivo? Chloe Vance (a *Máquina de Hype*) o arrastou para um evento exclusivo de gala nas colinas de Pedralbes, cercado por modelos internacionais, bilionários do Vale do Silício e executivos de tecnologia.
+* **Detalhamento Dramático:** Davi apareceu sorrindo para todas as lentes possíveis, ostentando um terno impecável e um relógio de pulso que custa mais que o orçamento de desenvolvimento da Haas para metade da temporada. Chloe Vance estava implacável, circulando com dois iPhones nas mãos, fechando contratos de patrocínio global em tempo real enquanto transmitia ao vivo para 4 milhões de seguidores o estilo de vida de estrela do jovem piloto da Williams.
+* **O Comentário da Insider (*Lady Paddock*):**  
+  > *"A Chloe Vance transformou o Davi em uma marca global antes mesmo dele completar o ensino médio. Os caras da Williams estão maravilhados: entram na pista apanhando no ritmo de corrida de domingo, mas o balanço de marketing da equipe nunca esteve tão gordo. É o poder da Brazilian Storm versionada em cifrões."*
+
+---
+
+### 🌐 O Termômetro da Web: 5 Comentários Ácidos dos Internautas (@fans)
+
+1. **@f1_depressivo_sp:** *"O Verstappen tá chorando tanto por causa do assoalho da Red Bull que daqui a pouco a FIA vai ter que liberar fralda geriátrica box-to-box para o holandês no rádio. Chora mais, Max!"* 🍼🔴
+2. **@ice_queen_m24:** *"Enquanto o grid inteiro gasta o salário em festa de iate em Mônaco e Barcelona, a Sarah de 16 anos tá no simulador calibrando o freio com a precisão de um robô cirúrgico. A patroa do Brasil não existe!"* 👑🇧🇷
+3. **@sauber_mil_grau:** *"O Felipe tem 43 anos e guia com a calma de um monge budista enquanto carrega a Sauber nas costas contra equipes de fábrica bilionárias. O homem é simplesmente o Professor Pardal da velocidade."* 🧠🟢
+4. **@davi_storm_fc:** *"A Chloe Vance é a verdadeira chefe de equipe da Williams. O Davi faz a pole, sai pra festa com modelo internacional e a conta bancária da escuderia britânica agradece. Marketing puro!"* 📈🔷
+5. **@fia_corruption_watch:** *"Deu 10 pontos de punição pra Red Bull em Mônaco e agora o Horner tá ameaçando até a mãe dele no microfone aberto. A F1 2026 tá melhor que novela mexicana, meu irmão!"* 🍿👀
+
+---
+*O circo está armado. Amanhã os motores rugem de verdade para o Treino Livre 1 em Barcelona. Fiquem ligados, porque o consórcio 'A F1 Que Você Não Vê' não pisca nem na hora da bandeira vermelha.*
