@@ -197,3 +197,56 @@ Aqui está o que apuramos:
 **Nota do Editor:** Enquanto os figurões brigam por contratos e os pilotos tentam manter a sanidade, Fernando Alonso observa tudo do seu motorhome na Aston Martin, rindo por último. Ele sabe que, no caos, a experiência sempre vence. 
 
 **Amanhã tem mais. Fiquem atentos às sombras do paddock.**
+
+
+---
+
+## 📅 DIA 3/4: QUARTA-FEIRA
+
+# A F1 Que Você Não Vê
+**Edição Especial de Quarta-feira: Simuladores, Tabloides e Multas Rescisórias**
+
+Aqui quem fala é o consórcio de jornalistas investigativos mais temido (e bloqueado) do paddock. Esqueça os releases oficiais da FIA e as coletivas de imprensa engomadinhas onde todo mundo elogia o motor Honda ou agradece aos patrocinadores. Enquanto o circo descansa a duas semanas da Espanha, os bastidores de Brackley, Milton Keynes, Hinwil e Grove estão pegando fogo. 
+
+Abra o seu bloco de notas e segure o seu café. Eis o que realmente aconteceu nesta **Quarta-feira (Dia 3 de Módulo 1)** nos quartéis-generais da elite do automobilismo.
+
+---
+
+### 1. RED BULL RACING (Milton Keynes) — *O Fantasma no Simulador*
+* **Local:** Sala de Simulação Avançada / Subsolo 2 (Milton Keynes, Reino Unido).
+* **O Drama:** Max Verstappen (5º no Mundial, 94 pts) passou as últimas 72 horas confinado no simulador com fúria nos olhos. Fontes internas relatam que a telemetria do holandês na sessão de ontem à noite em Montreal e Mônaco atingiu níveis obsessivos: ele bateu o próprio tempo de volta virtual em três décimos, mas quebrou duas hastes de direção por forçar a barra nas zebras digitais. O clima na garagem está insustentável após a punição de 10 pontos no Mundial de Construtores gerada pelo toque de Sergio Pérez (10º, 39 pts) em Mônaco. Christian Horner tenta apagar incêndios com a matriz austríaca enquanto Helmut Marko exige a cabeça de engenheiros de simulação.
+* **O Flagrante (*The Paddock Mole*):** 
+> *"Atenção para o que o 'Mole' ouviu no corredor cinzento do subsolo: Max simplesmente arrancou o volante do simulador de raiva e jogou contra o painel após o sistema mostrar que a Sauber de Felipe estava tracionando melhor na saída de curva lenta. Ele virou para o engenheiro de pista e soltou: 'Se o carro de Hinwil nos superar na curva 3 em Barcelona, eu vou direto para o aeroporto'. Pérez, por sua vez, foi visto no refeitório comendo um wrap de frango completamente sozinho, encarando o vazio como quem sabe que está com os dias contados."*
+
+---
+
+### 2. MERCEDES-AMG PETRONAS (Brackley) — *O Microfone Aberto da "Ice Queen"*
+* **Local:** Centro Tecnológico de Brackley, Sala de Briefing Executivo.
+* **O Drama:** Sarah (líder isolada com 171 pontos e 5 vitórias) parecia intocável, mas um deslize de aúdio em uma chamada interna com os engenheiros de aerodinâmica vazou para a imprensa alemã. A jovem de 16 anos não escondeu a frustração com o desgaste dos pneus dianteiros do W17 nas simulações de longa distância para Barcelona. Lewis Hamilton (4º, 97 pts), por sua vez, mantém um silêncio sepulcral, blindado por Jules Moreau, enquanto os tabloides britânicos especulam se a hierarquia interna da equipe começará a ruir caso a pressão da Sauber e da Red Bull aumente.
+* **O Flagrante (*Lady Paddock*):**
+> *"Querem drama? 'Lady Paddock' pegou o sinal de áudio bruto de uma reunião fechada onde Sarah, com aquela voz gélida que deixa qualquer marmanjo de terno trêmulo, disparou: 'Se a gente continuar gerindo pneu igual a uma categoria de base, eu vou ter que ganhar a corrida inteira no retrovisor'. O microfone continuou aberto por três segundos a mais. Toto Wolff quase engasgou com o espresso. O clima em Brackley hoje fede a paranoia pura."*
+
+---
+
+### 3. STAKE F1 TEAM KICK SAUBER (Hinwil) — *O Tubarão e a Multa Rescisória*
+* **Local:** Motorhome privativo da Sauber, isolado no fundo do paddock temporário (Zurique / Base de Hinwil).
+* **O Drama:** A *Silly Season* antecipou o inverno europeu. O vice-líder do campeonato, Felipe (2º com 131 pontos e 2 vitórias), está no centro de uma guerra jurídica e comercial nos bastidores. Marcus Thorne, o infame *Tubarão de Silverstone* e agente pessoal do "Monge de Hinwil", foi visto saindo de uma reunião a portas fechadas com diretores da Audi. Em pauta: cláusulas de desempenho, o motor de 2027 e sondagens pesadas de uma equipe de fábrica rival que quer roubar o veterano brasileiro a preço de ouro. A Sauber tenta cobrir a oferta, mas a multa rescisória é um labirinto jurídico.
+* **O Flagrante (*The Paddock Mole*):**
+> *"Marcus Thorne não usa terno, ele usa armadura de combate corporativo. Ele foi visto hoje cedo saindo do escritório da chefia da Sauber com uma pasta preta e um sorriso de canto de boca. Um funcionário de alto escalão me sussurrou: 'O Tubarão colocou a faca no pescoço da Audi. Ou garantem o desenvolvimento do bólido para a segunda metade da temporada de 2026, ou o Felipe assina um pré-acordo que vai deixar metade do conselho suíço sem dormir'. Enquanto isso, o Professor Felipe está onde? Na oficina, medindo a folga da suspensão traseira com um paquímetro de bolso como se o mundo não estivesse desabando ao seu redor."*
+
+---
+
+### 4. WILLIAMS RACING (Grove) — *O Tabloide e o Hype de Grove*
+* **Local:** Centro de Engenharia de Williams, Grove (Oxfordshire).
+* **O Drama:** Davi (7º no Mundial, 65 pontos, 3 pódios e 1 Pole em Miami) virou o garoto-propaganda mais cobiçado da F1 fora das pistas tradicionais. Chloe Vance, a *Máquina de Hype*, montou uma mini-base de operações em Londres para gerenciar o assédio de marcas globais de tecnologia e moda sobre o piloto de 20 anos. Porém, nos bastidores de Grove, a tensão técnica é real: após o abandono por asa danificada em Ímola e o P2 soberano no Canadá, a equipe precisa garantir que o FW48 aguente o tranco nas curvas de alta de Barcelona. 
+* **O Flagrante (*Lady Paddock*):**
+> *"Enquanto Davi dava entrevista para uma revista de cultura pop americana em um estúdio em Londres com a supervisão milimétrica da Chloe — que interrompeu o repórter três vezes por causa de uma pergunta sobre 'distração nas redes sociais' —, o rádio da fábrica de Grove capturou um desabafo cru do chefe de mecânicos: 'O garoto é rápido como um raio, mas se continuar abusando das zebras da curva 10 nos treinos livres, quem vai gastar o teto orçamentário com fibra de carbono sou eu'. O hype paga o patrocínio, mas a brita de Barcelona cobra em dólar pesado, queridos."*
+
+---
+
+### 🎙️ O Vedito do Consórcio
+Enquanto a FIA discute se o presidente Mohammed Ben Sulayem vai aparecer de capacete de rali na Espanha e se Tim Malyon consegue calibrar o Centro de Operações de Genebra sem causar polêmica, o campeonato de 2026 caminha para uma trinca mortal: **Sarah defendendo o castelo da Mercedes, Felipe negociando seu legado com o bisturi de um cirurgião e Davi equilibrando o circo midiático com o pé cravado no acelerador.**
+
+Não desliguem os modems. A qualquer momento tem mais vazamento. 
+
+*— A F1 Que Você Não Vê (O jornalismo que a Liberty Media tenta proibir).*
