@@ -509,6 +509,20 @@ def generate_pre_race_m1(
     return target_file
 
 
+ALL_10_CONSTRUCTORS = [
+    ("Mercedes-AMG Petronas", "mercedes", "Sarah (#24) & Hamilton (#44)", "The Silver Bullet / Lady Paddock"),
+    ("Stake F1 Team Kick Sauber (Audi)", "sauber", "Felipe (#5) & Hülkenberg (#27)", "The Paddock Mole / Lady Paddock"),
+    ("Red Bull Racing", "red_bull", "Verstappen (#1) & Pérez (#11)", "The Paddock Mole"),
+    ("McLaren F1 Team", "mclaren", "Norris (#4) & Piastri (#81)", "The Paddock Mole"),
+    ("Aston Martin Aramco", "aston_martin", "Alonso (#14) & Stroll (#18)", "El Chisme de Montmeló"),
+    ("Scuderia Ferrari", "ferrari", "Leclerc (#16) & Sainz (#55)", "Il Cavallino Spia"),
+    ("Williams Racing", "williams", "Davi (#15) & Albon (#23)", "The Paddock Mole / Lady Paddock"),
+    ("Alpine F1 Team", "alpine", "Gasly (#10) & Doohan (#7)", "El Chisme de Montmeló"),
+    ("MoneyGram Haas F1 Team", "haas", "Bearman (#87) & Ocon (#31)", "The Paddock Mole"),
+    ("Visa Cash App RB", "vcarb", "Tsunoda (#22) & Lawson (#30)", "Il Cavallino Spia"),
+]
+
+
 def generate_m1_daily_episode(
     root_dir: Path,
     round_num: int,
@@ -519,7 +533,8 @@ def generate_m1_daily_episode(
     """
     Generates an episodic daily installment of M1 (A Semana da F1):
     day_num: 1=Segunda, 2=Terça, 3=Quarta, 4=Quinta.
-    Appends or updates ET{round_num:02d}_PRE_A_Semana_da_F1.md and returns (file_path, teaser_text).
+    Covers ALL 10 CONSTRUCTORS and updates ET{round_num:02d}_PRE_A_Semana_da_F1.md
+    with section-based deduplication (never duplicates existing days).
     """
     from src.canon_ledger import sample_weekly_themes
 
@@ -537,25 +552,40 @@ def generate_m1_daily_episode(
 
     base_context = assemble_storytelling_context(root_dir, round_num, round_folder)[:15000]
 
-    # Deterministic RNG for this day
-    rb_themes = sample_weekly_themes(round_num, "red_bull")
-    merc_themes = sample_weekly_themes(round_num, "mercedes")
-    sauber_themes = sample_weekly_themes(round_num, "sauber")
-    williams_themes = sample_weekly_themes(round_num, "williams")
+    # Meta for current and previous GP
+    meta_curr = ROUND_METADATA.get(round_folder, {"name": f"GP Etapa {round_num}", "circuit": "Circuito"})
+    prev_num = round_num - 1
+    prev_folder = f"et_{prev_num:02d}_espanha" if prev_num == 10 else f"et_{prev_num:02d}"
+    meta_prev = ROUND_METADATA.get(prev_folder, {"name": f"GP Etapa {prev_num}"})
+
     day_key = {1: "monday", 2: "tuesday", 3: "wednesday", 4: "thursday"}.get(day_num, "monday")
+
+    # Sample deterministic themes for ALL 10 teams
+    sampled_bullets = []
+    for team_name, team_id, drivers, insider in ALL_10_CONSTRUCTORS:
+        themes = sample_weekly_themes(round_num, team_id)
+        theme_for_day = themes.get(day_key, "Bastidores técnicos e políticos")
+        sampled_bullets.append(f"- **{team_name}** ({drivers}) | Insider: *{insider}* | Tema sorteado: {theme_for_day}")
+
+    themes_block = "\n".join(sampled_bullets)
 
     daily_prompt = (
         f"{base_context}\n\n"
-        f"=== DIRETRIZ EPISÓDICA: MÓDULO 1 · DIA {day_num} DE 4 ({day_label}) ===\n"
-        f"Foco do Dia: {day_theme_focus}\n"
-        f"Temas Sorteados (RNG):\n"
-        f"- Red Bull: {rb_themes[day_key]}\n"
-        f"- Mercedes: {merc_themes[day_key]}\n"
-        f"- Kick Sauber: {sauber_themes[day_key]}\n"
-        f"- Williams: {williams_themes[day_key]}\n\n"
-        f"Escreva o episódio de {day_label} cobrindo os acontecimentos destas equipes e dos pilotos principais (Felipe, Davi, Sarah, Verstappen, Alonso).\n"
-        f"Para cada equipe, use os insiders (*The Paddock Mole*, *Lady Paddock*, etc.), cite o local, o detalhamento dramático e o comentário ácido do insider.\n"
-        + ("Como é Quinta-Feira (Dia 4), inclua também a síntese dos insiders e 5 comentários ácidos de internautas (@fans)." if day_num == 4 else "")
+        f"=== DIRETRIZ CRUCIAL: MÓDULO 1 · DIA {day_num} DE 4 ({day_label}) ===\n"
+        f"GP Atual em Preparação: Etapa {round_num}: {meta_curr['name']} ({meta_curr.get('circuit', '')})\n"
+        f"GP Anterior Concluído: Etapa {prev_num}: {meta_prev['name']}\n"
+        f"Foco Narrativo do Dia: {day_theme_focus}\n\n"
+        f"=== TEMAS SORTEADOS PARA TODAS AS 10 EQUIPES ===\n"
+        f"{themes_block}\n\n"
+        f"REGRAS DE CONTEÚDO:\n"
+        f"1. Você DEVE cobrir TODAS AS 10 EQUIPES acima, em ordem, sem pular nenhuma.\n"
+        f"2. Para CADA equipe, inclua:\n"
+        f"   - Título da Equipe\n"
+        f"   - **Local / Cidade:** (Onde a equipe/piloto está nesta {day_label})\n"
+        f"   - **O Fato de Bastidor:** (O relato dramático, a fofoca ácida, a treta de garagem ou marketing)\n"
+        f"   - **O comentário ácido do Insider:** (Citação em bloco `>` do correspondente indicado)\n"
+        f"3. Atenção aos pilotos da Brazilian Storm (Sarah líder pela Mercedes, Felipe vice pela Sauber, Davi destaque pela Williams).\n"
+        + ("4. Como é Quinta-Feira (Dia 4), conclua com a SÍNTESE DOS INSIDERS e 5 COMENTÁRIOS ÁCIDOS DE INTERNAUTAS (@fans).\n" if day_num == 4 else "")
     )
 
     try:
@@ -563,17 +593,42 @@ def generate_m1_daily_episode(
             model=ai_client.flash_model,
             parts=[{"text": daily_prompt}],
             system_instruction=(
-                "Você é o consórcio de jornalistas investigativos 'A F1 Que Você Não Vê'. "
-                "Escreva em Português (Brasil) com humor mordaz, alta imersão e fidelidade à tabela real."
+                "Você é o consórcio internacional de jornalistas investigativos 'A F1 Que Você Não Vê'. "
+                "Escreva em Português (Brasil) com humor mordaz, alta imersão, sem alucinar pontos e cobrindo as 10 equipes."
             ),
             temperature=0.45,
         ).strip()
     except Exception as exc:
-        episode_md = f"### 📝 {day_label}: {day_theme_focus}\n\nBastidores das equipes em ritmo de preparação para a Etapa {round_num}.\n"
+        episode_md = f"### 📝 {day_label}: {day_theme_focus}\n\nBastidores das 10 equipes em ritmo de preparação para {meta_curr['name']}.\n"
 
-    existing_content = target_file.read_text(encoding="utf-8") if target_file.exists() else f"# 🏁 A F1 QUE VOCÊ NÃO VÊ — A Semana da F1 (Etapa {round_num})\n## 💣 ESPECIAL SILLY SEASON PRÉ-{round_folder.upper()}\n\n"
-    updated_content = existing_content + f"\n\n---\n\n## 📅 DIA {day_num}/4: {day_label}\n\n" + episode_md + "\n"
-    target_file.write_text(updated_content, encoding="utf-8")
+    # Section-based storage (Deduplication engine)
+    existing_days: Dict[int, str] = {}
+    if target_file.exists():
+        raw_existing = target_file.read_text(encoding="utf-8")
+        day_splits = re.split(r"(## 📅 DIA \d/4:[^\n]*)", raw_existing)
+        if len(day_splits) > 1:
+            for i in range(1, len(day_splits), 2):
+                hdr = day_splits[i]
+                body = day_splits[i + 1] if i + 1 < len(day_splits) else ""
+                match_d = re.search(r"DIA (\d)/4", hdr)
+                if match_d:
+                    existing_days[int(match_d.group(1))] = body.strip().lstrip("-").strip()
+
+    # Overwrite current day with fresh generation
+    existing_days[day_num] = episode_md.strip()
+
+    # Reconstruct whole file cleanly with no duplicates
+    doc_header = (
+        f"# 🏁 A F1 QUE VOCÊ NÃO VÊ — A Semana da F1 (Etapa {round_num}: {meta_curr['name']})\n"
+        f"## 💣 ESPECIAL SILLY SEASON PRÉ-{round_folder.upper()}\n\n"
+    )
+    sections = []
+    for d_idx in sorted(existing_days.keys()):
+        d_lbl, _ = day_names.get(d_idx, (f"DIA {d_idx}", ""))
+        sections.append(f"## 📅 DIA {d_idx}/4: {d_lbl}\n\n{existing_days[d_idx]}")
+
+    full_md = doc_header + "\n\n---\n\n".join(sections) + "\n"
+    target_file.write_text(full_md, encoding="utf-8")
 
     clean_snippet = re.sub(r"[#*`]", "", episode_md)[:180].strip()
     teaser_summary = (

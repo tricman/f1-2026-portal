@@ -131,12 +131,15 @@ def deploy_portal_to_github_pages(commit_msg: str = "Auto-update F1 2026 Editori
     Rebuild `portal/index.html` and root `index.html` from all current Markdown/JSON files in `data/`
     and push directly to `https://github.com/tricman/f1-2026-portal.git` (GitHub Pages).
     """
+    from src.logger import log_text
+
     out_path = build_editorial_portal(ROOT_DIR)
+    log_text("[PORTAL BUILD] index.html e portal/portal_data.json recompilados com sucesso.")
     try:
         git_target_dir = ROOT_DIR if (ROOT_DIR / ".git").exists() else (ROOT_DIR / "portal")
         if (git_target_dir / ".git").exists():
             if git_target_dir == ROOT_DIR:
-                subprocess.run(["git", "-C", str(git_target_dir), "add", "index.html", "portal/index.html", "data/"], check=True)
+                subprocess.run(["git", "-C", str(git_target_dir), "add", "index.html", "portal", "data"], check=True)
             else:
                 subprocess.run(["git", "-C", str(git_target_dir), "add", "index.html"], check=True)
             diff_res = subprocess.run(
@@ -159,12 +162,20 @@ def deploy_portal_to_github_pages(commit_msg: str = "Auto-update F1 2026 Editori
                     ],
                     check=True,
                 )
-                subprocess.run(["git", "-C", str(git_target_dir), "push", "origin", "HEAD:main"], check=True)
-                print("Portal pushed live to GitHub Pages: https://tricman.github.io/f1-2026-portal/")
+                push_res = subprocess.run(
+                    ["git", "-C", str(git_target_dir), "push", "origin", "main"],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+                if push_res.returncode == 0:
+                    log_text(f"[PORTAL PUSH] ✅ Portal publicado no GitHub Pages com sucesso! ({commit_msg})")
+                else:
+                    log_text(f"[PORTAL PUSH WARNING] Falha no git push: {push_res.stderr.strip()}")
             else:
-                print("Portal is already up to date on GitHub Pages.")
+                log_text("[PORTAL PUSH] Portal já estava sincronizado na última revisão (sem alterações pendentes).")
     except Exception as exc:
-        print(f"[Portal Git Warning] Git push skipped or failed in container: {exc}")
+        log_text(f"[PORTAL ERROR] Erro durante o deploy do portal: {exc}")
     return out_path
 
 
@@ -339,7 +350,7 @@ def main() -> None:
             if stage_ev:
                 print(f"[STAGE EVENT] {stage_ev} -> Status: {session_state.get('status')}")
             if new_f:
-                print(f"[FILES DOWNLOADED] {len(new_f)} arquivos salvos: {new_f}")
+                log_text(f"[FILES DOWNLOADED] {len(new_f)} arquivos salvos: {new_f}")
             if stage_ev and stage_ev.startswith("END_ROUND_") and session_state.get("status") == "READY_FOR_SIMULATION":
                 r_folder = session_state.get("active_round_folder") or args.round_folder
                 print(f"[READY FOR SIMULATION] Etapa encerrada no Discord ({r_folder})!")
@@ -363,19 +374,28 @@ def main() -> None:
         max_seconds = int(args.max_hours * 3600)
         deadline = time.time() + max_seconds
         first_poll = True
-        print(
+        from src.logger import log_text
+        log_text(
             f"[Autonomous Showrunner Session] Sentinel={args.sentinel} | Janela máxima: {args.max_hours:.1f}h ({max_seconds}s) "
             f"escutando #1457392708355096580 a cada {args.interval}s..."
         )
+        poll_count = 0
         while time.time() < deadline:
+            poll_count += 1
             session_state = client.process_voice_channel_session(ROOT_DIR, state_file)
             stage_ev = session_state.get("last_poll_stage_event")
             new_f = session_state.get("last_poll_new_files", [])
             status_now = session_state.get("status", "IDLE")
+
+            if poll_count % 8 == 1:
+                r_curr = session_state.get("active_round_num", 11)
+                d_curr = session_state.get("semana_day", 1)
+                log_text(f"[HEARTBEAT] Listener escutando #1457392708355096580 a cada {args.interval}s | Status: {status_now} (Etapa {r_curr}, Dia {d_curr}/4)")
+
             if stage_ev:
-                print(f"[STAGE EVENT] {stage_ev} -> Status: {status_now}")
+                log_text(f"🔔 [STAGE EVENT DETECTADO] {stage_ev} -> Status: {status_now}")
             if new_f:
-                print(f"[FILES DOWNLOADED] {len(new_f)} arquivos salvos: {new_f}")
+                log_text(f"📥 [DOWNLOAD CONCLUÍDO] {len(new_f)} arquivos salvos: {new_f}")
 
             # In --sentinel mode (scheduled pulse), exit in 2s if no round was started
             if first_poll and args.sentinel and status_now == "IDLE":
