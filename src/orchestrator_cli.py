@@ -201,7 +201,7 @@ def publish_round_to_discord(round_folder: str, teaser_mode: bool = True, base_p
         persona = resolve_persona_for_filename(md_file.name)
         if teaser_mode:
             encoded_m = urllib.parse.quote(f"{round_folder}__{md_file.stem}")
-            deep_link = f"{base_url}/#r={r_num}&m={encoded_m}"
+            deep_link = f"{base_url}/?v={int(time.time())}#r={r_num}&m={encoded_m}"
             print(f"Publishing Teaser [{short_tag}: {md_file.name}] as '{persona}' -> {deep_link}...")
             msg_id = client.publish_editorial_teaser(
                 markdown_text=md_file.read_text(encoding="utf-8"),
@@ -290,7 +290,7 @@ def main() -> None:
         folder_name = file_path.parent.name
         r_num = ROUND_METADATA.get(folder_name, {}).get("num", 10)
         encoded_m = urllib.parse.quote(f"{folder_name}__{file_path.stem}")
-        deep_link = f"{base_url}/#r={r_num}&m={encoded_m}"
+        deep_link = f"{base_url}/?v={int(time.time())}#r={r_num}&m={encoded_m}"
         client = DiscordGatewayClient()
         msg_id = client.publish_editorial_teaser(
             markdown_text=md_text,
@@ -310,7 +310,7 @@ def main() -> None:
         base_url = (args.portal_url or os.environ.get("PORTAL_PUBLIC_URL") or "https://tricman.github.io/f1-2026-portal/").rstrip("/")
         import urllib.parse
         encoded_m = urllib.parse.quote(f"{args.round_folder}__{m1_file.stem}")
-        deep_link = f"{base_url}/#r={r_num}&m={encoded_m}"
+        deep_link = f"{base_url}/?v={int(time.time())}#r={r_num}&m={encoded_m}"
         msg_id = client.publish_editorial_teaser(
             markdown_text=m1_file.read_text(encoding="utf-8"),
             article_title=f"[M1 · PRÉ-SEMANA] {m1_file.stem}",
@@ -415,7 +415,7 @@ def main() -> None:
                 import urllib.parse
                 base_url = (args.portal_url or os.environ.get("PORTAL_PUBLIC_URL") or "https://tricman.github.io/f1-2026-portal/").rstrip("/")
                 encoded_m = urllib.parse.quote(f"{r_folder}__{m1_path.stem}")
-                deep_link = f"{base_url}/#r={r_num}&m={encoded_m}"
+                deep_link = f"{base_url}/?v={int(time.time())}#r={r_num}&m={encoded_m}"
                 client.publish_editorial_teaser(
                     markdown_text=f"{teaser}\n\n📖 **Leia o dossiê completo atualizado no Portal:**\n{deep_link}",
                     article_title=f"[M1 · DIA {day}/4] A Semana da F1 ({r_folder})",

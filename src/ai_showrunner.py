@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from src.canon_ledger import CanonLedgerManager, sample_weekly_themes
+from src.logger import log_text
 from src.portal_builder import ROUND_METADATA
 
 GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
@@ -79,6 +80,8 @@ class GeminiFreeTierClient:
 
         body_bytes = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         headers = {"Content-Type": "application/json; charset=utf-8"}
+        chars_in = len(body_bytes)
+        t_start = time.time()
 
         models_to_try = [model] + [m for m in FALLBACK_FLASH_MODELS if m != model]
         total_attempts = max(max_retries, len(models_to_try) + 2)
@@ -86,6 +89,7 @@ class GeminiFreeTierClient:
         for attempt in range(total_attempts):
             active_model = models_to_try[min(attempt, len(models_to_try) - 1)]
             active_url = f"{GEMINI_API_BASE}/{active_model}:generateContent?key={self.api_key}"
+            log_text(f"🤖 [GEMINI REQUEST] Modelo: {active_model} | Payload: {chars_in:,} bytes (~{chars_in // 4:,} tokens) | Tentativa {attempt + 1}/{total_attempts}")
             req = urllib.request.Request(active_url, data=body_bytes, headers=headers, method="POST")
             try:
                 with urllib.request.urlopen(req, timeout=45) as resp:
@@ -96,15 +100,18 @@ class GeminiFreeTierClient:
                     if not candidates:
                         raise RuntimeError(f"Resposta vazia do Gemini ({active_model}): {data}")
                     content_parts = candidates[0].get("content", {}).get("parts", [])
-                    return "".join(p.get("text", "") for p in content_parts)
+                    result_text = "".join(p.get("text", "") for p in content_parts)
+                    elapsed = time.time() - t_start
+                    log_text(f"✨ [GEMINI RESPONSE] 200 OK ({active_model}) em {elapsed:.2f}s | Gerados: {len(result_text):,} chars")
+                    return result_text
             except urllib.error.HTTPError as exc:
                 err_body = exc.read().decode("utf-8", errors="replace")
                 if exc.code in (429, 500, 502, 503, 504) and attempt < total_attempts - 1:
                     next_model = models_to_try[min(attempt + 1, len(models_to_try) - 1)]
                     wait_time = 4.0 * (attempt + 1) if exc.code != 429 else 12.0 * (attempt + 1)
-                    print(
-                        f"[Gemini HTTP {exc.code} em {active_model}] Tentativa {attempt + 1}/{total_attempts}: "
-                        f"alternando para {next_model} após {wait_time:.0f}s..."
+                    log_text(
+                        f"⚠️ [GEMINI HTTP {exc.code} em {active_model}] Tentativa {attempt + 1}/{total_attempts}. "
+                        f"Aguardando {wait_time:.0f}s e tentando {next_model}..."
                     )
                     time.sleep(wait_time)
                     continue
@@ -112,9 +119,9 @@ class GeminiFreeTierClient:
             except (urllib.error.URLError, TimeoutError, OSError) as exc:
                 if attempt < total_attempts - 1:
                     next_model = models_to_try[min(attempt + 1, len(models_to_try) - 1)]
-                    print(
-                        f"[Gemini Timeout/Network em {active_model}] Tentativa {attempt + 1}/{total_attempts}: "
-                        f"alternando para {next_model}..."
+                    log_text(
+                        f"⚠️ [GEMINI TIMEOUT/NETWORK em {active_model}] Tentativa {attempt + 1}/{total_attempts}. "
+                        f"Alternando para {next_model}..."
                     )
                     time.sleep(3.0)
                     continue
