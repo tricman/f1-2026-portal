@@ -226,30 +226,6 @@
         "sauber"
       ],
       "status": "RESOLVED"
-    },
-    {
-      "event_id": "ET10-ES-M1",
-      "round": 10,
-      "module": "M1_SEMANA_EQUIPES",
-      "summary": "A Semana Pré-Corrida da Espanha (Etapa 10) escancarou um tabuleiro de xadrez em ebulição na *Silly Season* de 2026. A Red Bull sofre os impactos da punição da FIA e da crise em torno da performance de Sergio Pérez, enquanto a Mercedes blindou agressivamente a liderança e o futuro de Sarah com exigências contratuais pesadas de Jules Moreau. Paralelamente, o assédio de rivais sobre Davi (Williams) e a consolidação do \"Monge\" Felipe como o cérebro da Audi para 2027 redefiniram as dinâmicas de poder no Paddock.",
-      "entities": [
-        "sarah",
-        "felipe",
-        "davi",
-        "verstappen",
-        "perez",
-        "horner",
-        "wolff",
-        "thorne",
-        "vance",
-        "moreau",
-        "red_bull",
-        "mercedes",
-        "audi",
-        "williams",
-        "sauber"
-      ],
-      "status": "OPEN"
     }
   ]
 }
