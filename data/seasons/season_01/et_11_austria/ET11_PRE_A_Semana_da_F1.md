@@ -1,252 +1,267 @@
-# 🏁 A F1 QUE VOCÊ NÃO VÊ — A Semana da F1 (Etapa 11)
+# 🏁 A F1 QUE VOCÊ NÃO VÊ — A Semana da F1 (Etapa 11: GP da Áustria)
 ## 💣 ESPECIAL SILLY SEASON PRÉ-ET_11_AUSTRIA
 
-
-
----
-
 ## 📅 DIA 1/4: SEGUNDA-FEIRA
 
-### 🕵️‍♂️ A F1 Que Você Não Vê — O Dossiê Secreto
-**Módulo 1 · Dia 1 de 4 (Segunda-feira pós-GP do Canadá)**  
-*Locais:* Montreal, Zurique, Londres e os bastidores fétidos do glamour global.
+Aqui está o dossiê exclusivo do consórcio internacional de jornalistas investigativos **'A F1 Que Você Não Vê'**. 
 
 ---
 
-### 1. MERCEDES-AMG PETRONAS
-**O Local:** *Le Mousso*, um dos restaurantes mais exclusivos (e absurdamente caros) de Montreal.  
-**O Tema:** Treta & Vestiário (discussão vazada por equipe de apoio/garçons).  
-**Os Envolvidos:** Sarah (*A Ice Queen*), Lewis Hamilton e Jules Moreau (o agente de Sarah).
-
-**O Relato do *Paddock Mole*:**  
-Enquanto a *Red Bull* tentava colar os cacos da própria dignidade em alto-mar, a mesa da Mercedes na segundona pós-Canadá parecia uma câmara de descompressão de submarino nuclear. Sarah (que venceu soberana em Montreal, ampliando sua liderança para 171 pontos) estava sentada comendo ostras com a mesma expressão de quem avalia uma autópsia. 
-
-Atrás da pilastra, um garçom bilingue que jurava manter sigilo profissional (mas que adora um envelope em dólares canadenses) capturou o momento em que Lewis Hamilton — agora 4º no Mundial com 97 pontos, vendo a menina de 16 anos sumir no retrovisor — cobrou explicações mais duras sobre a preferência de desenvolvimento no W17. 
-
-A resposta de Jules Moreau, o agente de Sarah, foi cirúrgica e fria como nitrogênio líquido: *"Lewis, o túnel de vento não tem nostalgia. Se quiser a prioridade no assoalho novo em Barcelona, vai ter que virar mais rápido nas sextas-feiras. A garagem número 1 tem dono e a identidade dela está no passaporte da Sarah"*. Sarah sequer levantou os olhos do prato. Apenas deu um gole d'água, enquanto Hamilton empurrava o prato de salmão para o lado, cuspindo um *"Inacreditável"* em direção aos guardanapos.
-
-> **O comentário ácido do *Paddock Mole*:**  
-> *"O Lewis passou a carreira inteira ouvindo que a experiência é tudo. Agora ele divide box com uma adolescente que programa o próprio simulador no tempo livre e trata heptacampeão mundial igual estagiário de sexta-feira. Alguém avisa o inglês que o relógio biológico não retrocede, mas a conta de luz em Brackley quem paga é a Mercedes — e o CEO prefere o recibo da Sarah."*
+### MÓDULO 1 · DIA 1 DE 4 (SEGUNDA-FEIRA)
+**Foco Narrativo:** A Ressaca da Corrida Anterior (Espanha) & Diagnóstico rumo ao GP da Áustria (Spielberg).
 
 ---
 
-### 2. STAKE F1 TEAM KICK SAUBER / AUDI
-**O Local:** Um iate alugado de 45 metros atracado no porto de Mônaco (mas com a festa inteira transmitida via stories em Montreal e Zurique).  
-**O Tema:** Glamour & Celebridades: Festas VIP, parcerias com grifes e flagras.  
-**Os Envolvidos:** Felipe (*O Monge de Hinwil*), Marcus Thorne (*O Tubarão de Silverstone*) e astros de Hollywood cooptados pelo marketing da Audi para 2027.
-
-**O Relato de *Lady Paddock*:**  
-Enquanto Felipe (surpreendente vice-líder do campeonato com 131 pontos após segurar Hamilton com maestria no Canadá) preferia passar a segunda-feira lendo relatórios de termodinâmica de freio em um hotel discreto, seu agente Marcus Thorne estava em pleno modo *Wolf of Wall Street*. 
-
-A convite da futura diretoria da Audi, Thorne transformou o convés de um iate luxuoso em uma bolsa de valores particular. Cercado por modelos de Milão, atores premiados do Oscar que mal sabem o que é um ponto de corda e executivos alemães de terno cinza, o "Tubarão" negociava bônus de luvas astronômicos para a transição da Sauber em 2027. 
-
-O flagra da noite veio de um paparazzi de Mônaco: Thorne foi fotografado rasgando um rascunho de contrato de patrocínio com uma marca de relógios suíços de luxo porque a oferta era "muito modesta para o único homem capaz de peitar a Mercedes com um motor que parece uma batedeira industrial". Enquanto isso, Felipe mandava uma mensagem de texto seca para o grupo da equipe: *"Segunda-feira é dia de simulação no rig. Menos champagne, mais dados de downforce para Barcelona"*.
-
-> **O comentário ácido de *Lady Paddock*:**  
-> *"É hilário ver o Felipe tentando manter pose de monge tibetano enquanto o empresário dele negocia contratos em iates onde o champanhe custa mais que o orçamento de desenvolvimento da Alpine inteira. Felipe quer engenharia; Marcus quer IPO na Bolsa de Frankfurt. No fim das contas, a Sauber vai virar uma concessionária da Audi com motor de foguete e alma de escritório de contabilidade em Zurique."*
+#### 1. Mercedes-AMG Petronas (Sarah & Hamilton)
+* **Local / Cidade:** Barcelona / Brackley (Reunião de emergência pós-Espanha)
+* **O Fato de Bastidor:** A calmaria pós-Espanha durou pouco no QG de Brackley. Em um restaurante reservado no centro de Barcelona, garçons cochicham que a mesa de debriefing informal entre a líder do mundial, Sarah (#24), e Lewis Hamilton (#44) quase virou uma zona de guerra de guardanapos. Discussões acaloradas sobre alinhamento de desenvolvimento e a soberania da "Ice Queen" na liderança deixaram o clima pesado. Jules Moreau, agente de Sarah, teve que intervir para evitar que os pratos principais voassem.
+* **O comentário ácido do Insider:**
+> *“Achei fofo o Lewis tentar ensinar a garota de 16 anos a fazer 'elbows out'. Sarah olhou para ele, ajustou o óculos e perguntou se ele queria o autógrafo dela agora ou depois da bandeirada na Áustria. O respeito é zero e o terror psicológico tá lindo de ver.”* — **The Silver Bullet / Lady Paddock**
 
 ---
 
-### 3. WILLIAMS RACING
-**O Local:** Um pub subterrâneo centenário e enfumaçado nos arredores de Londres (para onde a equipe voou direto de Montreal).  
-**O Tema:** Treta & Vestiário: Encontros tensos e discussões vazadas.  
-**Os Envolvidos:** Davi (*O Leão de Grove*), Chloe Vance (*A Máquina de Hype*) e engenheiros seniores da Williams.
-
-**O Relato do *Paddock Mole*:**  
-Se a Mercedes janta ostras e a Sauber bebe champagne em iates, a Williams comemora o P2 histórico e a Volta Mais Rápida de Davi no Canadá (7º no Mundial com 65 pontos) tomando pint de bitter quente num pub onde o carpete cheira a 1982. Mas o clima não era de festa unânime. 
-
-Entre uma rodada e outra, a mesa fechada da Williams ferveu. Chloe Vance, a agente de Davi ("A Máquina de Hype"), bateu o celular com força na mesa de madeira lascada, exigindo explicações da engenharia de pista sobre a estratégia de pit stop que quase custou o pódio do brasileiro. 
-
-O engenheiro-chefe, um veterano com olheiras profundas e uma cicatriz de queimadura de escapamento nosanos 90, não se intimidou com a marqueteira de Los Angeles: *"Olha aqui, gracinha de Hollywood, o Davi pilota como se estivesse jogando videogame em modo hard, mas o carro que a gente entrega é feito de fita isolante e esperança. Se ele quiser puxar 5G nas curvas de alta em Barcelona sem quebrar a suspensão, manda a sua agência inventar um patrocínio que pague um túnel de vento novo em Grove!"*. Davi teve que segurar Chloe pelo blazer para evitar que a executiva jogasse um copo de cerveja na cara do engenheiro britânico.
-
-> **O comentário ácido do *Paddock Mole*:**  
-> *"O casamento entre a Williams raiz, fudida e orgulhosa, e o marketing de Vale do Silício da Chloe Vance é uma bomba-relógio com cronômetro regressivo. O Davi tem talento bruto o bastante para brigar na frente, mas está preso num casamento onde a esposa quer desfilar no tapete vermelho de Cannes e o marido quer trocar a junta homocinética na base da marretada."*
+#### 2. Stake F1 Team Kick Sauber / Audi (Felipe & Hülkenberg)
+* **Local / Cidade:** Zurique / Mônaco (Transição corporativa e festa de alto luxo)
+* **O Fato de Bastidor:** Aproveitando a vice-liderança isolada, o "Professor" Felipe (#5) foi visto em uma festa exclusiva em um iate em Mônaco ao lado de magnatas da Audi e astros de Hollywood. Enquanto o paddock debate a motorização 2026, Marcus Thorne ("O Tubarão de Silverstone") já desfila com contratos bilionários e relógios que custam mais que o orçamento de desenvolvimento da Haas.
+* **O comentário ácido do Insider:**
+> *“O Felipe entrou naquela festa de terno alinhado parecendo um CEO comprando a rival, enquanto o Hülkenberg estava no canto comendo canapê e chorando por causa de Mônaco. A Sauber virou um escritório de private equity disfarçado de equipe de corrida.”* — **The Paddock Mole / Lady Paddock**
 
 ---
 
-### 4. RED BULL RACING
-**O Local:** Uma cobertura particular em Miami (escala técnica de Christian Horner antes da Europa) e o paddock de Milton Keynes.  
-**O Tema:** Glamour & Celebridades: Festas VIP, iates e flagras com astros pop.  
-**Os Envolvidos:** Max Verstappen (5º no Mundial com 94 pontos), Sergio Pérez (10º com 39 pontos e o pescoço na guilhotina) e a cúpula da FIA rindo do Dossiê Mônaco.
-
-**O Relato de *Lady Paddock*:**  
-Enquanto a poeira baixava do famigerado Dossiê Mônaco — onde a Red Bull perdeu 10 pontos nos Construtores por aquela esticada descarada de 12% no acelerador que esmagou a Sauber de Felipe no túnel —, a equipe de energéticos tentava manter a pose de intocável com uma festa de lançamento de uma nova linha de bonés com um trapper americano cujos cachorros peidavam mais do que o motor da Alpine em 2026.
-
-Max Verstappen apareceu por exatamente 14 minutos, bebeu uma lata de Red Bull sem açúcar, recusou uma foto com uma atriz de Hollywood cujo nome ele sequer fingiu tentar lembrar, resmungou algo em holandês sobre *"esse circo de palermas que a Liberty Media inventou"* e foi embora direto para o simulador particular em sua casa na Bélgica. 
-
-Já Sergio Pérez... bem, Checo foi visto em uma boate de Miami cercado por influencers de TikTok, tentando desesperadamente convencer um executivo de patrocínio mexicano de que "a vaga de 2027 ainda é dele", enquanto Helmut Marko assistia a tudo de longe, chupando uma bala de menta com a expressão de quem já assinou a rescisão com o próximo estagiário da F2.
-
-> **O comentário ácido de *Lady Poodle*:**  
-> *"A Red Bull passou de dominadora implacável a circo itinerante de influenciadores em menos de um ano regulamentar. Perderam 10 pontos na marra por batida antidesportiva, o Max está com a cara de quem prefere correr de cortador de grama a aturar o Christian Horner, e o Pérez parece um figurante pago para fingir que está se divertindo na festa do patrão. O império de Milton Keynes está rachando, e o barulho está delicioso de se ouvir."*
-
+#### 3. Red Bull Racing (Verstappen & Pérez)
+* **Local / Cidade:** Salzburgo / Viena (Controlando os danos do Dossiê Mônaco)
+* **O Fato de Bastidor:** Com a punição de -10 pontos no Mundial de Construtores engolida a seco após o fiasco do túnel em Mônaco, a Red Bull tentou desviar o foco jogando Max Verstappen e Sergio Pérez em um evento de gala com grifes internacionais em Viena. O clima de festa de tapete vermelho, no entanto, não escondeu as olheiras profundas de Christian Horner tentando explicar para Helmut Marko por que a equipe despencou para o 3º lugar nos Construtores.
+* **O comentário ácido do Insider:**
+> *“Colocar o Checo com smoking e o Max com cara de quem quer socar alguém numa festa de rico não apaga o fato de que a FIA passou o trator na contabilidade deles. A festa foi luxuosa, mas o clima nos bastidores é de velório corporativo.”* — **The Paddock Mole**
 
 ---
 
-## 📅 DIA 1/4: SEGUNDA-FEIRA
-
-### 📰 A F1 Que Você Não Vê
-**Edição Especial de Segunda-Feira: O Rescaldo do Canadá e a ressaca das milionárias**
-
----
-
-Boa tarde, caçadores de intrigas, viúvas do *paddock* e viciados em telemetria clandestina. O circo já cruzou o Atlântico rumo à Europa, mas o cheiro de champanhe azedo, borracha queimada e ego ferido ainda paira sobre Montreal. A Etapa 9 nos entregou o **segundo pódio 100% brasileiro da história** (Sarah em 1º, Davi em 2º com direito a Volta Mais Rápida, e o 'Professor' Felipe em 3º), mas o que aconteceu *longe* das câmeras oficiais da Liberty Media é o que realmente faz o nosso trabalho valer a pena.
-
-Com vocês, o raio-X do nosso consórcio para a segunda-feira mais quente do ano. Apertem os cintos.
+#### 4. McLaren F1 Team (Norris & Piastri)
+* **Local / Cidade:** Londres / Woking (Refúgio VIP)
+* **O Fato de Bastidor:** Lando Norris (#4) e Oscar Piastri (#81) tentaram lavar a alma em uma boate exclusiva em Londres neste início de semana. Entre garrafas de champanhe de grife e flashes de paparazzi, a dupla da McLaren tentava digerir a pressão de ver a Aston Martin e a Ferrari coladas na briga do meio de tabela. O papo entre uma música e outra girava em torno de quem realmente tem moral com o túnel de vento de Woking.
+* **O comentário ácido do Insider:**
+> *“O Lando gasta mais tempo posando com celebridades do que acertando a saída de curva lenta. Enquanto isso, o Piastri fica no canto estudando telemetria no iPad como se estivesse prestando vestibular para engenharia quântica. Dupla dinâmica só no marketing.”* — **The Paddock Mole**
 
 ---
 
-### 🔴 Red Bull Racing: O iate afundou no glamour (e nas multas)
-* **Local:** Marina de Port Royal, iate particular de Christian Horner, Monte Carlo (escala pós-Canadá).
-* **O Tema:** Glamour, Celebridades e o desespero corporativo.
-
-A Red Bull veio a público tentar esconder a vergonha de ver a liderança dos Construtores escapar pelo ralo (agora são terceiros, com direito a -10 pontos descontados pela FIA em Mônaco por aquela "afobação" no túnel). Mas nos bastidores, a ordem era fingir que está tudo bem ostentando. 
-
-O iate de luxo alugado para a festa de pós-fim de semana em Mônaco (uma escala rápida antes de Barcelona) reuniu Max Verstappen tentando parecer entusiasmado ao lado de astros de Hollywood cujos nomes ele claramente desconhecia, e Sergio Pérez — cujo lugar na equipe já balança mais que asa traseira de Haas em Monza — tentando convencer executivos de uma grife de relógios de que "ainda é um ativo de marketing global". 
-
-O clima azedou de vez quando um garçom holandês derrubou uma taça de Moët & Chandon de 15 mil euros direto no terno de grife de um consultor da marca de energéticos. Max aproveitou a confusão para sumir no provador e voltar a jogar iRacing no simulador que mandou instalar na suíte principal.
-
-> **O comentário de *The Paddock Mole*:**  
-> *"Querido, a Red Bull está gastando em champanhe o que deveria usar em túnel de vento. O Max está com a cara de quem prefere passar raiz forte no olho a ter que tirar mais uma foto sorrindo com DJ famoso. Quanto ao Pérez? Se ele continuar guiando assim, o próximo contrato dele vai ser para pilotar carrinho bate-bate em parque de diversões."*
+#### 5. Aston Martin Aramco (Alonso & Stroll)
+* **Local / Cidade:** Silverstone / Barcelona (Silly Season a todo vapor)
+* **O Fato de Bastidor:** O motorhome da Aston Martin esteve fechado a sete chaves nesta segunda-feira. Fontes garantem que conversas sigilosas envolveram sondagens pesadas sobre a permanência de Fernando Alonso (vencedor em Mônaco e 3º no campeonato) e multas rescisórias cruzadas. Lawrence Stroll quer blindar o projeto verde a qualquer custo, enquanto empresários rivais rondam os corredores como abutres.
+* **O comentário ácido do Insider:**
+> *“O Fernando joga xadrez 4D com todo mundo. Ele ganha em Mônaco, bota a Aston Martin à frente da Ferrari nos Construtores e agora assiste de camarote aos executivos suando frio para renovar o contrato dele por mais três anos. Um verdadeiro senhor do caos.”* — **El Chisme de Montmeló**
 
 ---
 
-### 🥈 Mercedes-AMG Petronas: Treta, torta de climão e vazamento no bistrô
-* **Local:** *Le Pois Sautant*, restaurante de alta gastronomia francesa perto de Montreal.
-* **O Tema:** Treta & Vestiário / Encontros tensos.
-
-Enquanto a pequena prodígio **Sarah (Mercedes #24)** comemorava sua 5ª vitória na temporada com um copo de água com gás e seu agente Jules Moreau revisando contratos de exclusividade, a mesa ao lado era um verdadeiro campo de minas. 
-
-Lewis Hamilton (4º no campeonato) e Toto Wolff dividiam uma mesa reservada, mas a paz durou até a entrada do prato principal. Testemunhas garantem que a discussão girou em torno da supremacia técnica da "Ice Queen" dentro da garagem da estrela de três pontas. Hamilton, visivelmente frustrado por ver a menina de 16 anos ditar o ritmo técnico do W17, cobrou garantias de igualdade de desenvolvimento. 
-
-A discussão foi captada quase inteiramente por um sommelier distraído que tentava explicar a safra de um Bordeaux. O áudio vazado para o nosso consórcio revela Toto esbravejando: *"Lewis, o cronômetro não tem idade, tem decimal!"*
-
-> **O comentário de *Lady Paddock*:**  
-> *"Dói na alma britânica ver o heptacampeão tendo que pedir licença para passar no corredor da própria equipe, né? A Sarah não fala muito, mas quando entra na pista, ela atropela até o ego dos ídolos. O clima na Mercedes está tão cortante que você podia fatiar presunto parma com o olhar do Lewis."*
+#### 6. Scuderia Ferrari HP (Leclerc & Sainz)
+* **Local / Cidade:** Maranello (Crise na sede e desfiles de gala)
+* **O Fato de Bastidor:** Enquanto Charles Leclerc (#16) tentava manter a pose em um evento de alta costura em Milão patrocinado pela escudeira, em Maranello os telefones não param de tocar. Perder a 5ª posição nos Construtores para a Aston Martin causou insônia generalizada. Carlos Sainz (#55), isolado em 11º no campeonato, parece já estar com a cabeça nos boxes da próxima temporada.
+* **O comentário ácido do Insider:**
+> *“Em Maranello a segunda-feira começa com gritaria em italiano e café espresso jogado na parede. Perder para a Aston Martin de Lawrence Stroll é uma ofensa à pátria. O Leclerc tenta sorrir para a grife, mas a alma dele já foi embora junto com a confiabilidade da Ferrari.”* — **Il Cavallino Spia**
 
 ---
 
-### 🟢 Stake F1 Team Kick Sauber: O monge, o tubarão e o tapete vermelho
-* **Local:** Coquetel privado de lançamento de uma joalheria suíça, Zurique.
-* **O Tema:** Glamour & Celebridades.
-
-**Felipe (Sauber #5)**, o nosso "Monge de Hinwil", odeia holofotes quase tanto quanto odeia setup desbalanceado. Mas quando **Marcus Thorne**, o implacável *Tubarão de Silverstone*, agenda um compromisso de R$ 5 milhões com uma marca de relógios de luxo na Suíça, o veterano de 43 anos tem que vestir o smoking e sorrir.
-
-Entre atrizes europeias fingindo entender de telemetria e executivos com pulseiras VIP, Felipe parecia um prisioneiro de guerra educado. Thorne passava a noite inteira circulando com dois celulares, negociando os termos da transição da Sauber para Audi em 2027. O foco do agente é cirúrgico: garantir que o status de "Professor" e os bônus por pódio do brasileiro estejam blindados contra qualquer tentativa da diretoria alemã de trazer um jovem piloto europeu baratinho no ano que vem.
-
-> **O comentário de *The Paddock Mole*:**  
-> *"O Felipe estava com aquela cara de quem prefere trocar a embreagem de um trator na chuva a ouvir influencer perguntando 'qual é a cor favorita do seu carro'. Mas o Marcus Thorne? Ah, o Thorne saiu daquele coquetel com o talão de cheques da Suíça praticamente carimbado. O homem é um predador."*
+#### 7. Williams Racing (Davi & Albon)
+* **Local / Cidade:** Grove / Rio de Janeiro (A ressaca da Brazilian Storm)
+* **O Fato de Bastidor:** O "Leão de Grove", Davi (#15), e sua empresária Chloe Vance desembarcaram digitalmente destruindo a internet nesta segunda-feira. Com o P2 e Volta Mais Rápida no Canadá ainda ecoando, a Williams virou o centro das atenções de marcas globais. No entanto, reuniões internas exigem foco total: o carro precisa parar de sofrer danos crônicos em circuitos de rua para consolidar o 7º lugar nos Construtores.
+* **O comentário ácido do Insider:**
+> *“A Chloe Vance já está negociando contrato com marcas que nem sabiam o que era asa móvel até mês passado. O Davi voa na pista, crava volta rápida e deixa o Albon falando sozinho no simulador. A Williams finalmente voltou a ser relevante — quer dizer, pelo menos o lado brasileiro dela.”* — **The Paddock Mole / Lady Paddock**
 
 ---
 
-### 🔷 Williams Racing: A fúria do Leão e a mesa dos Bastidores
-* **Local:** *Modus Bar & Grill*, aeroporto privado de Montreal.
-* **O Tema:** Treta & Vestiário / Alianças improváveis.
-
-Enquanto **Davi (Williams #15)** ainda saboreava o gosto do seu pódio canadense (P2 com direito a Volta Mais Rápida e muita moral na *Brazilian Storm*), sua empresária **Chloe Vance** armava um verdadeiro quartel-general numa mesa reservada do aeroporto. 
-
-Ao lado de Chloe estava um estrategista rival da Alpine — sim, você leu certo —, numa conversa informal que durou exatas duas horas. O assunto? O valor de mercado do "Leão de Grove" no próximo mercado de transferências (*Silly Season*). Enquanto Davi dava entrevistas rindo à toa sobre sua ultrapassagem dupla na curva 10, Chloe já desenhava o plano de marketing global para transformar o jovem brasileiro em ícone pop dos EUA até o final do ano.
-
-O único momento de tensão ocorreu quando um engenheiro júnior da Williams passou pela mesa e insinuou que o ritmo de Davi na classificação dependia demais de sorte. Chloe não hesitou: fechou o laptop com força e disparou uma frase que ecoou pelo salão: *"A única sorte aqui é o motor não ter que carregar o peso da tua incompetência no simulador."*
-
-> **O comentário de *Lady Paddock*:**  
-> *"A Chloe Vance não gerencia uma carreira, ela gerencia uma OPA (Oferta Pública de Aquisição) na Bolsa de Nova York. O Davi pilota como se não houvesse amanhã, e ela cobra como se o amanhã fosse exclusivo para bilionários. A Williams que se cuide: se bobear, o menino voa para outro ninho antes da pausa de verão."*
+#### 8. BWT Alpine F1 Team (Gasly & Doohan)
+* **Local / Cidade:** Enstone / Paris (Reuniões de crise)
+* **O Fato de Bastidor:** Com apenas 6 míseros pontos no campeonato (todos de Pierre Gasly), a Alpine vive uma segunda-feira deprimente em Enstone. O comitê gestor se reuniu para avaliar pacotes de atualizações que insistem em não funcionar, enquanto empresários de pilotos da base batem à porta desesperados por uma boia de salvação na *Silly Season*.
+* **O comentário ácido do Insider:**
+> *“A Alpine é aquela tia avó esquecida no Natal. Tem estrutura de montadora, orçamento milionário, mas consegue ser irrelevante com elegância francesa. O Gasly carrega o caixão sozinho enquanto o resto assiste à paisagem.”* — **El Chisme de Montmeló**
 
 ---
 
-### 📊 Painel do Consórcio: O que vem por aí?
-Com a caravana arrumando as malas para o **GP da Espanha (Barcelona)** — Etapa 10 de 24 do canônico de 2026 —, a tabela do Mundial de Pilotos continua sangrando a favor da prodígio da Mercedes (Sarah com 171 pontos, contra 131 de Felipe e 104 de Alonso). 
+#### 9. MoneyGram Haas F1 Team (Bearman & Ocon)
+* **Local / Cidade:** Banbury (Vazamento de áudio nos boxes)
+* **O Fato de Bastidor:** Um microfone ambiente esquecido ligado na garagem da Haas nesta segunda-feira vazou um desabafo furioso de engenheiros discutindo a falta crônica de ritmo do VF-26. Com apenas 1 ponto solitário (o milagre de Hülkenberg/Haas no passado, agora adaptado à nova era), a equipe americana tenta abafar boatos de que o clima interno azedou de vez entre a gestão técnica e os pilotos Bearman e Ocon.
+* **O comentário ácido do Insider:**
+> *“O microfone captou um 'a gente não vai pontuar nem se chover canivete' cristalino direto da boca do engenheiro de pista. A Haas continua sendo a comédia romântica trágica favorita do paddock.”* — **The Paddock Mole**
 
-Apertem os cintos. Barcelona costuma ser a pista onde os carros mostram suas verdadeiras caras (e as equipes mascaram suas crises). Nós estaremos lá, ouvindo atrás das portas do *hospitality center* e cheirando o óleo dos motores antes de qualquer boletim oficial.
+---
 
-*Até o próximo vácuo,*  
-**Consórcio de Jornalistas Investigativos 'A F1 Que Você Não Vê'** 🕵️‍♂️🏎️🇧🇷
+#### 10. Visa Cash App RB (Tsunoda & Lawson)
+* **Local / Cidade:** Faenza / Tóquio (Mico corporativo digital)
+* **O Fato de Bastidor:** A lanterna isolada nos Construtores (0 pontos) não impediu o departamento de marketing da VCARB de obrigar Yuki Tsunoda e Liam Lawson a gravarem mais um vídeo constrangedor para o TikTok, desta vez testando sabores exóticos de refrigerante patrocinado. Fontes garantem que Tsunoda recusou três takes antes de ceder sob ameaça de multa interna.
+* **O comentário ácido do Insider:**
+> *“Zero pontos na tabela, mas líderes absolutos no ranking de vergonha alheia nas redes sociais. Ver o Yuki com uma touca de pelúcia fazendo dancinha enquanto o carro é uma britadeira sem assoalho resume perfeitamente a filial da Red Bull.”* — **Il Cavallino Spia**
 
+---
 
 ---
 
 ## 📅 DIA 2/4: TERÇA-FEIRA
 
-Aqui é o consórcio **'A F1 Que Você Não Vê'**. Esqueça os comunicados oficiais polidos e as entrevistas de "foquei no meu trabalho". A terça-feira pré-GP da Espanha foi um verdadeiro hospício a céu aberto. Enquanto o asfalto de Barcelona ainda esfria, os bastidores estão em ebulição.
-
-Aqui está o que apuramos:
+Aqui está o dossiê confidencial do consórcio internacional de jornalistas investigativos **'A F1 Que Você Não Vê'** para esta terça-feira que antecede o GP da Áustria (Spielberg). Esqueçam os release bonitinhos das assessorias; o buraco é mais embaixo nos bastidores de 2026.
 
 ---
 
-### 🔴 Red Bull: O "Efeito Mônaco" e o Fim da Linha
-**Local:** Motorhome da Red Bull, portas trancadas.
-**O Flagrante:** Christian Horner foi visto gesticulando freneticamente enquanto o empresário de Sergio Pérez, Julian Jakobi, entrava com uma pasta que parecia conter um pedido de rescisão (ou um ultimato). A punição de -10 pontos em Mônaco não foi apenas um erro de telemetria; foi o estopim para uma guerra civil.
-**Insider (*The Paddock Mole*):** *"O clima ali dentro é de velório com música de circo. Verstappen não fala com a equipe técnica, e Pérez está mais preocupado em garantir que sua multa rescisória seja paga em dia do que em acertar o carro. A Red Bull está implodindo, e o pessoal de Milton Keynes já está sondando nomes que nem deveriam estar na lista. O desespero tem cheiro de combustível queimado e café frio."*
-
-### ⚪ Mercedes: A "Ice Queen" e a Política de Brackley
-**Local:** Motorhome da Mercedes, área VIP privativa.
-**O Flagrante:** Jules Moreau, empresário de Sarah, foi visto em uma conversa de quase duas horas com Toto Wolff. O assunto? A extensão do contrato da "Ice Queen" e a garantia de que, mesmo com a liderança isolada, ela não será "sacrificada" para favorecer o marketing de Hamilton.
-**Insider (*Lady Paddock*):** *"Sarah é a joia da coroa, mas a Mercedes é um ninho de cobras. Jules é um estrategista nato; ele não quer apenas vitórias, ele quer o controle total sobre o desenvolvimento do W17. Enquanto Hamilton tenta manter a pose de veterano, Sarah nem pisca. Ela quer o título, e se a equipe tentar qualquer 'ordem de box' para favorecer o inglês, o motorhome vai abaixo."*
-
-### 🟢 Kick Sauber: O "Monge" sob Pressão
-**Local:** Sim-Center da Sauber, Hinwil (remoto).
-**O Flagrante:** Felipe, o "Professor", passou 14 horas seguidas no simulador. A telemetria vazada mostra que ele está testando configurações de diferencial que a própria equipe considera "arriscadas demais". Marcus Thorne, o "Tubarão de Silverstone", foi visto discutindo com os engenheiros da Audi sobre a falta de peças de reposição de alta performance.
-**Insider (*The Paddock Mole*):** *"Felipe não é um piloto, é um algoritmo com consciência. Ele está humilhando a fábrica ao provar que o carro tem potencial para lutar com a Mercedes, mas a Sauber ainda opera como uma equipe de meio de pelotão. O 'Monge' está perdendo a paciência com a burocracia. Se a Audi não entregar o que ele quer, ele vai embora com o conhecimento técnico na cabeça."*
-
-### 🔵 Williams: O Mico do Marketing
-**Local:** Paddock de Barcelona, estúdio improvisado.
-**O Flagrante:** Davi foi obrigado pela equipe de marketing a gravar um vídeo de TikTok dançando uma trend duvidosa com um patrocinador de bebidas energéticas enquanto vestia um chapéu de toureiro. O vídeo foi deletado 10 minutos depois, após Davi, visivelmente irritado, ter pedido para Chloe Vance intervir.
-**Insider (*Lady Paddock*):** *"Chloe Vance quase teve um colapso nervoso. Ela quer o Davi como um ícone global, não como um palhaço de rede social. A Williams está desesperada por dinheiro e está vendendo a dignidade do garoto a preço de banana. Davi é um leão na pista, mas fora dela, a gestão da marca dele está virando uma comédia pastelão. O 'Leão de Grove' está rugindo, e não é de alegria."*
+### 1. Mercedes-AMG Petronas (Brackley / Stuttgart)
+* **Pilotos:** Sarah (#24) & Lewis Hamilton (#44)
+* **Insider:** *The Silver Bullet / Lady Paddock*
+* **O Fato de Bastidor:** A "Ice Queen" Sarah lidera o campeonato com mãos de ferro (5 vitórias em 9 etapas), mas o clima nos bastidores de Brackley está pegando fogo por causa do contrato. Jules Moreau, o agente de Sarah, foi visto saindo de um motorhome isolado às 2h da manhã após uma reunião tensa com a cúpula da Daimler. Há rumores fortíssimos de que equipes rivais acenaram com uma cláusula de liberdade técnica total para 2027 que a Mercedes reluta em cobrir. Enquanto isso, Hamilton observa tudo de camarote, ponderando seu próprio legado (e sua conta bancária) enquanto a garota prodígio de 16 anos dita o ritmo da F1.
+> *"Jules Moreau não acorda cedo por menos de oito dígitos. A Mercedes criou um monstro: agora tem a melhor piloto do grid e um agente que sabe exatamente como chantagear a diretoria alemã usando o interesse da concorrência."*
 
 ---
 
-**Nota do Editor:** Enquanto os figurões brigam por contratos e os pilotos tentam manter a sanidade, Fernando Alonso observa tudo do seu motorhome na Aston Martin, rindo por último. Ele sabe que, no caos, a experiência sempre vence. 
+### 2. Stake F1 Team Kick Sauber / Audi (Hinwil)
+* **Pilotos:** Felipe (#5) & Nico Hülkenberg (#27)
+* **Insider:** *The Paddock Mole*
+* **O Fato de Bastidor:** O "Monge de Hinwil" continua aterrorizando os engenheiros na fábrica. Após cravar a vice-liderança do campeonato e vencer na Arábia e em Miami, Felipe exigiu que a telemetria do seu simulador fosse comparada centésimo por centésimo com os dados aerodinâmicos da futura estrutura de 2027 da Audi. Hülkenberg, visivelmente estressado com o ritmo implacável do brasileiro de 43 anos, passou o dia trancado na sala de engenharia tentando entender como o veterano consegue extrair desempenho de um bólido que, nas mãos de Bottas, parece um trator agrícola.
+> *"O Professor virou o pesadelo do departamento de dados da Sauber. Ele chega com anotações manuscritas apontando onde o mapeamento de torque está falhando. Os engenheiros alemães estão tendo que aprender a trabalhar de verdade."*
 
-**Amanhã tem mais. Fiquem atentos às sombras do paddock.**
+---
 
+### 3. Red Bull Racing (Milton Keynes)
+* **Pilotos:** Max Verstappen (#1) & Sergio Pérez (#11)
+* **Insider:** *The Paddock Mole*
+* **O Fato de Bastidor:** O clima em Milton Keynes azedou de vez após a punição de 10 pontos no Mundial de Construtores em Mônaco. Christian Horner convocou reuniões de crise a portas fechadas no motorhome para estancar a sangria e conter as pressões de patrocinadores. Nos bastidores da *Silly Season*, empresários de Verstappen sondam a Mercedes para avaliar cenários de fuga caso a unidade de potência de 2027 da Red Bull nasça natimorta. Ao mesmo tempo, o assento de Pérez oscila mais que pêndulo de relógio velho.
+> *"A Red Bull parece um navio afundando com elegância britânica. Horner tenta sorrir para as câmeras, mas nos bastidores os advogados estão trabalhando mais do que os projetistas."*
+
+---
+
+### 4. McLaren F1 Team (Woking)
+* **Pilotos:** Lando Norris (#4) & Oscar Piastri (#81)
+* **Insider:** *The Paddock Mole*
+* **O Fato de Bastidor:** O departamento de marketing da McLaren cruzou a linha do aceitável nesta terça-feira. Lando Norris foi obrigado a gravar um vídeo de 40 minutos para o TikTok vestindo uma fantasia corporativa ridícula para promover o patrocinador principal da equipe. Fontes garantem que Norris ameaçou jogar o celular no lago artificial de Woking se tivessem pedido mais uma dancinha. Piastri, com sua poker face habitual, assistiu a tudo comendo pipoca e agradecendo mentalmente por seu contrato ter cláusulas estritas de preservação de dignidade atlética.
+> *"Lando parecia um refém de terno de pelúcia. Se a McLaren quer ganhar o campeonato de construtores, talvez devesse gastar menos tempo coreografando o TikTok e mais tempo acertando o ritmo de corrida."*
+
+---
+
+### 5. Aston Martin Aramco (Silverstone)
+* **Pilotos:** Fernando Alonso (#14) & Lance Stroll (#18)
+* **Insider:** *El Chisme de Montmeló*
+* **O Fato de Bastidor:** Aproveitando a ótima fase (3º no campeonato e uma vitória em Mônaco), a Aston Martin tentou emplacar uma ação de marketing conjunta com Alonso e Stroll em um shopping de Madri. Resultado? Um completo fiasco corporativo. Alonso recusou-se a usar o boné do patrocinador por "incompatibilidade ergonômica com sua calva" e passou a sessão inteira dando entrevistas irônicas sobre o design aerodinâmico do carro. Stroll simplesmente sumiu no meio do evento alegando "cãibras diplomáticas".
+> *"O viejo Astutiz (Alonso) faz o que quer na Aston Martin. Ele é maior que a marca, maior que o patrocinador e, pelo jeito, maior que as leis da física em Mônaco. Ninguém tem culhões para multar o espanhol."*
+
+---
+
+### 6. Scuderia Ferrari HP (Maranello)
+* **Pilotos:** Charles Leclerc (#16) & Carlos Sainz (#55)
+* **Insider:** *Il Cavallino Spia*
+* **O Fato de Bastidor:** Em Maranello, o clima de velório pós-GP da Espanha deu lugar a turnos triplos e desesperados no simulador. Leclerc passou 12 horas seguidas calibrando o assoalho da SF-26, tentando entender por que a Ferrari perdeu terreno para a Aston Martin no Mundial de Construtores. A telemetria vazada de testes internos mostra um Charles visivelmente frustrado, socando o volante virtual após rodar na curva simulada de Spielberg. A pressão dos *tifosi* está tão insuportável que até a máquina de café do QG foi plotada com avisos de "Proibido Errar".
+> *"Em Maranello, a esperança dura exatamente até a primeira bandeira amarela. Leclerc está correndo com o peso de uma catedral italiana nas costas e a paciência dele já virou fumaça."*
+
+---
+
+### 7. Williams Racing (Grove)
+* **Pilotos:** Davi (#15) & Alexander Albon (#23)
+* **Insider:** *The Paddock Mole / Lady Paddock*
+* **O Fato de Bastidor:** A *Brazilian Storm* segue dando lucro e dor de cabeça em Grove. Impulsionado por sua ascensão meteórica e três pódios (incluindo a atuação brilhante no Canadá), Davi chegou à fábrica flanqueado por Chloe Vance, sua implacável agente de marketing ("A Máquina de Hype"). Chloe fechou três novos contratos globais de peso antes do café da manhã, enquanto Albon assistia de canto, percebendo que o jovem leão brasileiro virou o verdadeiro dono dos holofotes e do orçamento de desenvolvimento da equipe tradicional inglesa.
+> *"A Williams esqueceu como é ser uma equipe 'raiz' de Grove. Agora parece um escritório de influenciadores de Los Angeles administrado por engenheiros britânicos. E o pior: está funcionando."*
+
+---
+
+### 8. BWT Alpine F1 Team (Enstone)
+* **Pilotos:** Pierre Gasly (#10) & Jack Doohan (#7)
+* **Insider:** *El Chisme de Montmeló*
+* **O Fato de Bastidor:** O clima em Enstone está azedo. Em um restaurante badalado perto da fábrica, garçons curiosos vazaram trechos de uma discussão acalorada entre Pierre Gasly e membros da diretoria técnica sobre a falta absoluta de competitividade da unidade de potência e do chassi (apenas 6 pontos somados no ano). Gasly teria dito com todas as letras que a Alpine virou "um celeiro de testes para carros de passeio franceses". 
+> *"A Alpine está tão irrelevante no grid que a única forma de aparecer nos jornais é com barraco de garçom fofoqueiro. Triste fim para uma fábrica que já foi campeã mundial."*
+
+---
+
+### 9. MoneyGram Haas F1 Team (Kannapolis / Banbury)
+* **Pilotos:** Oliver Bearman (#87) & Esteban Ocon (#31)
+* **Insider:** *The Paddock Mole*
+* **O Fato de Bastidor:** Enquanto lutam para sair das 1ª e 20ª posições de relevância, a gestão da Haas resolveu apelar para o glamour de fachada. Ocon e Bearman foram vistos em um evento de gala em Nova York ao lado de astros de Hollywood, tentando colar a imagem da equipe em grifes de luxo. O problema é que, no dia seguinte, os mecânicos em Banbury continuam quebrando a cabeça para colar peças de fibra de carbono com fita isolante e orçamento contado a pão e água.
+> *"A Haas é a definição perfeita de 'fake it until you make it'. Gastam mais com convites para festas em iates do que com o túnel de vento. É uma agência de publicidade que por acaso tem dois carros de F1."*
+
+---
+
+### 10. Visa Cash App RB (Faenza)
+* **Pilotos:** Yuki Tsunoda (#22) & Liam Lawson (#30)
+* **Insider:** *Il Cavallino Spia*
+* **O Fato de Bastidor:** A lanterna solitária do Mundial de Construtores (zero pontos) tem gerado uma guerra intestina nos escritórios de Faenza. Com Tsunoda e Lawson zerados até aqui na temporada, empresários de ambos os lados correm contra o tempo nos motorhomes para negociar saídas estratégicas antes que a Red Bull decida fazer uma limpa total no programa de jovens pilotos. Reuniões secretas com equipes da Indy e do WEC já rolaram debaixo do tapete.
+> *"A VCARB é um purgatório com motor Honda. Ninguém quer ficar ali para assinar o atestado de óbito da própria carreira. Os empresários estão com a faca nos dentes nas negociações de rescisão."*
 
 ---
 
 ## 📅 DIA 3/4: QUARTA-FEIRA
 
-# A F1 Que Você Não Vê
-**Edição Especial de Quarta-feira: Simuladores, Tabloides e Multas Rescisórias**
-
-Aqui quem fala é o consórcio de jornalistas investigativos mais temido (e bloqueado) do paddock. Esqueça os releases oficiais da FIA e as coletivas de imprensa engomadinhas onde todo mundo elogia o motor Honda ou agradece aos patrocinadores. Enquanto o circo descansa a duas semanas da Espanha, os bastidores de Brackley, Milton Keynes, Hinwil e Grove estão pegando fogo. 
-
-Abra o seu bloco de notas e segure o seu café. Eis o que realmente aconteceu nesta **Quarta-feira (Dia 3 de Módulo 1)** nos quartéis-generais da elite do automobilismo.
+### A F1 Que Você Não Vê
+*Consórcio Internacional de Jornalismo Investigativo — Dossiê Especial: Módulo 1, Dia 3 de 4 (Quarta-feira).*  
+*Foco do momento: Fábricas em polvorosa, simuladores pegando fogo e o asfalto de Spielberg (Áustria) logo ali no retrovisor.*
 
 ---
 
-### 1. RED BULL RACING (Milton Keynes) — *O Fantasma no Simulador*
-* **Local:** Sala de Simulação Avançada / Subsolo 2 (Milton Keynes, Reino Unido).
-* **O Drama:** Max Verstappen (5º no Mundial, 94 pts) passou as últimas 72 horas confinado no simulador com fúria nos olhos. Fontes internas relatam que a telemetria do holandês na sessão de ontem à noite em Montreal e Mônaco atingiu níveis obsessivos: ele bateu o próprio tempo de volta virtual em três décimos, mas quebrou duas hastes de direção por forçar a barra nas zebras digitais. O clima na garagem está insustentável após a punição de 10 pontos no Mundial de Construtores gerada pelo toque de Sergio Pérez (10º, 39 pts) em Mônaco. Christian Horner tenta apagar incêndios com a matriz austríaca enquanto Helmut Marko exige a cabeça de engenheiros de simulação.
-* **O Flagrante (*The Paddock Mole*):** 
-> *"Atenção para o que o 'Mole' ouviu no corredor cinzento do subsolo: Max simplesmente arrancou o volante do simulador de raiva e jogou contra o painel após o sistema mostrar que a Sauber de Felipe estava tracionando melhor na saída de curva lenta. Ele virou para o engenheiro de pista e soltou: 'Se o carro de Hinwil nos superar na curva 3 em Barcelona, eu vou direto para o aeroporto'. Pérez, por sua vez, foi visto no refeitório comendo um wrap de frango completamente sozinho, encarando o vazio como quem sabe que está com os dias contados."*
+### 1. Mercedes-AMG Petronas (Brackley / Stuttgart)
+* **Local / Cidade:** Brackley, Reino Unido (Quartzel-geral da equipe)
+* **O Fato de Bastidor:** Um microfone ambiente de lapela esquecido ligado no motorhome da Mercedes capturou um desabafo gélido da líder do campeonato, Sarah (#24), com seu engenheiro chefe. Enquanto avaliava o comportamento da traseira do W17 para o Red Bull Ring, a "Ice Queen" disparou sem filtros sobre o ritmo de simulação do companheiro de equipe: *"Se o Lewis continuar perdendo três décimos na curva 3 por excesso de conservação de borracha, vou ter que desenhar o traçado no Paint para ele durante o briefing"*. Do outro lado da sala, Hamilton limitou-se a sorrir amarelo para a lente de um paparazzi escondido no telhado.
+* **O comentário ácido do Insider:**
+> *"Queridas, em Brackley a paz só reina quando o contrato da prodígio brasileira está trancado em cofre suíço. O resto é gritaria e café frio."* — **The Silver Bullet / Lady Paddock**
 
 ---
 
-### 2. MERCEDES-AMG PETRONAS (Brackley) — *O Microfone Aberto da "Ice Queen"*
-* **Local:** Centro Tecnológico de Brackley, Sala de Briefing Executivo.
-* **O Drama:** Sarah (líder isolada com 171 pontos e 5 vitórias) parecia intocável, mas um deslize de aúdio em uma chamada interna com os engenheiros de aerodinâmica vazou para a imprensa alemã. A jovem de 16 anos não escondeu a frustração com o desgaste dos pneus dianteiros do W17 nas simulações de longa distância para Barcelona. Lewis Hamilton (4º, 97 pts), por sua vez, mantém um silêncio sepulcral, blindado por Jules Moreau, enquanto os tabloides britânicos especulam se a hierarquia interna da equipe começará a ruir caso a pressão da Sauber e da Red Bull aumente.
-* **O Flagrante (*Lady Paddock*):**
-> *"Querem drama? 'Lady Paddock' pegou o sinal de áudio bruto de uma reunião fechada onde Sarah, com aquela voz gélida que deixa qualquer marmanjo de terno trêmulo, disparou: 'Se a gente continuar gerindo pneu igual a uma categoria de base, eu vou ter que ganhar a corrida inteira no retrovisor'. O microfone continuou aberto por três segundos a mais. Toto Wolff quase engasgou com o espresso. O clima em Brackley hoje fede a paranoia pura."*
+### 2. Stake F1 Team Kick Sauber / Audi (Hinwil)
+* **Local / Cidade:** Hinwil, Suíça (Fábrica da Sauber / transição Audi)
+* **O Fato de Bastidor:** O clima de "Silly Season" pegou fogo na Suíça. Marcus Thorne, o temido *Tubarão de Silverstone* e empresário de Felipe (#5), foi visto saindo de uma sala de reuniões estanque no terceiro andar da fábrica acompanhado por diretores executivos da futura Audi. Fontes internas juram de pé junto que a discussão girou em torno de cláusulas de rescisão antecipada e multas pesadas caso a estrutura alemã não garanta unidades de potência competitivas já para o início do próximo regulamento. Enquanto isso, o vice-líder do mundial despistava a imprensa fingindo ajustar o banco do simulador.
+* **O comentário ácido do Insider:**
+> *"O 'Professor' Felipe está com a faca, o queijo e o contrato de 2027 na mão. O Tubarão Thorne só veio cobrar os juros da paciência do nosso veterano."* — **The Paddock Mole / Lady Paddock**
 
 ---
 
-### 3. STAKE F1 TEAM KICK SAUBER (Hinwil) — *O Tubarão e a Multa Rescisória*
-* **Local:** Motorhome privativo da Sauber, isolado no fundo do paddock temporário (Zurique / Base de Hinwil).
-* **O Drama:** A *Silly Season* antecipou o inverno europeu. O vice-líder do campeonato, Felipe (2º com 131 pontos e 2 vitórias), está no centro de uma guerra jurídica e comercial nos bastidores. Marcus Thorne, o infame *Tubarão de Silverstone* e agente pessoal do "Monge de Hinwil", foi visto saindo de uma reunião a portas fechadas com diretores da Audi. Em pauta: cláusulas de desempenho, o motor de 2027 e sondagens pesadas de uma equipe de fábrica rival que quer roubar o veterano brasileiro a preço de ouro. A Sauber tenta cobrir a oferta, mas a multa rescisória é um labirinto jurídico.
-* **O Flagrante (*The Paddock Mole*):**
-> *"Marcus Thorne não usa terno, ele usa armadura de combate corporativo. Ele foi visto hoje cedo saindo do escritório da chefia da Sauber com uma pasta preta e um sorriso de canto de boca. Um funcionário de alto escalão me sussurrou: 'O Tubarão colocou a faca no pescoço da Audi. Ou garantem o desenvolvimento do bólido para a segunda metade da temporada de 2026, ou o Felipe assina um pré-acordo que vai deixar metade do conselho suíço sem dormir'. Enquanto isso, o Professor Felipe está onde? Na oficina, medindo a folga da suspensão traseira com um paquímetro de bolso como se o mundo não estivesse desabando ao seu redor."*
+### 3. Red Bull Racing (Milton Keynes)
+* **Local / Cidade:** Milton Keynes, Reino Unido (Fábrica da RBR)
+* **O Fato de Bastidor:** Turnos triplos e portas trancadas no simulador de Milton Keynes. Após a perda de pontos no tapetão pós-Mônaco e a queda para a terceira posição nos Construtores, a telemetria interna vazada revelou uma sessão tensa em que Max Verstappen (#1) cravou tempos por volta inteira meio segundo mais rápidos que o carro espelho de Sergio Pérez (#11). O mexicano, sob forte risco de perder a vaga para a reta final da temporada, teria abandonado a sessão furioso após ouvir o engenheiro comparar sua desaceleração em curvas de alta com a de um "kart de aluguel".
+* **O comentário ácido do Insider:**
+> *"Em Milton Keynes, o único motor que realmente ferve é o ego do chefe quando vê a Mercedes abrindo vantagem na tabela."* — **The Paddock Mole**
 
 ---
 
-### 4. WILLIAMS RACING (Grove) — *O Tabloide e o Hype de Grove*
-* **Local:** Centro de Engenharia de Williams, Grove (Oxfordshire).
-* **O Drama:** Davi (7º no Mundial, 65 pontos, 3 pódios e 1 Pole em Miami) virou o garoto-propaganda mais cobiçado da F1 fora das pistas tradicionais. Chloe Vance, a *Máquina de Hype*, montou uma mini-base de operações em Londres para gerenciar o assédio de marcas globais de tecnologia e moda sobre o piloto de 20 anos. Porém, nos bastidores de Grove, a tensão técnica é real: após o abandono por asa danificada em Ímola e o P2 soberano no Canadá, a equipe precisa garantir que o FW48 aguente o tranco nas curvas de alta de Barcelona. 
-* **O Flagrante (*Lady Paddock*):**
-> *"Enquanto Davi dava entrevista para uma revista de cultura pop americana em um estúdio em Londres com a supervisão milimétrica da Chloe — que interrompeu o repórter três vezes por causa de uma pergunta sobre 'distração nas redes sociais' —, o rádio da fábrica de Grove capturou um desabafo cru do chefe de mecânicos: 'O garoto é rápido como um raio, mas se continuar abusando das zebras da curva 10 nos treinos livres, quem vai gastar o teto orçamentário com fibra de carbono sou eu'. O hype paga o patrocínio, mas a brita de Barcelona cobra em dólar pesado, queridos."*
+### 4. McLaren F1 Team (Woking)
+* **Local / Cidade:** Woking, Reino Unido (McLaren Technology Centre)
+* **O Fato de Bastidor:** Um garçom de um restaurante exclusivo perto de Guildford acabou vazando os detalhes de um jantar nada amigável entre Lando Norris (#4) e Oscar Piastri (#81). O cardápio incluía briga de guardanapos sobre quem teria prioridade de estratégia em caso de safety car na Áustria. A discussão escalou a ponto de o australiano lembrar ao britânico o número exato de erros cometidos sob pressão nas últimas três etapas, sob o olhar horrorizado de assessores de imprensa que tentavam abafar o som com taças de espumante.
+* **O comentário ácido do Insider:**
+> *"Laranja por fora, laranjas podres por dentro quando a briga é pelo topo do pão de ló da equipe."* — **The Paddock Mole**
 
 ---
 
-### 🎙️ O Vedito do Consórcio
-Enquanto a FIA discute se o presidente Mohammed Ben Sulayem vai aparecer de capacete de rali na Espanha e se Tim Malyon consegue calibrar o Centro de Operações de Genebra sem causar polêmica, o campeonato de 2026 caminha para uma trinca mortal: **Sarah defendendo o castelo da Mercedes, Felipe negociando seu legado com o bisturi de um cirurgião e Davi equilibrando o circo midiático com o pé cravado no acelerador.**
+### 5. Aston Martin Aramco (Silverstone)
+* **Local / Cidade:** Silverstone, Reino Unido (Campus Tecnológico Aston Martin)
+* **O Fato de Bastidor:** Numa cantina italiana frequentada por figurões de Silverstone, Fernando Alonso (#14) foi flagrado desenhando estratégias de ultrapassagem em cima de uma toalha de mesa de papel, tendo como "pilotos" dois saleiros e um pimenteiro. O espanhol, heroico terceiro colocado no campeonato e vencedor em Mônaco, discutia em tom teatral com membros do alto escalão técnico sobre como superar os carros prateados de Brackley. Ao notar fotos tiradas de longe por um fã, o asturiano apenas piscou para a câmera e pediu mais uma garrafa de vinho tinto.
+* **O comentário ácido do Insider:**
+> *"El Abuelo continua pilotando com a genialidade de um jovem de 20 anos e a malícia política de um cardeal do século XVII."* — **El Chisme de Montmeló**
 
-Não desliguem os modems. A qualquer momento tem mais vazamento. 
+---
 
-*— A F1 Que Você Não Vê (O jornalismo que a Liberty Media tenta proibir).*
+### 6. Scuderia Ferrari HP (Maranello)
+* **Local / Cidade:** Maranello, Itália (Gestione Sportiva)
+* **O Fato de Bastidor:** O departamento de marketing de Maranello cometeu o que os *tifosi* já chamam de crime de lesa-patrimônio. Charles Leclerc (#16) e Carlos Sainz (#55) foram obrigados a gravar um vídeo de TikTok com coreografia sincronizada segurando volantes de pelúcia enquanto usavam orelhas de gatinho customizadas com o emblema do Cavallino Rampante. Fontes afirmam que Leclerc ameaçou rescindir os bônus de imagem se o material fosse ao ar, enquanto Sainz cumpriu a coreografia com a expressão facial de quem está testando um freio de mão em estrada de terra.
+* **O comentário ácido do Insider:**
+> *"Em Maranello, ganha-se com elegância ou perde-se com vergonha alheia nas redes sociais. Hoje escolheram a segunda opção."* — **Il Cavallino Spia**
+
+---
+
+### 7. Williams Racing (Grove)
+* **Local / Cidade:** Grove, Reino Unido (Fábrica da Williams)
+* **O Fato de Bastidor:** A "Brazilian Storm" continua agitando os bastidores de Grove. Davi (#15), o *Leão de Grove*, passou o dia inteiro trancado no simulador calibrando ajustes finos para as zonas de aceleração do Red Bull Ring, enquanto sua agente, Chloe Vance, articulava acordos comerciais globais nos corredores da fábrica. Um microfone indiscreto captou o jovem piloto comemorando efusivamente a marca de mil voltas virtuais sem um único erro de traçado, mostrando que o P2 e a Volta Mais Rápida no Canadá não foram sorte de principiante.
+* **O comentário ácido do Insider:**
+> *"O Leão está afiando as garras na Flórida e em Grove. Cuidado com o garoto da Williams quando os pontos começarem a ser distribuídos na Áustria."* — **The Paddock Mole / Lady Paddock**
+
+---
+
+### 8. BWT Alpine F1 Team (Enstone)
+* **Local / Cidade:** Enstone, Reino Unido (Fábrica da Alpine)
+* **O Fato de Bastidor:** Numa tentativa desespero para engajar o público jovem após resultados inexpressivos na pista (Gasly com apenas 6 pontos e Doohan zerado), a diretoria de marketing da Alpine obrigou Pierre Gasly (#10) e Jack Doohan (#7) a participarem de um desafio culinário ao vivo na cantina da fábrica, transmitido para os funcionários. Gasly quase incendiou um crepe francês após se recusar a seguir a receita do chef consultor, enquanto Doohan tentava inutilmente explicar o conceito de downforce aerodinâmico usando massa de pizza.
+* **O comentário ácido do Insider:**
+> *"Enquanto os franceses brincam de masterchef na cozinha, o carro na pista parece um soufflé que solaram antes de ir ao forno."* — **El Chisme de Montmeló**
+
+---
+
+### 9. MoneyGram Haas F1 Team (Kannapolis / Banbury)
+* **Local / Cidade:** Banbury, Reino Unido (Base operacional da Haas)
+* **O Fato de Bastidor:** O clima interno na Haas azedou antes mesmo de cruzar o Canal da Mancha. Oliver Bearman (#87) e Esteban Ocon (#31) protagonizaram uma discussão ríspida em um gastropub local na saída de Banbury, flagrada por comissários de bordo que faziam escala na região. O motivo da discórdia? A prioridade no uso das novas atualizações de assoalho aerodinâmico para o fim de semana na Áustria, com Ocon exigindo status de veterano e Bearman rebatendo com dados brutos de velocidade de ponta nas últimas sessões de testes.
+* **O comentário ácido do Insider:**
+> *"Na Haas, o orçamento é curto, mas a vontade de colar o companheiro de equipe na parede de proteção é de time grande."* — **The Paddock Mole**
+
+---
+
+### 10. Visa Cash App RB (Faenza)
+* **Local / Cidade:** Faenza, Itália (Sede da VCARB)
+* **O Fato de Bastidor:** O porão do grid continua sem trégua. Yuki Tsunoda (#22) e Liam Lawson (#30) foram vistos trocando farpas em tom irônico durante a inspeção de assentos ergonômicos na fábrica de Faenza. Com a equipe zerada no Mundial de Construtores e a pressão da matriz em Milton Keynes pesando sobre os ombros de ambos, a disputa pelos últimos milímetros de visibilidade no cockpit virou uma queda de braço política envolvendo os patrocinadores de cada piloto.
+* **O comentário ácido do Insider:**
+> *"Zero pontos no bolso e muita vontade de brigar no grito. A lanterna do campeonato nunca esteve tão barulhenta."* — **Il Cavallino Spia**
