@@ -90,6 +90,8 @@
 
 ---
 
+---
+
 ## 📅 DIA 2/4: TERÇA-FEIRA
 
 ### 🗞️ A F1 QUE VOCÊ NÃO VÊ
@@ -183,6 +185,8 @@
 
 ---
 
+---
+
 ## 📅 DIA 3/4: QUARTA-FEIRA
 
 Aqui está o dossiê exclusivo do consórcio internacional de jornalistas investigativos **'A F1 Que Você Não Vê'**. 
@@ -268,3 +272,97 @@ Com o circo da Fórmula 1 de malas prontas para a Catalunha e o eco ainda estron
 * **O Fato de Bastidor:** A equipe de Faenza foi a estrela de um mico promocional de dar vergonha alheia. Yuki Tsunoda e Liam Lawson foram obrigados a vestir trajes típicos de torcedores locais e gravar vídeos com sotaque exagerado para as redes sociais da patrocinadora de energéticos, com direito a danças robóticas e piadas sem graça sobre tacos e burritos.
 * **O comentário ácido do Insider (*Il Cavallino Spia*):**
   > *"Lanternas do campeonato de construtores com zero pontos, a VCARB resolveu apelar para o entretenimento de mau gosto. Se o carro andasse na pista com a mesma velocidade que eles inventam vergonha alheia no TikTok, talvez saíssem do zero."*
+
+---
+
+## 📅 DIA 4/4: QUINTA-FEIRA
+
+### 🚨 EXCLUSIVO: O DOSSIÊ MONTMELÓ — QUINTA-FEIRA DE CAOS NO PADDOCK
+
+*Por: Consórcio Internacional de Jornalistas Investigativos 'A F1 Que Você Não Vê'*
+
+O circo da Fórmula 1 aterrissou na Catalunha para o **GP da Espanha**, mas o asfalto de Barcelona é o que menos importa neste momento. Com 9 etapas já devoradas pelo calendário de 2026 e a *Brazilian Storm* aterrorizando os europeus (Sarah liderando com mãos de ferro na Mercedes, o "Professor" Felipe exercendo seu monopólio de elegância na Sauber e o "Leão" Davi amassando na Williams), o mercado de pilotos (*Silly Season*) e os bastidores corporativos explodiram antes mesmo do primeiro treino livre. 
+
+Abaixo, o raio-x completo e sem filtros das 10 equipes nesta quinta-feira de desembarque:
+
+---
+
+### 1. Mercedes-AMG Petronas (Sarah #24 & Hamilton #44)
+* **Local / Cidade:** Brackley / Barcelona-Catalunya (Motorhome da Mercedes)
+* **O Fato de Bastidor:** Enquanto a líder isolada Sarah (171 pontos) desfila com a pose de *Ice Queen* que apavora os rivais, o motorhome prateado virou uma zona desmilitarizada de negociações. Jules Moreau foi visto saindo às pressas de uma sala reservada com Toto Wolff após discutir cláusulas de extensão contratual de longo prazo. Paralelamente, os engenheiros tentam conter o pânico com os rumores de sondagens pesadas da Red Bull em cima do entourage da prodígio brasileira.
+* **O comentário ácido do Insider:**
+> *"Jules Moreau não veio a Barcelona negociar patrocínio de azeite português. A mesa estava cheia de minutas contratuais com valores que fariam o PIB de um país pequeno corar. A Mercedes sabe que tem ouro nas mãos e a concorrência está disposta a pagar o resgate."*
+> — **The Silver Bullet / Lady Paddock**
+
+### 2. Stake F1 Team Kick Sauber / Audi (Felipe #5 & Hülkenberg #27)
+* **Local / Cidade:** Hinwil / Barcelona-Catalunya (Restaurante VIP do Paddock)
+* **O Fato de Bastidor:** O clima pesou nas mesas do hospitality da Sauber. O "Professor" Felipe, vice-líder isolado do campeonato (131 pontos) e dono de uma serenidade irritante, foi flagrado tendo um jantar altamente tenso com Marcus Thorne. O "Tubarão de Silverstone" exige um reajuste salarial astronômico e garantias absolutas sobre a unidade de potência da Audi para 2027. Garçons juram ter ouvido a palavra "multa rescisória" voando por cima do carpete.
+* **O comentário ácido do Insider:**
+> *"Marcus Thorne não veste terno sob medida para comer salada. Ele foi ali impor termos à diretoria da Audi. Ou eles dão status de equipe de fábrica de verdade para o Felipe, ou o 'Monge de Hinwil' assina com outra escudeira e deixa os alemães chupando dedo."*
+> — **The Paddock Mole / Lady Paddock**
+
+### 3. Red Red Bull Racing (Verstappen #1 & Pérez #11)
+* **Local / Cidade:** Milton Keynes / Barcelona-Catalunya (Box da RBR)
+* **O Fato de Bastidor:** O clima em Milton Keynes está com cheiro de pano queimado. Após a punição de -10 pontos no Mundial de Construtores em Mônaco devido à atitude antidesportiva de Pérez, a fábrica operou em turnos triplos no simulador. Verstappen passou a quarta-feira inteira soltando fumaça com a telemetria do companheiro mexicano, enquanto a cabeça de Checo está a prêmio — com analistas especulando sua demissão antes mesmo da pausa de verão.
+* **O comentário ácido do Insider:**
+> *"O simulador da Red Bull hoje em dia parece uma sessão de terapia intensiva. Max está cuspindo fogo nos engenheiros porque o carro não vira, e a única coisa que Pérez consegue quebrar no simulador é o recorde pessoal de giros em falso."*
+> — **The Paddock Mole**
+
+### 4. McLaren Formula 1 Team (Norris #4 & Piastri #81)
+* **Local / Cidade:** Woking / Barcelona-Catalunya (Truck da McLaren)
+* **O Fato de Bastidor:** A papaya army está dividida entre o lamento e o desespero de mercado. Com Lando Norris (8º) e Oscar Piastri (9º) vendo o trem do campeonato passar, empresários de ambos os lados começaram a sondar discretamente a Alpine e a própria Mercedes. O motorhome da equipe em Barcelona virou um centro de espionagem corporativa, com Lando soltando indiretas venenosas sobre a falta de ritmo em curvas de alta velocidade.
+* **O comentário ácido do Insider:**
+> *"A McLaren trouxe um pacote de atualizações aerodinâmicas gigantesco para Barcelona, mas o verdadeiro update que eles precisavam era de paciência. Os empresários de Norris já estão folheando o catálogo de ofertas da concorrência faz tempo."*
+> — **The Paddock Mole**
+
+### 5. Aston Martin Aramco F1 Team (Alonso #14 & Stroll #18)
+* **Local / Cidade:** Silverstone / Barcelona-Catalunya (Hospitality Aston Martin)
+* **O Fato de Bastidor:** Um microfone ambiente esquecido aberto na sala de briefing capturou Fernando Alonso (3º no campeonato, com a vitória épica em Mônaco) esbravejando em espanhol puro contra a falta de confiabilidade do eixo traseiro. O "El Nano" não poupou nem os estagiários, exigindo que a equipe pare de focar no carro de 2027 e salve o pódio deste ano.
+* **O comentário ácido do Insider:**
+> *"Alonso não está correndo apenas contra os carros da frente, ele está correndo contra a própria idade e a paciência. Quando o bicampeão começa a falar sozinho no rádio em tom apocalíptico, os mecânicos já sabem que vão passar a noite em claro."*
+> — **El Chisme de Montmeló**
+
+### 6. Scuderia Ferrari HP (Leclerc #16 & Sainz #55)
+* **Local / Cidade:** Maranello / Barcelona-Catalunya (Área de Mídia Ferrari)
+* **O Fato de Bastidor:** Maranello conseguiu superar todos os limites do bom gosto corporativo. Para engajar o público jovem, a assessoria obrigou Charles Leclerc e Carlos Sainz a gravarem uma esquete de TikTok com passos de dança duvidosos vestindo capas de chuva vermelhas e óculos escuros. Leclerc parecia estar revivendo seus piores pesadelos na pista, enquanto Sainz ameaçava atirar o smartphone no mar Mediterrâneo.
+* **O comentário ácido do Insider:**
+> *"Se a Ferrari gastasse a mesma quantidade de energia refinando a estratégia de box que gasta produzindo micos no TikTok, Leclerc estaria liderando o campeonato. O vídeo é tão constrangedor que o comitê de ética da FIA quase emitiu uma bandeira preta por danos psicológicos aos fãs."*
+> — **Il Cavallino Spia**
+
+### 7. Williams Racing (Davi #15 & Albon #23)
+* **Local / Cidade:** Grove / Barcelona-Catalunya (Garagem da Williams)
+* **O Fato de Bastidor:** O "Leão de Grove" chegou a Barcelona cercado por um cordão de segurança particular e pela sua agente, Chloe Vance. A *Máquina de Hype* transformou o pit lane da Williams em um tapete vermelho de Hollywood, fechando contratos relâmpago de patrocínio global enquanto Davi (7º no campeonato, impulsionado pela *Brazilian Storm*) dava entrevistas frias e cirúrgicas sobre o acerto do FW48. Albon, visivelmente ofuscado, assistia a tudo de canto com um sorriso amarelo.
+* **O comentário ácido do Insider:**
+> *"Enquanto a Williams sofreu por anos tentando juntar moedas para comprar bico de fibra de carbono, a Chloe Vance transformou o Davi em uma grife ambulante. O box de Grove hoje fede a perfume caro e contrato de exclusividade."*
+> — **The Paddock Mole / Lady Paddock**
+
+### 8. BWT Alpine F1 Team (Gasly #10 & Doohan #7)
+* **Local / Cidade:** Enstone / Barcelona-Catalunya (Motorhome Alpine)
+* **O Fato de Bastidor:** Enstone continua sendo o cenário de uma novela mexicana sem fim. Pierre Gasly, frustrado com a carroça azul (apenas 6 miseráveis pontos), teve uma reunião de portas fechadas com sua equipe jurídica para averiguar cláusulas de saída por desempenho insatisfatório. A *Silly Season* bate forte na Alpine, onde até os copeiros parecem estar mandando currículo para outras equipes.
+* **O comentário ácido do Insider:**
+> *"A Alpine em 2026 é um meme institucional. Gasly está com o pé no acelerador e a alma no limbo. Se pudessem, rescindiriam o contrato coletivamente e virariam uma equipe de e-Sports."*
+> — **El Chisme de Montmeló**
+
+### 9. MoneyGram Haas F1 Team (Bearman #87 & Ocon #31)
+* **Local / Cidade:** Kannapolis / Barcelona-Catalunya (Box da Haas)
+* **O Fato de Bastidor:** A Haas virou o refúgio dos desesperados por contrato. Com Ocon completamente zerado e Bearman tentando se firmar, o chefe Ayao Komatsu foi visto circulando com advogados especialistas em rescisão contratual e acordos cruzados com patrocinadores de fundo de quintal. O clima é de quem não tem nada a perder e muito a esconder.
+* **O comentário ácidoO do Insider:**
+> *"A Haas opera num nível de improviso que dá orgulho. Os caras estão negociando multas contratuais usando guardanapos de papel no refeitório do circuito. É o suco mais puro da F1 raiz."*
+> — **The Paddock Mole**
+
+### 10. Visa Cash App RB (Tsunoda #22 & Lawson #30)
+* **Local / Cidade:** Faenza / Barcelona-Catalunya (Iate particular / Lounge VIP)
+* **O Fato de Bastidor:** A equipe secundária da energia vermelha decidiu ignorar os problemas técnicos e mergulhou no *glamour* artificial de Barcelona. Yuki Tsunoda e Liam Lawson foram flagrados em um iate alugado na costa catalã cercados por influenciadores digitais e astros de pop espanhóis, gravando campanhas para marcas de relógio de luxo enquanto o monolugar de Faenza segue agonizando na lanterna do campeonato (zero pontos).
+* **O comentário ácido do Insider:**
+> *"Enquanto o carro não anda nem morro abaixo, a VCARB gasta o orçamento de desenvolvimento em festas em iates com sub-celebridades. É a definição perfeita do circo sem lona."*
+> — **Il Cavallino Spia**
+
+---
+
+### 💬 O TERMÔMETRO DA ARQUIBANCADA (@F1_Zueira_BR)
+
+1. **@c_leclerc_pofexo:** *"O Leclerc dançando no TikTok da Ferrari foi a coisa mais deprimente que eu vi desde o GP de Mônaco. Alguém resgate esse homem de Maranello por favor!"*
+2. **@senapressure_24:** *"A Sarah tá tão fria que se botar ela pra pilotar na Sibéria o gelo derrete de vergonha. Líder isolada e mandando em Brackley com 16 anos!"*
+3. **@felipe_sauber_brasil:** *"O 'Professor' Felipe e o Marcus Thorne vão arrancar até a última gota de Euro da Audi. O Tubarão de Silverstone não perdoa ninguém!"*
+4. **@davi_williams_storm:** *"O Davi com a Williams no top 7 e a Chloe Vance transformando o paddock em Hollywood é cinema puro. A Brazilian Storm não tem limites!"*
+5. **@redbull_tears:** *"De -10 pontos no construtores a surto coletivo no simulador. A Red Bull tá derretendo mais rápido que sorvete no asfalto de Barcelona!"*

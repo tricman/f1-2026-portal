@@ -226,6 +226,26 @@
         "sauber"
       ],
       "status": "RESOLVED"
+    },
+    {
+      "event_id": "ET10-ES-M1",
+      "round": 10,
+      "module": "M1_SEMANA_EQUIPES",
+      "summary": "A Silly Season antecipou-se com fissuras profundas: na Mercedes, a frieza geracional de Sarah racha a convivência com um isolado Lewis Hamilton; na Red Bull, o pânico institucional se instaura com a queda ao 3º lugar nos Construtores, punições e o isolamento de Sergio Pérez. Paralelamente, o \"Professor\" Felipe pressiona a Audi por confiabilidade em seu assoalho técnico, enquanto na Ferrari e McLaren crescem os vazamentos e o descontentamento interno com a competitividade dos carros.",
+      "entities": [
+        "sarah",
+        "felipe",
+        "lewis_hamilton",
+        "sergio_perez",
+        "max_verstappen",
+        "audi",
+        "red_bull",
+        "mercedes",
+        "mclaren",
+        "ferrari",
+        "hamilton"
+      ],
+      "status": "OPEN"
     }
   ]
 }
