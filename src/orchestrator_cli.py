@@ -25,7 +25,17 @@ def load_dotenv_if_present() -> None:
         if not line or line.startswith("#") or "=" not in line:
             continue
         k, v = line.split("=", 1)
-        os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+        k = k.strip()
+        v = v.strip()
+        if v.startswith('"'):
+            end_q = v.find('"', 1)
+            v = v[1:end_q] if end_q != -1 else v.strip('"')
+        elif v.startswith("'"):
+            end_q = v.find("'", 1)
+            v = v[1:end_q] if end_q != -1 else v.strip("'")
+        else:
+            v = v.split("#")[0].strip()
+        os.environ[k] = v
 
 
 MODULE_PERSONAS: Dict[str, str] = {

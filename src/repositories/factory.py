@@ -24,6 +24,12 @@ def get_repository(force_refresh: bool = False) -> IDataRepository:
     if _GLOBAL_REPO_INSTANCE is not None and not force_refresh:
         return _GLOBAL_REPO_INSTANCE
 
+    try:
+        from src.orchestrator_cli import load_dotenv_if_present
+        load_dotenv_if_present()
+    except Exception:
+        pass
+
     backend = os.environ.get("STORAGE_BACKEND", "local").strip().lower()
 
     if backend == "firestore":
