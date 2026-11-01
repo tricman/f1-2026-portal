@@ -171,7 +171,18 @@ def deploy_portal_to_github_pages(commit_msg: str = "Auto-update F1 2026 Editori
                 if push_res.returncode == 0:
                     log_text(f"[PORTAL PUSH] ✅ Portal publicado no GitHub Pages com sucesso! ({commit_msg})")
                 else:
-                    log_text(f"[PORTAL PUSH WARNING] Falha no git push: {push_res.stderr.strip()}")
+                    log_text(f"[PORTAL PUSH WARNING] Falha inicial no git push: {push_res.stderr.strip()}. Tentando auto-rebase...")
+                    subprocess.run(["git", "-C", str(git_target_dir), "pull", "--rebase", "origin", "main"], check=False)
+                    push_retry = subprocess.run(
+                        ["git", "-C", str(git_target_dir), "push", "origin", "main"],
+                        capture_output=True,
+                        text=True,
+                        check=False,
+                    )
+                    if push_retry.returncode == 0:
+                        log_text(f"[PORTAL PUSH] ✅ Portal publicado no GitHub Pages com sucesso após rebase! ({commit_msg})")
+                    else:
+                        log_text(f"[PORTAL PUSH WARNING] Falha no git push: {push_retry.stderr.strip()}")
             else:
                 log_text("[PORTAL PUSH] Portal já estava sincronizado na última revisão (sem alterações pendentes).")
     except Exception as exc:
