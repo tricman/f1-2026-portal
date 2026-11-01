@@ -259,12 +259,23 @@
       "module": "M2_COLETIVA"
     },
     {
-      "event_id": "ET10-M2-Q3",
       "round": 10,
-      "module": "M2_COLETIVA",
-      "summary": "Na Coletiva Oficial FIA da Etapa 10, Davi declarou à imprensa: 'Crítica a gente escuta e absorve, mas a minha agressividade é exatamente o que colocou a Williams na Pole Position em Miami e no pódio do Canadá com a volta mais rápida da prova. Os erros de Melbourne'",
       "entities": [
         "davi",
+        "fia"
+      ],
+      "summary": "Na Coletiva Oficial FIA da Etapa 10, Davi declarou à imprensa: 'Crítica a gente escuta e absorve, mas a minha agressividade é exatamente o que colocou a Williams na Pole Position em Miami e no pódio do Canadá com a volta mais rápida da prova. Os erros de Melbourne'",
+      "status": "OPEN",
+      "event_id": "ET10-M2-Q3",
+      "module": "M2_COLETIVA"
+    },
+    {
+      "event_id": "ET10-M2-Q5",
+      "round": 10,
+      "module": "M2_COLETIVA",
+      "summary": "Na Coletiva Oficial FIA da Etapa 10, Sarah declarou à imprensa: 'Ruído de bastidor não ganha corrida; tempo de volta ganha. A Mercedes não lidera o campeonato por sorte, mas por trabalho e precisão em Brackley. Se os rivais dizem que estão se aproximando na aerodin'",
+      "entities": [
+        "sarah",
         "fia"
       ],
       "status": "OPEN"

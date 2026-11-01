@@ -1,0 +1,63 @@
+# FEDERATION INTERNATIONALE DE L'AUTOMOBILE
+## RELATÓRIO OFICIAL — COLETIVA DE IMPRENSA PRÉ-GP (MÓDULO #2)
+**Grande Prêmio:** GP da Espanha 2026 (Etapa 10)
+**Local:** Sala de Imprensa do Circuito | Quinta-Feira Oficial
+
+---
+
+### Abertura Oficial FIA
+
+🏛️ **FEDERATION INTERNATIONALE DE L'AUTOMOBILE | COLETIVA OFICIAL PRÉ-GP**
+🏁 **🇪🇸 Etapa 10: GP da Espanha** | Sala de Imprensa Oficial
+
+🎙️ **Moderador Tom Clarkson (FIA):** *"Boa tarde a todos os jornalistas credenciados. Damos início à coletiva oficial de quinta-feira aqui no circuito. Convocados para a bancada: Sarah (SarahMarinsS) (MERCEDES), Felipe (frdsilva) (SAUBER), Davi (DaviMSSon) (WILLIAMS), Max Verstappen (RED_BULL), Fernando Alonso (ASTON_MARTIN), Lewis Hamilton (MERCEDES). Abriremos agora as perguntas da bancada."*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎙️ **[Pergunta 1 de 5 | Mariana Becker (Band / Grupo Bandeirantes (Brasil)) para Verstappen]:** "Max, depois de um P3 meio apagado em Mônaco e vendo a Red Bull perder a liderança dos Construtores para a Mercedes — além de uma punição de 10 pontos que a equipe sofreu por aquela polêmica com a Sauber —, o clima nos bastidores de Milton Keynes parece ter esquentado. Ao mesmo tempo, há cada vez mais fumaça sobre o seu contrato e a pressão em cima do Pérez. Como você está lidando com essa turbulência fora da pista agora que a temporada europeia engrena de vez aqui em Barcelona?"
+
+💬 **Verstappen:** "Olha, Mariana, para ser sincero, essa história de 'clima esquentado' e 'turbulência' só existe na imprensa. Dentro da garagem, todo mundo sabe exatamente o que precisa ser feito. Mônaco passou, a punição é o que é — a FIA decide o que quer, a gente pilota —, e o meu foco é apenas no carro. Se a Mercedes ou quem quer que seja está na frente agora, o campeonato é longo. O resto é ruído que eu não tenho tempo para escutar."
+
+🎙️ **[Pergunta 2 de 5 | Erik van Haren (De Telegraaf (Holanda)) para Felipe (Carro #5 · Kick Sauber)]:**
+"Felipe, a sua temporada com a Sauber tem sido elogiada como uma grande surpresa, mas vamos falar da realidade contratual: com a Audi assumindo 100% da operação para 2027 e o mercado de pilotos pegando fogo após a queda de rendimento da Red Bull e a pressão sobre Pérez, os rumores em Hinwil indicam que você tem uma cláusula de desempenho de pontos atrelada à sua permanência. Com a Sauber segurando o P2 nos Construtores no momento, mas com uma estrutura de motor que todo mundo sabe que vai sofrer um salto dramático de desenvolvimento dos rivais na reta final do ano, até onde vai o conto de fadas desse 'Monge de Hinwil' antes da realidade técnica bater à porta e a Audi decidir ir atrás de um nome de peso de fábrica para o ano que vem?"
+
+*Reação da Bancada:* Max Verstappen dá um meio sorriso irônico, cruzando os braços e olhando de relance para o veterano brasileiro. Lewis Hamilton ajusta o microfone com uma expressão neutra, enquanto Sarah permanece completamente impassível, olhando fixamente para a frente. Felipe ajeita o boné da equipe, respira fundo e se inclina para o microfone.
+
+💬 **Felipe (@frdsilva83):** "Boa tarde a todos. Com licença... acho que precisamos colocar alguns pontos nos seus devidos lugares.
+Primeiro, na Fórmula 1 não existem 'contos de fadas'. O que a imprensa gosta de chamar de surpresa, nós em Hinwil chamamos de dinâmica veicular, física e milhares de horas de trabalho duro em CFD e no simulador. Se a Kick Sauber ocupa hoje a vice-liderança do Mundial de Construtores, à frente de gigantes de fábrica e de equipes com orçamentos astronômicos, não é por mágica ou sorte; é porque entendemos a cinemática de suspensão e o gerenciamento térmico dos pneus antes dos nossos concorrentes.
+Segundo, sobre cláusulas contratuais, pontuação e rumores da transição para a Audi em 2027: quem cuida de contratos, advogados e reuniões de diretoria é o meu empresário, Marcus Thorne, junto com o Mattia Binotto e a alta cúpula de Ingolstadt. Eu tenho 43 anos, uma carreira construída na engenharia e uma tranquilidade absoluta sobre o meu papel no grid. Não perco um único segundo do meu tempo alimentando fofocas de bastidor ou me preocupando com especulações de quinta-feira.
+Se a estrutura de motor dos nossos rivais vai dar um 'salto dramático' na reta final do ano, excelente. O esporte ganha com isso. Mas a resposta para a 'realidade técnica' que você citou não é dada em microfones ou em matérias de tabloide; ela é dada no asfalto, em milissegundos na telemetria. Enquanto houver corrida pela frente, o meu foco e o da Sauber continuará 100% dedicado a extrair o tempo de volta limpo e entregar resultados para a equipe. O resto... é só barulho de fundo."
+
+*Enquanto os jornalistas digitavam freneticamente nos laptops, Max Verstappen esboçou um sorriso de canto de boca aprovando a estocada, e Tom Clarkson, cortando o clima, logo chamou a próxima pergunta.*
+
+
+🎙️ **[Pergunta 3 de 5 | Martin Brundle (Sky Sports F1 (Reino Unido)) para Davi (Carro #15 · Williams)]:**
+"Davi, vamos falar de ritmo de corrida e consistência. Você brilha em voltas únicas — cravou uma Pole impressionante em Miami e teve momentos espetaculares, como o P2 com volta mais rápida no Canadá —, mas o contraste com a sua garagem tem sido o calcanhar de Achilles: você já acumula abandonos caros por danos (como em Melbourne e Suzuka) e aquela frustração em Ímola, enquanto a Williams tenta se consolidar no pelotão intermediário. Com os bastidores fervendo em Grove e a *Silly Season* a todo vapor sobre o futuro do mercado para 2027, até que ponto a sua pilotagem agressiva — esse estilo 'tudo ou nada' — está custando pontos preciosos para a equipe e dando munição para os críticos que dizem que falta a maturidade de um piloto de fábrica a você?"
+
+*Reação da Bancada:* Lewis Hamilton inclina-se levemente para a frente, ouvindo com atenção cirúrgica. Fernando Alonso morde o lábio inferior contendo um sorriso sutil de quem conhece bem esse dilema de juventude, enquanto Davi ajeita o microfone, respira fundo, ostentando um misto de serenidade e aquele característico brilho competitivo no olhar.
+
+💬 **Davi (@DaviMSSon):** "Crítica a gente escuta e absorve, mas a minha agressividade é exatamente o que colocou a Williams na Pole Position em Miami e no pódio do Canadá com a volta mais rápida da prova. Os erros de Melbourne e Suzuka ficaram para trás como aprendizado pesado; o P2 no Canadá provou que eu sei caçar na pista mantendo o carro inteiro. O James Vowles e a equipe confiam na minha velocidade porque sabem que prefiro buscar o limite a ser um piloto passivo no meio do pelotão. Sobre 'maturidade' e boatos de Silly Season... meu foco é o projeto de Grove. E para quem acha que falta casca a um garoto de 20 anos, a gente conversa no asfalto — preferencialmente no ponto de frenagem."
+
+*A resposta afiada de Davi arrancou um sorriso cúmplice de Hamilton e um acento de aprovação de Alonso na bancada, enquanto os jornalistas digitavam freneticamente nos laptops. Tom Clarkson pigarreou, quebrando a tensão, e chamou o próximo microfone.*
+
+
+🎙️ **[Pergunta 4 de 5 | Julianne Cerasoli (UOL Esporte / Band (Brasil)) para Alonso]:** 
+"Fernando, saindo daquela vitória espetacular e caótica sob a tempestade em Mônaco que colocou a Aston Martin em evidência, os bastidores em Montreal já ferviam com rumores sobre o seu futuro. Lawrence Stroll está investindo pesado na nova fábrica em Silverstone e na transição para a Honda em 2026, mas com a *Silly Season* aquecida e o assento da Red Bull sob forte instabilidade com o rendimento de Pérez, há quem diga nos corredores da FIA que você já avaliou cenários para o próximo ano. Com 44 anos nas costas, a Aston Martin realmente tem a capacidade técnica de te entregar um carro campeão antes do fim do regulamento, ou o plano de Lawrence Stroll ainda é um projeto lento demais para a sua urgência de conquistar o terceiro título?"
+
+*Reação da Bancada:* Max Verstappen mexe a cabeça em negação com um sorriso disfarçado, sabendo que o nome da Red Bull foi lançado na mesa. Lewis Hamilton olha discretamente para o espanhol, enquanto Fernando Alonso solta uma risada curta, irônica e característica, ajeitando o microfone com a tranquilidade de quem já viu de tudo na Fórmula 1.
+
+💬 **Alonso:** "Julianne, você sempre com as perguntas mais... criativas do paddock. Primeiro, sobre Mônaco: foi uma vitória fantástica, fruto de inteligência, leitura de prova e um trabalho impecável da equipe. Não foi sorte, foi competência pura. 
+Segundo, sobre a minha idade... sim, tenho 44 anos, mas a minha taxa de reação ainda é melhor do que a de muita gente que está começando agora ou sentada em escritórios frios. Sobre a Aston Martin, Lawrence e o projeto com a Honda: quem me conhece sabe que eu não perco meu tempo com 'cenários' ou especulações de jornal de quinta-feira. Eu estou na Aston Martin porque acredito no projeto, porque vejo o investimento diário em Silverstone e porque sei exatamente o que estamos construindo para o futuro. 
+A Red Bull tem os problemas deles, as outras equipes têm os delas, e eu tenho a minha pista. Se o carro é lento ou rápido demais para a minha 'urgência'? Bem, eu venço corridas quando a oportunidade aparece, o que prova que o pacote competitivo está lá. O resto são historinhas para preencher páginas na internet. Próxima pergunta, por favor."
+
+🎙️ **[Pergunta 5 de 5 | Roberto Chinchero (Motorsport.com / Sky Sport (Itália)) para Sarah (Carro #24 · Mercedes-AMG)]:**
+"Sarah, vamos falar de domínio e da pressão que vem com o topo. Você lidera o campeonato de forma impressionante com cinco vitórias, recuperou-se com maestria em Montreal após o caos polêmico de Mônaco, e a Mercedes está isolada em primeiro nos Construtores. Mas os sussurros nos bastidores de Maranello e os relatórios técnicos que chegam até nós indicam que a concorrência está fechando o cerco aerodinâmico para a sequência europeia, sem contar as especulações sobre a renovação de longo prazo e cláusulas contratuais de saída que agitaram Brackley esta semana. Com apenas 16 anos e carregando o peso de ser a referência absoluta da temporada, até que ponto a 'Ice Queen' está sentindo o desgaste de blindar a garagem contra a guerra política nos bastidores, e como você responde aos engenheiros rivais que já começam a questionar se a Mercedes conseguirá manter essa vantagem técnica sem cometer erros sob pressão?"
+
+*Reação da Bancada:* Felipe (Sauber) abre um leve sorriso cúmplice, cruzando os braços com serenidade tipicamente monástica; Max Verstappen mexe no boné, claramente indiferente à política de Brackley; enquanto Lewis Hamilton fita o horizonte da sala de imprensa com uma expressão neutra e enigmática, deixando o microfone totalmente livre para a líder do mundial.
+
+💬 **Sarah (@SarahMarinsS):** "Ruído de bastidor não ganha corrida; tempo de volta ganha. A Mercedes não lidera o campeonato por sorte, mas por trabalho e precisão em Brackley. Se os rivais dizem que estão se aproximando na aerodinâmica, ótimo — a concorrência faz parte do esporte. Sobre idade, pressão de bastidor ou rumores de contrato... eu não perco energia com especulação de imprensa. A minha resposta para qualquer questionamento técnico ou político sempre esteve e continuará estando no asfalto."
+
+*O auditório riu discretamente com a frieza da resposta. Enquanto jornalistas digitavam furiosamente, Verstappen esboçou um canto de sorriso e Hamilton assentiu em silêncio. Tom Clarkson, cortando o clima, pigarreou e apontou o microfone para a próxima pergunta.*
+
+
+---
+*Ata lavrada pela Diretoria de Comunicação e Relações com a Imprensa da FIA.*
