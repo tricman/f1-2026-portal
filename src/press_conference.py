@@ -3,14 +3,18 @@ FIA Thursday Press Conference Interactive Engine (Módulo #2 · Coletiva Pré-GP
 Features:
   - Interactive Turn-Lock (Trava de Turno) in Discord for Human Drivers (Felipe, Davi, Sarah).
   - Grounded in M1 Silly Season leaks, Canon Ledger, and FIA Standings.
-  - Generates realistic questions from accredited media (Mariana Becker, Erik van Haren, Martin Brundle, etc.).
-  - Simulates instant answers for NPCs (Verstappen, Alonso, Hamilton, Leclerc) and pauses for humans.
-  - Injects human driver responses directly into Canon Ledger and compiles the final official FIA report.
+  - Dynamic International Press Pool (17 accredited journalists across 8 countries).
+  - Shuffled question sequence and themed topic sampling per round.
+  - Context-aware, human, non-cliché room reactions based on Canon Ledger relationships.
+  - Simulates instant answers for NPCs and pauses for human drivers.
+  - Injects human driver responses directly into Canon Ledger, compiles the final official FIA report,
+    and publishes automated media dispatches to `#repercussao-midia` and Portal.
 """
 from __future__ import annotations
 
 import json
 import os
+import random
 import re
 import time
 from pathlib import Path
@@ -27,12 +31,42 @@ DRIVER_MENTIONS = {
     "sarah": ("Sarah", "SarahMarinsS", "Carro #24 · Mercedes-AMG"),
 }
 
-JOURNALISTS = [
-    ("Mariana Becker", "Band / Grupo Bandeirantes (Brasil)", "Curiosa, elegante, focada no lado humano e bastidores de paddock."),
-    ("Erik van Haren", "De Telegraaf (Holanda)", "Incisivo, direto, agressivo, muito ligado ao clã Verstappen e Red Bull."),
-    ("Martin Brundle", "Sky Sports F1 (Reino Unido)", "Cirúrgico, analítico, ex-piloto, focado em disputas roda a roda e regulamento."),
-    ("Julianne Cerasoli", "UOL Esporte / Band (Brasil)", "Técnica, investigativa, conectada às reuniões políticas da FIA e contratos."),
-    ("Roberto Chinchero", "Motorsport.com / Sky Sport (Itália)", "Passional, focado em estratégia, pneus e nas intrigas de Maranello e Hinwil."),
+JOURNALISTS_CATALOG = [
+    # Brasil
+    {"name": "Mariana Becker", "outlet": "Band / Grupo Bandeirantes (Brasil)", "desc": "Curiosa, elegante, focada no lado humano, bastidores e psicologia dos pilotos."},
+    {"name": "Julianne Cerasoli", "outlet": "UOL Esporte / Band (Brasil)", "desc": "Técnica, investigativa, muito conectada às reuniões políticas da FIA e contratos."},
+    {"name": "Reginaldo Leme", "outlet": "Band (Brasil)", "desc": "Histórico, analítico, busca comparações com grandes lendas e regulamentos do passado."},
+    # Reino Unido
+    {"name": "Martin Brundle", "outlet": "Sky Sports F1 (Reino Unido)", "desc": "Cirúrgico, analítico, ex-piloto, focado em disputas roda a roda e dinâmica de chassi."},
+    {"name": "Ted Kravitz", "outlet": "Sky Sports F1 'The Notebook' (Reino Unido)", "desc": "Obsessivo por detalhes técnicos, asas, assoalhos e teorias de conspiração de paddock."},
+    {"name": "Andrew Benson", "outlet": "BBC Sport (Reino Unido)", "desc": "Político, incisivo sobre governança da FIA, acordos comerciais e bastidores de diretoria."},
+    {"name": "Will Buxton", "outlet": "F1 TV / Formula 1 Official (Global)", "desc": "Dramático, focado em narrativas épicas, linguagem corporal e pressão pelo título."},
+    # Itália
+    {"name": "Roberto Chinchero", "outlet": "Motorsport.com / Sky Sport (Itália)", "desc": "Passional, focado em estratégia, pneus e nas intrigas de Maranello e Hinwil."},
+    {"name": "Mara Sangiorgio", "outlet": "Sky Sport F1 (Itália)", "desc": "Direta, rápida, focada no clima interno e tensões de garagem das equipes de fábrica."},
+    # Holanda
+    {"name": "Erik van Haren", "outlet": "De Telegraaf (Holanda)", "desc": "Agressivo, leal ao clã Verstappen, sempre cutuca rivais e expõe atritos internos."},
+    {"name": "Jack Plooij", "outlet": "Ziggo Sport (Holanda)", "desc": "Provocativo e irreverente, busca desestabilizar pilotos com perguntas inusitadas."},
+    # Espanha
+    {"name": "Antonio Lobato", "outlet": "DAZN F1 (Espanha)", "desc": "Eufórico, patriótico, acompanha cada suspiro de Alonso, Sainz e a torcida espanhola."},
+    {"name": "Cristóbal Rosaleny", "outlet": "SoyMotor (Espanha)", "desc": "Técnico em aerodinâmica, telemetria de classificação e histórico de pistas europeias."},
+    # Alemanha
+    {"name": "Michael Schmidt", "outlet": "Auto Motor und Sport (Alemanha)", "desc": "Maior autoridade técnica do paddock, números exatos de downforce, motor e CFD."},
+    # França
+    {"name": "Julien Fébreau", "outlet": "Canal+ (França)", "desc": "Intenso, perspicaz, focado em disputas internas de equipe e na geopolítica de Enstone."},
+    # América Latina / México
+    {"name": "Diego Mejía", "outlet": "Fox Sports México / América Latina", "desc": "Atento às disputas do pelotão intermediário e pressão sobre pilotos latino-americanos."},
+    # Japão
+    {"name": "Ken Tanaka", "outlet": "Autosport Japan", "desc": "Respeitoso, detalhista, focado na transição de motores e gestão térmica de pneus."},
+]
+
+PRESS_THEMES = [
+    "Silly Season, cláusulas contratuais de 2027 e sondagens rivais",
+    "Atritos de garagem, convivência com companheiro de equipe e preferência de desenvolvimento",
+    "Evolução aerodinâmica, eficiência de assoalho e saltos de ritmo de rivais",
+    "Gestão térmica de pneus, janelas de operação e ritmo de corrida vs volta única",
+    "Polêmicas de regulamento, critérios dos comissários da FIA e disputas roda a roda",
+    "Pressão psicológica pelo topo, expectativa de pódio e maturidade de pilotagem",
 ]
 
 
@@ -54,6 +88,51 @@ class PressConferenceSession:
         self.ai_client = ai_client or GeminiFreeTierClient(api_key=ai_key)
         self.state: Dict[str, Any] = self._load_or_init_state()
 
+    def _generate_conference_plan(self, panel: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Dynamically plan 5 questions with deterministic RNG per round:
+        - 3 questions guaranteed for Brazilian Storm (Sarah, Felipe, Davi)
+        - 2 questions for NPCs on the panel (Verstappen, Alonso, Hamilton, Leclerc, etc.)
+        - Shuffled order (no two rounds share the same sequence!)
+        - Dynamic journalists sampled from catalog without duplicates
+        - Dedicated themed angle per question
+        """
+        rng = random.Random(f"press_conf_plan_season2026_r{self.round_num}")
+
+        # 1. Human drivers order
+        human_drivers = ["felipe", "davi", "sarah"]
+        rng.shuffle(human_drivers)
+
+        # 2. NPC drivers from panel
+        panel_npc_ids = [d["id"] for d in panel if d["id"] not in ("felipe", "davi", "sarah")]
+        if not panel_npc_ids:
+            panel_npc_ids = ["verstappen", "hamilton", "alonso", "leclerc"]
+
+        # Sample 2 distinct NPCs
+        chosen_npcs = rng.sample(panel_npc_ids, k=min(2, len(panel_npc_ids)))
+        while len(chosen_npcs) < 2:
+            candidate = rng.choice(["verstappen", "hamilton", "alonso", "norris", "leclerc"])
+            if candidate not in chosen_npcs:
+                chosen_npcs.append(candidate)
+
+        # Build 5-question driver sequence
+        driver_sequence = [chosen_npcs[0], human_drivers[0], human_drivers[1], chosen_npcs[1], human_drivers[2]]
+        rng.shuffle(driver_sequence)
+
+        # Sample 5 distinct journalists and themes
+        shuffled_journos = rng.sample(JOURNALISTS_CATALOG, k=5)
+        shuffled_themes = rng.sample(PRESS_THEMES, k=5)
+
+        plan = []
+        for i in range(5):
+            plan.append({
+                "idx": i + 1,
+                "driver_id": driver_sequence[i],
+                "journalist": shuffled_journos[i],
+                "theme": shuffled_themes[i],
+            })
+        return plan
+
     def _load_or_init_state(self) -> Dict[str, Any]:
         if self.state_file.exists():
             try:
@@ -67,12 +146,15 @@ class PressConferenceSession:
         panel = select_press_conference_panel(st, self.round_num)
         panel_names = [f"{d['name']} ({d['team_id'].upper()})" for d in panel]
 
+        question_plan = self._generate_conference_plan(panel)
+
         initial = {
             "round_num": self.round_num,
             "round_folder": self.round_folder,
             "status": "INITIALIZED",
             "panel": panel,
             "panel_summary": panel_names,
+            "question_plan": question_plan,
             "current_question_idx": 0,
             "total_questions": 5,
             "waiting_for_driver": None,
@@ -120,19 +202,25 @@ class PressConferenceSession:
 
         self.state["current_question_idx"] = idx
 
-        # Determine target driver for this question
-        # Plan: Q1 = NPC (Verstappen/Alonso), Q2 = Felipe, Q3 = Davi, Q4 = NPC, Q5 = Sarah
-        question_targets = {
-            1: "verstappen",
-            2: "felipe",
-            3: "davi",
-            4: "alonso",
-            5: "sarah",
-        }
-        target_id = question_targets.get(idx, "felipe")
-        journo_name, journo_outlet, journo_desc = JOURNALISTS[(idx - 1) % len(JOURNALISTS)]
+        # Determine target driver and journalist from dynamic plan or fallback
+        plan = self.state.get("question_plan", [])
+        if plan and len(plan) >= idx:
+            item = plan[idx - 1]
+            target_id = item["driver_id"]
+            journo = item["journalist"]
+            journo_name = journo["name"]
+            journo_outlet = journo["outlet"]
+            journo_desc = journo["desc"]
+            theme_hint = item.get("theme", "Silly Season e bastidores da F1")
+        else:
+            # Fallback
+            default_targets = {1: "verstappen", 2: "felipe", 3: "davi", 4: "alonso", 5: "sarah"}
+            target_id = default_targets.get(idx, "felipe")
+            journo = JOURNALISTS_CATALOG[(idx - 1) % len(JOURNALISTS_CATALOG)]
+            journo_name, journo_outlet, journo_desc = journo["name"], journo["outlet"], journo["desc"]
+            theme_hint = "Silly Season e bastidores da F1"
 
-        # Context assembly from M1 and standings
+        # Context assembly from M1, Canon Ledger, and standings
         context = assemble_storytelling_context(self.root_dir, self.round_num, self.round_folder)[:12000]
         recent_blocks = "\n".join(self.state.get("transcript_blocks", [])[-2:])
 
@@ -141,18 +229,18 @@ class PressConferenceSession:
         prompt = (
             f"{context}\n\n=== TRANSCRIÇÃO ATÉ O MOMENTO ===\n{recent_blocks}\n\n"
             f"=== TAREFA DA PERGUNTA {idx} DE {total} ===\n"
-            f"Jornalista: {journo_name} ({journo_outlet}) — {journo_desc}\n"
+            f"Jornalista: {journo_name} ({journo_outlet}) — Estilo: {journo_desc}\n"
             f"Piloto Alvo: {target_id.upper()}\n"
-            f"Cenário: É a Pergunta {idx} de {total} da Coletiva Pré-GP da FIA.\n"
-            f"O jornalista deve fazer uma pergunta ácida, instigante e realista baseada nos vazamentos do Módulo 1 (Silly Season da semana) "
-            f"e no resultado da etapa anterior.\n"
+            f"Eixo Temático Obrigatório: {theme_hint}\n"
+            f"Cenário: Pergunta {idx} de {total} da Coletiva Pré-GP da FIA.\n"
+            f"O jornalista deve formular uma pergunta ácida, instigante, realista e bem fundamentada nos fatos do M1 e no último GP.\n"
         )
 
         if not is_human:
             prompt += (
-                f"Como {target_id.upper()} é um NPC, gere a pergunta do jornalista e em seguida a resposta completa e autêntica de {target_id.upper()}, "
-                f"mantendo a sua personalidade e desdém ou competitividade. "
-                f"IMPORTANTE: Mantenha a pergunta e a resposta concisas e diretas (máximo de 1.200 caracteres no total) para dinamismo no Discord.\n"
+                f"Como {target_id.upper()} é um NPC, gere a pergunta do jornalista e a resposta completa de {target_id.upper()}, "
+                f"respeitando sua postura autêntica (desdém, autoconfiança, ironia ou frieza).\n"
+                f"IMPORTANTE: Pergunta e resposta concisas (máximo de 1.100 caracteres no total) para dinamismo no Discord.\n"
                 f"Formate como:\n"
                 f"🎙️ **[Pergunta {idx} de {total} | {journo_name} ({journo_outlet}) para {target_id.capitalize()}]:** \"...\"\n\n"
                 f"💬 **{target_id.capitalize()}:** \"...\"\n"
@@ -162,13 +250,13 @@ class PressConferenceSession:
                     model=self.ai_client.flash_model,
                     parts=[{"text": prompt}],
                     system_instruction="Você é o moderador e narrador da Coletiva Oficial da FIA.",
-                    temperature=0.4,
+                    temperature=0.5,
                 ).strip()
-            except Exception as exc:
+            except Exception:
                 gen_text = (
                     f"🎙️ **[Pergunta {idx} de {total} | {journo_name} ({journo_outlet}) para {target_id.capitalize()}]:** "
-                    f"\"Como você avalia as chances da equipe neste fim de semana após os problemas do último GP?\"\n\n"
-                    f"💬 **{target_id.capitalize()}:** \"Estamos focados em nosso trabalho e confiantes no ritmo.\""
+                    f"\"Como você avalia as chances da equipe neste fim de semana após as especulações de bastidor?\"\n\n"
+                    f"💬 **{target_id.capitalize()}:** \"Estamos focados em nosso trabalho e confiantes no ritmo do carro.\""
                 )
 
             self.state.setdefault("transcript_blocks", []).append(gen_text)
@@ -180,8 +268,8 @@ class PressConferenceSession:
             driver_name, discord_tag, car_desc = DRIVER_MENTIONS[target_id]
             prompt += (
                 f"Como {driver_name} é um PILOTO HUMANO, gere APENAS a pergunta provocativa de {journo_name} "
-                f"e a reação corporal dos outros pilotos na bancada. NÃO responda pelo piloto! "
-                f"Encerre estritamente com a chamada para o piloto responder.\n"
+                f"e a reação corporal inicial da sala ou bancada. NÃO responda pelo piloto humano!\n"
+                f"IMPORTANTE: NUNCA use clichês batidos como 'digitam freneticamente nos laptops', 'sorriso de canto de boca' ou 'fita o horizonte'.\n"
                 f"Formate como:\n"
                 f"🎙️ **[Pergunta {idx} de {total} | {journo_name} ({journo_outlet}) para {driver_name} ({car_desc})]:**\n"
                 f"\"...\"\n\n"
@@ -192,12 +280,12 @@ class PressConferenceSession:
                     model=self.ai_client.flash_model,
                     parts=[{"text": prompt}],
                     system_instruction="Você é o moderador e narrador da Coletiva Oficial da FIA.",
-                    temperature=0.45,
+                    temperature=0.55,
                 ).strip()
-            except Exception as exc:
+            except Exception:
                 gen_text = (
                     f"🎙️ **[Pergunta {idx} de {total} | {journo_name} ({journo_outlet}) para {driver_name} ({car_desc})]:**\n"
-                    f"\"Os vazamentos desta semana apontam forte pressão sobre você. Como você responde a essas especulações?\"\n"
+                    f"\"Os vazamentos desta semana apontam forte pressão sobre o seu desempenho. Como você responde a essas especulações?\"\n"
                 )
 
             call_to_action = (
@@ -216,12 +304,11 @@ class PressConferenceSession:
     def submit_pilot_answer(self, driver_id: str, raw_answer: str) -> str:
         """
         Receives human pilot answer from Discord, incorporates into transcript and Canon Ledger,
-        and generates immediate room reaction.
+        and generates context-aware, organic room reaction based on Canon Ledger relationships.
         """
         clean_answer = raw_answer.strip()
         driver_name, discord_tag, car_desc = DRIVER_MENTIONS.get(driver_id, (driver_id.capitalize(), driver_id, "Piloto"))
         idx = self.state.get("current_question_idx", 1)
-        total = self.state.get("total_questions", 5)
 
         # 1. Register in Canon Ledger
         ledger_path = self.root_dir / "data" / "state" / "canon_ledger.json"
@@ -230,27 +317,39 @@ class PressConferenceSession:
             event_id=f"ET{self.round_num:02d}-M2-Q{idx}",
             round_num=self.round_num,
             module="M2_COLETIVA",
-            summary=f"Na Coletiva Oficial FIA da Etapa {self.round_num}, {driver_name} declarou à imprensa: '{clean_answer[:200]}'",
+            summary=f"Na Coletiva Oficial FIA da Etapa {self.round_num}, {driver_name} declarou à imprensa: '{clean_answer[:220]}'",
             entities=[driver_id, "fia"],
             status="OPEN",
         )
 
-        # 2. Generate room reaction via Gemini
+        # 2. Load relationships for nuanced reaction
+        ledger_data = mgr.load()
+        relationships = ledger_data.get("relationships", {})
+        storm_core = relationships.get("brazilian_storm_core", {})
+        grid_dynamics = relationships.get("grid_rivalries_and_dynamics", {})
+        rel_str = f"Brazilian Storm: {json.dumps(storm_core, ensure_ascii=False)} | Grid: {json.dumps(grid_dynamics, ensure_ascii=False)}"
+
+        # 3. Generate room reaction via Gemini
         q_text = self.state.get("pending_question_text", "")
         prompt = (
+            f"SITUAÇÃO DA COLETIVA FIA (Etapa {self.round_num}):\n"
             f"Pergunta feita: {q_text}\n"
             f"Resposta de {driver_name}: \"{clean_answer}\"\n\n"
-            f"Gere em 1 parágrafo curto (máximo 250 caracteres) a reação no recinto: como os jornalistas anotaram nos laptops, "
-            f"o olhar dos chefes de equipe ou dos rivais na bancada (como Verstappen ou Hamilton), e o moderador Tom Clarkson chamando o próximo tópico."
+            f"RELAÇÕES DO CANON LEDGER:\n{rel_str}\n\n"
+            f"TAREFA:\n"
+            f"Gere em 1 parágrafo curto (máximo 220 caracteres) a reação no recinto.\n\n"
+            f"REGRAS DE OURO:\n"
+            f"- PROIBIDO usar clichês repetitivos como 'digitam freneticamente nos laptops', 'sorriso de canto de boca', 'canto de sorriso', 'Hamilton fita o horizonte', 'Tom Clarkson pigarreia cortando o clima'.\n"
+            f"- Varie a perspectiva entre: a postura de um dos chefes de equipe no fundo da sala (Toto, Vowles, Binotto, Marko); a cumplicidade ou ironia entre Sarah, Felipe e Davi (irmãos competitivos/mentor e pupilos); a reação irritada ou indiferente de Verstappen/Alonso; ou um burburinho agudo entre os correspondentes italianos, espanhóis ou britânicos."
         )
         try:
             reaction = self.ai_client._call_generate_content(
                 model=self.ai_client.flash_model,
                 parts=[{"text": prompt}],
-                temperature=0.3,
+                temperature=0.65,
             ).strip()
         except Exception:
-            reaction = "Os jornalistas digitam furiosamente nos laptops enquanto o moderador Tom Clarkson agradece e reorganiza as anotações."
+            reaction = "Um silêncio momentâneo toma a sala enquanto os comissários e repórteres trocam olhares rápidos após a declaração enfática."
 
         qa_block = (
             f"{q_text}\n\n"
@@ -273,7 +372,10 @@ class PressConferenceSession:
         return ack
 
     def _conclude_session(self) -> Tuple[str, bool, Optional[str]]:
-        """Concludes the press conference, saves Markdown report, and triggers Portal deploy."""
+        """
+        Concludes the press conference, saves Markdown report, triggers Portal deploy,
+        and posts automated media coverage dispatch to #repercussao-midia.
+        """
         gp_name = self.meta["name"]
         filename = f"Etapa {self.round_num:02d} - Relatório Oficial FIA - Coletiva de Imprensa Pré-GP - {gp_name} 2026.md"
         target_md = self.round_dir / filename
@@ -294,11 +396,29 @@ class PressConferenceSession:
         self.state["completed"] = True
         self._save_state(self.state)
 
+        portal_url = os.environ.get("PORTAL_PUBLIC_URL", "https://tricman.github.io/f1-2026-portal/")
+
+        # Post dispatch to #repercussao-midia (Media publish channel)
+        try:
+            from src.discord_gateway import DiscordGatewayClient
+            gw = DiscordGatewayClient()
+            dispatch = (
+                f"🏛️ **COLETIVA OFICIAL DA FIA CONCLUÍDA — {self.meta['flag']} {gp_name.upper()} 2026 (ETAPA {self.round_num})**\n"
+                f"📍 *Sala de Imprensa Oficial do Circuito*\n\n"
+                f"🎙️ **DECLARAÇÕES DE BASTIDORES & ATA OFICIAL ENCERRADA!**\n"
+                f"A bancada de pilotos da Formula 1 e da Brazilian Storm encarou a imprensa mundial em uma sessão inflamada em {gp_name}.\n\n"
+                f"📰 **Confira a Ata Oficial na Íntegra e a Cobertura Editorial Completa no Portal F1 2026:**\n"
+                f"🔗 {portal_url}"
+            )
+            gw.post_channel_message(gw.publish_channel_id, dispatch)
+        except Exception as exc:
+            warning(f"[PRESS CONF DISPATCH ERROR] Falha ao enviar para canal de mídia: {exc}")
+
         closing_msg = (
             f"🏛️ **COLETIVA DE IMPRENSA OFICIAL DA FIA ENCERRADA!**\n"
-            f"• Ata e crônica completa compiladas em `{filename}`.\n"
+            f"• Ata oficial e crônica compiladas em `{filename}`.\n"
             f"• As respostas de Sarah, Felipe e Davi foram incorporadas ao Canon Oficial de 2026.\n"
+            f"📰 **Crônica Publicada:** Canal <#1536416375969685524> e no Portal Mobile: {portal_url}\n"
             f"👉 O fim de semana de corrida está aberto! Quando prontos, digitem **`inicio da etapa {self.round_num}`** no canal de voz!"
         )
         return (closing_msg, False, None)
-
