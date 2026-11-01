@@ -250,6 +250,39 @@ def publish_round_to_discord(round_folder: str, teaser_mode: bool = True, base_p
         )
 
 
+def acquire_listener_lock(lock_file: Path) -> None:
+    """Ensure strictly ONE listener instance runs on the machine at any time."""
+    import atexit
+    current_pid = os.getpid()
+    if lock_file.exists():
+        try:
+            old_pid = int(lock_file.read_text(encoding="utf-8").strip())
+            if old_pid != current_pid:
+                res = subprocess.run(
+                    ["tasklist", "/FI", f"PID eq {old_pid}", "/FO", "CSV", "/NH"],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+                if str(old_pid) in res.stdout:
+                    subprocess.run(["taskkill", "/F", "/PID", str(old_pid)], capture_output=True, check=False)
+                    time.sleep(0.5)
+        except Exception:
+            pass
+
+    lock_file.parent.mkdir(parents=True, exist_ok=True)
+    lock_file.write_text(str(current_pid), encoding="utf-8")
+
+    def _cleanup():
+        try:
+            if lock_file.exists() and int(lock_file.read_text(encoding="utf-8").strip()) == os.getpid():
+                lock_file.unlink()
+        except Exception:
+            pass
+
+    atexit.register(_cleanup)
+
+
 def main() -> None:
     load_dotenv_if_present()
     parser = argparse.ArgumentParser(description="F1 24 Showrunner & FIA Orchestrator CLI")
@@ -378,6 +411,7 @@ def main() -> None:
                 break
             time.sleep(args.interval)
     elif args.action == "autonomous-session":
+        acquire_listener_lock(ROOT_DIR / "data" / "state" / "listener.pid")
         from src.ai_showrunner import (
             GeminiFreeTierClient,
             finalize_round_transition,
