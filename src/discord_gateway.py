@@ -404,12 +404,40 @@ class DiscordGatewayClient:
                         )
                     continue
 
+            # Interactive Press Conference Answer Detection (Trava de Turno)
+            active_r_num = int(state.get("active_round_num") or 11)
+            active_folder = state.get("active_round_folder") or ROUND_NUMBER_TO_FOLDER.get(active_r_num, f"et_{active_r_num:02d}")
+            press_conf_file = root_dir / "data" / "state" / f"press_conf_et{active_r_num:02d}.json"
+            if content and not cmd and msg_id not in processed_msg_ids and press_conf_file.exists():
+                try:
+                    pc_data = json.loads(press_conf_file.read_text(encoding="utf-8"))
+                    if pc_data.get("status") == "AWAITING_PILOT_REPLY":
+                        processed_msg_ids.add(msg_id)
+                        waiting_driver = pc_data.get("waiting_for_driver") or "felipe"
+                        from src.press_conference import PressConferenceSession
+                        pc_sess = PressConferenceSession(root_dir, active_r_num, active_folder)
+                        ack_msg = pc_sess.submit_pilot_answer(waiting_driver, content)
+                        if should_reply:
+                            self.post_channel_message(self.ingest_channel_id, ack_msg)
+                        next_msg, is_lock, next_driver = pc_sess.advance_to_next_question()
+                        if should_reply and next_msg:
+                            self.post_channel_message(self.ingest_channel_id, next_msg)
+
+                        # Se a pergunta seguinte for de NPC (is_lock == False), avança automaticamente até atingir o próximo piloto humano ou o término
+                        while not is_lock and not pc_sess.state.get("completed"):
+                            time.sleep(3.0)
+                            next_msg, is_lock, next_driver = pc_sess.advance_to_next_question()
+                            if should_reply and next_msg:
+                                self.post_channel_message(self.ingest_channel_id, next_msg)
+                        continue
+                except Exception as exc:
+                    print(f"[Press Conf Answer Warning] {exc}")
+
             # Only collect attachments and debrief notes sent AFTER the current session's `start_message_id`
             start_id = state.get("start_message_id")
             if state.get("status") != "COLLECTING" or (start_id and int(msg_id) <= int(start_id)):
                 continue
 
-            active_folder = state.get("active_round_folder") or "et_10_espanha"
             tel_dir = root_dir / "data" / "seasons" / "season_01" / active_folder / "telemetry"
             photos_dir = root_dir / "data" / "seasons" / "season_01" / active_folder / "photos"
             debrief_dir = root_dir / "data" / "seasons" / "season_01" / active_folder / "debriefing"
@@ -453,27 +481,6 @@ class DiscordGatewayClient:
                     self.ingest_channel_id,
                     f"📥 **Recebido de {author_name}:** " + " | ".join(ack_parts),
                 )
-
-            # Interactive Press Conference Answer Detection (Trava de Turno)
-            active_r_num = int(state.get("active_round_num") or 10)
-            press_conf_file = root_dir / "data" / "state" / f"press_conf_et{active_r_num:02d}.json"
-            if content and not cmd and msg_id not in processed_msg_ids and press_conf_file.exists():
-                try:
-                    pc_data = json.loads(press_conf_file.read_text(encoding="utf-8"))
-                    if pc_data.get("status") == "AWAITING_PILOT_REPLY":
-                        processed_msg_ids.add(msg_id)
-                        waiting_driver = pc_data.get("waiting_for_driver") or "felipe"
-                        from src.press_conference import PressConferenceSession
-                        pc_sess = PressConferenceSession(root_dir, active_r_num, active_folder)
-                        ack_msg = pc_sess.submit_pilot_answer(waiting_driver, content)
-                        if should_reply:
-                            self.post_channel_message(self.ingest_channel_id, ack_msg)
-                        next_msg, is_lock, next_driver = pc_sess.advance_to_next_question()
-                        if should_reply and next_msg:
-                            self.post_channel_message(self.ingest_channel_id, next_msg)
-                        continue
-                except Exception as exc:
-                    print(f"[Press Conf Answer Warning] {exc}")
 
             # 2. Capture non-command text messages as driver debriefing notes
             if content and not cmd and msg_id not in processed_msg_ids and state.get("status") == "COLLECTING":

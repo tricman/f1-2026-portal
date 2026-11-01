@@ -51,78 +51,20 @@ def select_press_conference_panel(
     return [by_id[d_id] for d_id in panel_ids]
 
 
-class CanonLedgerManager:
-    def __init__(self, ledger_path: Path):
-        self.ledger_path = ledger_path
-        self.ledger_path.parent.mkdir(parents=True, exist_ok=True)
-        if not self.ledger_path.exists():
-            self._init_default_ledger()
+from src.repositories.factory import get_repository
+from src.repositories.base_repository import IDataRepository
 
-    def _init_default_ledger(self) -> None:
-        initial = {
-            "season": 2026,
-            "reputation": {
-                "sarah": {
-                    "score": 45,
-                    "archetype": "Ice Queen / Prodígio Implacável",
-                    "public_perception": "Admirada pela genialidade técnica em Brackley e frieza cirúrgica; respeitada e temida pelos veteranos.",
-                },
-                "felipe": {
-                    "score": 70,
-                    "archetype": "O Professor / Monge de Hinwil",
-                    "public_perception": "Herói técnico do Paddock; visto como mentor da Brazilian Storm e milagreiro da KICK Sauber.",
-                },
-                "davi": {
-                    "score": 30,
-                    "archetype": "O Leão de Grove / Showman Agressivo",
-                    "public_perception": "Amado pela velocidade bruta e ultrapassagens no limite, mas visado pelos comissários e pela Red Bull.",
-                },
-            },
-            "events": [
-                {
-                    "event_id": "ET08-MC-01",
-                    "round": 8,
-                    "module": "M5_CORRIDA",
-                    "summary": "Toque de Verstappen na traseira de Felipe na saída do Túnel em Mônaco causou DNF de Felipe e perda de asa de Davi; WMSC deduziu -10 pts de Construtores da Red Bull.",
-                    "entities": ["felipe", "verstappen", "davi", "sauber", "red_bull"],
-                    "status": "OPEN",
-                },
-                {
-                    "event_id": "ET08-MC-02",
-                    "round": 8,
-                    "module": "M5_CORRIDA",
-                    "summary": "Sarah foi desclassificada (DSQ) em Mônaco quando liderava com Pole e Volta Mais Rápida por suposto desrespeito a bandeira amarela; Mercedes recorreu em Paris.",
-                    "entities": ["sarah", "mercedes", "fia"],
-                    "status": "OPEN",
-                },
-                {
-                    "event_id": "ET09-CA-01",
-                    "round": 9,
-                    "module": "M5_CORRIDA",
-                    "summary": "Segundo pódio 100% brasileiro da história no Canadá: Sarah P1, Davi P2 (+VR 1:13.846 pressionando até o fim) e Felipe P3 segurando Hamilton.",
-                    "entities": ["sarah", "davi", "felipe", "hamilton"],
-                    "status": "RESOLVED",
-                },
-                {
-                    "event_id": "ET10-ES-M1",
-                    "round": 10,
-                    "module": "M1_SEMANA_EQUIPES",
-                    "summary": "Semana pré-Espanha fervendo: Toto Wolff e Jules Moreau alinharam blindagem de 80 milhões de euros para Sarah; Helmut Marko levou porta na cara de James Vowles ao sondar Davi; estafe de Sainz jantou com executivos da Audi/Sauber; ultimato sobre Checo Pérez.",
-                    "entities": ["sarah", "davi", "felipe", "sainz", "perez", "verstappen"],
-                    "status": "OPEN",
-                },
-            ],
-        }
-        self.save(initial)
+
+class CanonLedgerManager:
+    def __init__(self, ledger_path: Optional[Path] = None, repo: Optional[IDataRepository] = None):
+        self.repo = repo or get_repository()
+        self.ledger_path = ledger_path or (Path(__file__).resolve().parent.parent / "data" / "state" / "canon_ledger.json")
 
     def load(self) -> Dict[str, Any]:
-        return json.loads(self.ledger_path.read_text(encoding="utf-8"))
+        return self.repo.get_canon_ledger()
 
     def save(self, data: Dict[str, Any]) -> None:
-        self.ledger_path.write_text(
-            json.dumps(data, indent=2, ensure_ascii=False) + "\n",
-            encoding="utf-8",
-        )
+        self.repo.save_canon_ledger(data)
 
     def append_event(
         self,
@@ -133,16 +75,12 @@ class CanonLedgerManager:
         entities: List[str],
         status: str = "OPEN",
     ) -> None:
-        data = self.load()
-        existing_ids = {e["event_id"] for e in data["events"]}
-        if event_id not in existing_ids:
-            data["events"].append({
-                "event_id": event_id,
-                "round": round_num,
-                "module": module,
-                "summary": summary,
-                "entities": entities,
-                "status": status,
-            })
-            self.save(data)
+        self.repo.append_canon_event(
+            event_id=event_id,
+            round_num=round_num,
+            module=module,
+            summary=summary,
+            entities=entities,
+            status=status,
+        )
 

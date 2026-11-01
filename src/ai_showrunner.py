@@ -513,6 +513,10 @@ def generate_pre_race_m1(
         md_content = f"# 🏁 A F1 QUE VOCÊ NÃO VÊ — A Semana da F1 (Etapa {round_num})\n\nBastidores e intrigas no Paddock pré-{round_folder}.\n"
 
     target_file.write_text(md_content + "\n", encoding="utf-8")
+    try:
+        extract_and_record_m1_canon_event(root_dir, round_num, round_folder, md_content, ai_client)
+    except Exception as exc:
+        print(f"[Canon Event Warning] Falha ao sintetizar evento M1: {exc}")
     return target_file
 
 
@@ -643,7 +647,90 @@ def generate_m1_daily_episode(
         f"• **Foco:** *{day_theme_focus}*\n"
         f"> *\"{clean_snippet}...\"*"
     )
+    # If day 4 is reached (Thursday), synthesize and record canon event
+    if day_num == 4:
+        try:
+            extract_and_record_m1_canon_event(root_dir, round_num, round_folder, full_md, ai_client)
+        except Exception as exc:
+            print(f"[Canon Event Warning] Falha ao sintetizar evento M1 (Dia 4): {exc}")
+
     return target_file, teaser_summary
+
+
+def extract_and_record_m1_canon_event(
+    root_dir: Path,
+    round_num: int,
+    round_folder: str,
+    m1_content: str,
+    ai_client: GeminiFreeTierClient,
+) -> Dict[str, Any]:
+    """
+    Synthesizes the key political/contractual events from M1 and registers
+    an official Canon Ledger event with status 'OPEN'.
+    """
+    from src.canon_ledger import CanonLedgerManager
+
+    prompt = (
+        f"Analise o dossiê da semana pré-corrida da F1 (Módulo 1) abaixo para a Etapa {round_num} ({round_folder}):\n\n"
+        f"{m1_content[:15000]}\n\n"
+        f"TAREFA:\n"
+        f"Identifique os 3 a 5 fatos políticos, contratuais, atritos de garagem ou vazamentos mais impactantes da semana "
+        f"que devem virar memória canônica permanente para os próximos GPs (ex: blindagens contratuais, sondagens rivais, ultimatos de chefia).\n"
+        f"Resuma em um único parágrafo conciso (250 a 450 caracteres) com tom analítico e jornalístico.\n"
+        f"Na última linha, forneça 'ENTIDADES: ' seguido das entidades separadas por vírgula (ex: sarah, felipe, davi, verstappen, audi, red_bull, mercedes)."
+    )
+
+    try:
+        raw_res = ai_client._call_generate_content(
+            model=ai_client.flash_model,
+            parts=[{"text": prompt}],
+            system_instruction="Você é o arquivista e curador histórico da FIA e do Paddock de 2026.",
+            temperature=0.3,
+        ).strip()
+    except Exception as exc:
+        raw_res = f"Semana pré-{round_folder} fervendo com movimentações contratuais e especulações técnicas de bastidores."
+
+    # Parse summary and entities
+    lines = [l.strip() for l in raw_res.splitlines() if l.strip()]
+    summary_parts = []
+    entities = ["f1", round_folder]
+    for line in lines:
+        if line.upper().startswith("ENTIDADES:"):
+            clean_line = re.sub(r"(?i)^entidades?:\s*", "", line).strip()
+            found = [w.strip().lower() for w in re.split(r"[,;]", clean_line) if w.strip()]
+            if found:
+                entities = found
+        else:
+            summary_parts.append(line)
+
+    summary = " ".join(summary_parts).strip()
+    if not summary:
+        summary = raw_res
+
+    # Auto-tag Brazilian Storm and major key players if mentioned
+    for d in ("sarah", "felipe", "davi", "verstappen", "hamilton", "alonso", "sauber", "mercedes", "williams", "red_bull", "audi"):
+        if d in summary.lower() and d not in entities:
+            entities.append(d)
+
+    event_id = f"ET{round_num:02d}-ES-M1" if round_num == 10 else f"ET{round_num:02d}-M1-WEEK"
+    mgr = CanonLedgerManager()
+    mgr.append_event(
+        event_id=event_id,
+        round_num=round_num,
+        module="M1_SEMANA_EQUIPES",
+        summary=summary,
+        entities=entities,
+        status="OPEN",
+    )
+    return {
+        "event_id": event_id,
+        "round_num": round_num,
+        "module": "M1_SEMANA_EQUIPES",
+        "summary": summary,
+        "entities": entities,
+        "status": "OPEN",
+    }
+
 
 
 
