@@ -8,6 +8,11 @@ __pycache__/
 .pytest_cache/
 
 # Root temporary uploads (tracked copies live inside data/seasons/season_01/et_XX/)
+logs/
+scratch/
+check_discord_*.py
+inspect_*.py
+validate_*.py
 /*.jpg
 /*.jpeg
 /*.png
