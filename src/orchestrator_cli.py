@@ -452,8 +452,13 @@ def main() -> None:
                 opening = sess.start_session()
                 client.post_channel_message(client.ingest_channel_id, opening)
                 time.sleep(2.0)
-                q1_text, is_lock, driver = sess.advance_to_next_question()
-                client.post_channel_message(client.ingest_channel_id, q1_text)
+                is_lock = False
+                while not is_lock and not sess.state.get("completed"):
+                    q_text, is_lock, driver = sess.advance_to_next_question()
+                    if q_text:
+                        client.post_channel_message(client.ingest_channel_id, q_text)
+                    if not is_lock and not sess.state.get("completed"):
+                        time.sleep(3.0)
 
             if stage_ev and stage_ev.startswith("END_ROUND_") and status_now == "READY_FOR_SIMULATION":
                 r_folder = session_state.get("active_round_folder") or args.round_folder
