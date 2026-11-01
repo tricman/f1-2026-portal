@@ -251,9 +251,14 @@
       "round": 10,
       "entities": [
         "felipe",
-        "fia"
+        "fia",
+        "imprensa",
+        "sauber",
+        "audi",
+        "verstappen",
+        "hamilton"
       ],
-      "summary": "Na Coletiva Oficial FIA da Etapa 10, Felipe declarou à imprensa: 'Boa tarde a todos. Com licença... acho que precisamos colocar alguns pontos nos seus devidos lugares.\nPrimeiro, na Fórmula 1 não existem 'contos de fadas'. O que a imprensa gosta de chamar de surpresa'",
+      "summary": "Na Coletiva Oficial FIA da Etapa 10, Felipe declarou a Erik van Haren (De Telegraaf): 'Na F1 não existem contos de fadas, o P2 da Sauber vem de física, CFD e trabalho duro; cláusulas com a Audi são tratadas por Marcus Thorne e a resposta é dada no asfalto em milissegundos'. Reação no recinto: Max Verstappen deu um meio sorriso irônico aprovando a estocada contra as fofocas da Audi, enquanto Toto Wolff e os engenheiros no fundo da sala trocaram olhares atentos.",
       "status": "OPEN",
       "event_id": "ET10-M2-Q2",
       "module": "M2_COLETIVA"
@@ -262,23 +267,63 @@
       "round": 10,
       "entities": [
         "davi",
-        "fia"
+        "fia",
+        "imprensa",
+        "williams",
+        "hamilton",
+        "alonso"
       ],
-      "summary": "Na Coletiva Oficial FIA da Etapa 10, Davi declarou à imprensa: 'Crítica a gente escuta e absorve, mas a minha agressividade é exatamente o que colocou a Williams na Pole Position em Miami e no pódio do Canadá com a volta mais rápida da prova. Os erros de Melbourne'",
+      "summary": "Na Coletiva Oficial FIA da Etapa 10, Davi declarou a Martin Brundle (Sky Sports F1): 'Minha agressividade botou a Williams na Pole de Miami e no pódio do Canadá com volta mais rápida. Para quem acha que falta casca a um piloto de 20 anos, a gente conversa no ponto de frenagem'. Reação no recinto: Sorriso cúmplice de Hamilton e aprovação comedida de Alonso na bancada sobre a audácia do jovem piloto de Grove.",
       "status": "OPEN",
       "event_id": "ET10-M2-Q3",
       "module": "M2_COLETIVA"
     },
     {
-      "event_id": "ET10-M2-Q5",
       "round": 10,
-      "module": "M2_COLETIVA",
-      "summary": "Na Coletiva Oficial FIA da Etapa 10, Sarah declarou à imprensa: 'Ruído de bastidor não ganha corrida; tempo de volta ganha. A Mercedes não lidera o campeonato por sorte, mas por trabalho e precisão em Brackley. Se os rivais dizem que estão se aproximando na aerodin'",
       "entities": [
         "sarah",
-        "fia"
+        "fia",
+        "imprensa",
+        "mercedes",
+        "hamilton",
+        "verstappen",
+        "felipe"
       ],
-      "status": "OPEN"
+      "summary": "Na Coletiva Oficial FIA da Etapa 10, Sarah declarou a Roberto Chinchero (Motorsport.com / Sky Sport): 'Ruído de bastidor não ganha corrida, tempo de volta ganha. Se a concorrência está se aproximando aerodinamicamente, ótimo; minha resposta sempre esteve e continuará no asfalto'. Reação no recinto: Silêncio gélido com a frieza cirúrgica da 'Ice Queen', enquanto Hamilton observou em silêncio e Verstappen fingiu indiferença.",
+      "status": "OPEN",
+      "event_id": "ET10-M2-Q5",
+      "module": "M2_COLETIVA"
+    },
+    {
+      "round": 10,
+      "entities": [
+        "verstappen",
+        "fia",
+        "imprensa",
+        "red_bull",
+        "mercedes",
+        "sauber"
+      ],
+      "summary": "Na Coletiva Oficial FIA da Etapa 10, Verstappen respondeu a Mariana Becker (Band / Grupo Bandeirantes): 'Essa história de clima esquentado só existe na imprensa. O campeonato é longo, o resto é ruído que eu não tenho tempo para escutar'. Reação no recinto: O clã Red Bull e a bancada acompanharam a resposta ríspida com silêncio tenso.",
+      "status": "OPEN",
+      "event_id": "ET10-M2-Q1",
+      "module": "M2_COLETIVA"
+    },
+    {
+      "round": 10,
+      "entities": [
+        "alonso",
+        "fia",
+        "imprensa",
+        "aston_martin",
+        "honda",
+        "red_bull",
+        "verstappen"
+      ],
+      "summary": "Na Coletiva Oficial FIA da Etapa 10, Alonso respondeu a Julianne Cerasoli (UOL Esporte / Band): 'Aos 44 anos minha taxa de reação ainda é melhor do que muita gente começando ou em escritórios frios; estou na Aston Martin pelo projeto com a Honda e venço corridas quando a oportunidade aparece'. Reação no recinto: Max Verstappen negou com a cabeça disfarçando o riso enquanto os repórteres espanhóis vibravam no auditório.",
+      "status": "OPEN",
+      "event_id": "ET10-M2-Q4",
+      "module": "M2_COLETIVA"
     }
   ]
 }

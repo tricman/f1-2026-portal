@@ -55,9 +55,17 @@ class LocalJsonRepository(IDataRepository):
         status: str = "OPEN",
     ) -> None:
         ledger = self.get_canon_ledger()
-        existing_ids = {e.get("event_id") for e in ledger.get("events", [])}
-        if event_id not in existing_ids:
-            ledger.setdefault("events", []).append({
+        events = ledger.setdefault("events", [])
+        found = False
+        for ev in events:
+            if ev.get("event_id") == event_id:
+                ev["summary"] = summary
+                ev["entities"] = entities
+                ev["status"] = status
+                found = True
+                break
+        if not found:
+            events.append({
                 "event_id": event_id,
                 "round": round_num,
                 "module": module,
@@ -65,7 +73,7 @@ class LocalJsonRepository(IDataRepository):
                 "entities": entities,
                 "status": status,
             })
-            self.save_canon_ledger(ledger)
+        self.save_canon_ledger(ledger)
 
     # 2. Championship Standings
     def get_standings(self, round_num: Optional[int] = None) -> Dict[str, Any]:

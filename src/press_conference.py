@@ -230,12 +230,13 @@ class PressConferenceSession:
 
         if not is_human:
             prompt += (
-                f"Como {target_id.upper()} é um NPC, gere a pergunta do jornalista e a resposta completa de {target_id.upper()}, "
-                f"respeitando sua postura autêntica (desdém, autoconfiança, ironia ou frieza).\n"
-                f"IMPORTANTE: Pergunta e resposta concisas (máximo de 1.100 caracteres no total) para dinamismo no Discord.\n"
+                f"Como {target_id.upper()} é um NPC, gere a pergunta do jornalista, a resposta completa de {target_id.upper()} "
+                f"e a reação corporal imediata no recinto ou bancada.\n"
+                f"IMPORTANTE: Pergunta, resposta e reação concisas (máximo de 1.100 caracteres no total) para dinamismo no Discord.\n"
                 f"Formate como:\n"
                 f"🎙️ **[Pergunta {idx} de {total} | {journo_name} ({journo_outlet}) para {target_id.capitalize()}]:** \"...\"\n\n"
-                f"💬 **{target_id.capitalize()}:** \"...\"\n"
+                f"💬 **{target_id.capitalize()}:** \"...\"\n\n"
+                f"*Reação do Recinto:* ...\n"
             )
             try:
                 gen_text = self.ai_client._call_generate_content(
@@ -248,8 +249,36 @@ class PressConferenceSession:
                 gen_text = (
                     f"🎙️ **[Pergunta {idx} de {total} | {journo_name} ({journo_outlet}) para {target_id.capitalize()}]:** "
                     f"\"Como você avalia as chances da equipe neste fim de semana após as especulações de bastidor?\"\n\n"
-                    f"💬 **{target_id.capitalize()}:** \"Estamos focados em nosso trabalho e confiantes no ritmo do carro.\""
+                    f"💬 **{target_id.capitalize()}:** \"Estamos focados em nosso trabalho e confiantes no ritmo do carro.\"\n\n"
+                    f"*Reação do Recinto:* Os comissários e repórteres registram as declarações em silêncio concentrado."
                 )
+
+            # Persist NPC answer & reaction into Canon Ledger
+            try:
+                ledger_path = self.root_dir / "data" / "state" / "canon_ledger.json"
+                mgr = CanonLedgerManager(ledger_path)
+                
+                resp_match = re.search(r"💬\s*\*\*?[^:]+\*\*?:\s*["']?([^"'\n]+(?:["']?[^\n]+)?)", gen_text)
+                clean_npc_ans = resp_match.group(1).strip() if resp_match else "Declaração aos repórteres da FIA."
+                
+                react_match = re.search(r"\*([^*]+)\*\s*$", gen_text.strip())
+                npc_react = react_match.group(1).strip() if react_match else "A sala de imprensa acompanha em silêncio atento."
+                
+                entities = [target_id, "fia", "imprensa"]
+                for d in ("sarah", "felipe", "davi", "verstappen", "hamilton", "alonso", "leclerc", "norris", "perez", "sainz", "audi", "red_bull", "mercedes", "ferrari", "aston_martin", "williams", "sauber", "vcarb"):
+                    if d in gen_text.lower() and d not in entities:
+                        entities.append(d)
+                
+                mgr.append_event(
+                    event_id=f"ET{self.round_num:02d}-M2-Q{idx}",
+                    round_num=self.round_num,
+                    module="M2_COLETIVA",
+                    summary=f"Na Coletiva Oficial FIA da Etapa {self.round_num}, {target_id.capitalize()} respondeu a {journo_name} ({journo_outlet}): '{clean_npc_ans[:200]}'. Reação no recinto: {npc_react[:180]}",
+                    entities=entities,
+                    status="OPEN",
+                )
+            except Exception as e_reg:
+                warning(f"[PRESS CONF CANON REGISTRATION ERROR] Falha ao registrar NPC no Canon Ledger: {e_reg}")
 
             self.state.setdefault("transcript_blocks", []).append(gen_text)
             self._save_state(self.state)
@@ -302,26 +331,22 @@ class PressConferenceSession:
         driver_name, discord_tag, car_desc = DRIVER_MENTIONS.get(driver_id, (driver_id.capitalize(), driver_id, "Piloto"))
         idx = self.state.get("current_question_idx", 1)
 
-        # 1. Register in Canon Ledger
+        # 1. Load relationships and journalist context
         ledger_path = self.root_dir / "data" / "state" / "canon_ledger.json"
         mgr = CanonLedgerManager(ledger_path)
-        mgr.append_event(
-            event_id=f"ET{self.round_num:02d}-M2-Q{idx}",
-            round_num=self.round_num,
-            module="M2_COLETIVA",
-            summary=f"Na Coletiva Oficial FIA da Etapa {self.round_num}, {driver_name} declarou à imprensa: '{clean_answer[:220]}'",
-            entities=[driver_id, "fia"],
-            status="OPEN",
-        )
-
-        # 2. Load relationships for nuanced reaction
         ledger_data = mgr.load()
         relationships = ledger_data.get("relationships", {})
         storm_core = relationships.get("brazilian_storm_core", {})
         grid_dynamics = relationships.get("grid_rivalries_and_dynamics", {})
         rel_str = f"Brazilian Storm: {json.dumps(storm_core, ensure_ascii=False)} | Grid: {json.dumps(grid_dynamics, ensure_ascii=False)}"
 
-        # 3. Generate room reaction via Gemini
+        plan = self.state.get("question_plan", [])
+        item = plan[idx - 1] if plan and len(plan) >= idx else {}
+        journo = item.get("journalist", {})
+        journo_name = journo.get("name", "Imprensa Credenciada")
+        journo_outlet = journo.get("outlet", "FIA Media Hub")
+
+        # 2. Generate room reaction via Gemini
         q_text = self.state.get("pending_question_text", "")
         prompt = (
             f"SITUAÇÃO DA COLETIVA FIA (Etapa {self.round_num}):\n"
@@ -341,7 +366,23 @@ class PressConferenceSession:
                 temperature=0.65,
             ).strip()
         except Exception:
-            reaction = "Um silêncio momentâneo toma a sala enquanto os comissários e repórteres trocam olhares rápidos após a declaração enfática."
+            reaction = "Um silêncio momentâneo toma a sala enquanto comissários e repórteres trocam olhares rápidos após a declaração enfática."
+
+        # 3. Register in Canon Ledger WITH answer and reaction
+        entities = [driver_id, "fia", "imprensa"]
+        full_ctx = f"{clean_answer} {reaction} {q_text}"
+        for d in ("sarah", "felipe", "davi", "verstappen", "hamilton", "alonso", "leclerc", "norris", "perez", "sainz", "audi", "red_bull", "mercedes", "ferrari", "aston_martin", "williams", "sauber", "vcarb"):
+            if d in full_ctx.lower() and d not in entities:
+                entities.append(d)
+
+        mgr.append_event(
+            event_id=f"ET{self.round_num:02d}-M2-Q{idx}",
+            round_num=self.round_num,
+            module="M2_COLETIVA",
+            summary=f"Na Coletiva Oficial FIA da Etapa {self.round_num}, {driver_name} declarou a {journo_name} ({journo_outlet}): '{clean_answer[:200]}'. Reação no recinto: {reaction[:180]}",
+            entities=entities,
+            status="OPEN",
+        )
 
         qa_block = (
             f"{q_text}\n\n"
