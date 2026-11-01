@@ -195,12 +195,38 @@ class DiscordGatewayClient:
                 time.sleep(2 ** attempt)
 
     def post_channel_message(self, channel_id: str, content: str) -> Dict[str, Any]:
-        """Post a message directly to a Discord channel using the Bot Token."""
+        """Post a message directly to a Discord channel using the Bot Token, splitting safely if > 1900 chars."""
         if not self.bot_token:
             raise PermissionError("DISCORD_BOT_TOKEN is required to post channel messages.")
         url = f"{DISCORD_API_BASE}/channels/{channel_id}/messages"
-        res = self._request_with_backoff(url, method="POST", payload={"content": content})
-        return res if isinstance(res, dict) else {}
+
+        # Discord limit is 2000 chars. Split at paragraph/line boundaries if exceeding 1900 chars.
+        if len(content) <= 1900:
+            res = self._request_with_backoff(url, method="POST", payload={"content": content})
+            return res if isinstance(res, dict) else {}
+
+        chunks: List[str] = []
+        rem = content
+        while len(rem) > 1900:
+            cut = rem.rfind("\n\n", 0, 1900)
+            if cut == -1:
+                cut = rem.rfind("\n", 0, 1900)
+            if cut == -1:
+                cut = rem.rfind(" ", 0, 1900)
+            if cut == -1:
+                cut = 1900
+            chunks.append(rem[:cut].strip())
+            rem = rem[cut:].strip()
+        if rem:
+            chunks.append(rem)
+
+        last_res: Dict[str, Any] = {}
+        for idx, chunk in enumerate(chunks):
+            if chunk:
+                last_res = self._request_with_backoff(url, method="POST", payload={"content": chunk})
+                if idx < len(chunks) - 1:
+                    time.sleep(0.8)
+        return last_res if isinstance(last_res, dict) else {}
 
     def fetch_recent_ingest_attachments(self, limit: int = 25) -> List[Dict[str, Any]]:
         """

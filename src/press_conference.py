@@ -152,6 +152,7 @@ class PressConferenceSession:
             prompt += (
                 f"Como {target_id.upper()} é um NPC, gere a pergunta do jornalista e em seguida a resposta completa e autêntica de {target_id.upper()}, "
                 f"mantendo a sua personalidade e desdém ou competitividade. "
+                f"IMPORTANTE: Mantenha a pergunta e a resposta concisas e diretas (máximo de 1.200 caracteres no total) para dinamismo no Discord.\n"
                 f"Formate como:\n"
                 f"🎙️ **[Pergunta {idx} de {total} | {journo_name} ({journo_outlet}) para {target_id.capitalize()}]:** \"...\"\n\n"
                 f"💬 **{target_id.capitalize()}:** \"...\"\n"
