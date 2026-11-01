@@ -90,33 +90,21 @@ class PressConferenceSession:
 
     def _generate_conference_plan(self, panel: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
-        Dynamically plan 5 questions with deterministic RNG per round:
-        - 3 questions guaranteed for Brazilian Storm (Sarah, Felipe, Davi)
-        - 2 questions for NPCs on the panel (Verstappen, Alonso, Hamilton, Leclerc, etc.)
-        - Shuffled order (no two rounds share the same sequence!)
-        - Dynamic journalists sampled from catalog without duplicates
-        - Dedicated themed angle per question
+        Dynamically plan 5 questions exclusively from the drivers summoned to the panel.
+        No driver is artificially forced. Human drivers participate ONLY if summoned to the panel!
         """
         rng = random.Random(f"press_conf_plan_season2026_r{self.round_num}")
+        panel_driver_ids = [d["id"] for d in panel]
+        if not panel_driver_ids:
+            panel_driver_ids = ["verstappen", "sarah", "felipe", "hamilton", "alonso"]
 
-        # 1. Human drivers order
-        human_drivers = ["felipe", "davi", "sarah"]
-        rng.shuffle(human_drivers)
+        # Shuffle the panel order for the 5 questions
+        shuffled_drivers = list(panel_driver_ids)
+        rng.shuffle(shuffled_drivers)
 
-        # 2. NPC drivers from panel
-        panel_npc_ids = [d["id"] for d in panel if d["id"] not in ("felipe", "davi", "sarah")]
-        if not panel_npc_ids:
-            panel_npc_ids = ["verstappen", "hamilton", "alonso", "leclerc"]
-
-        # Sample 2 distinct NPCs
-        chosen_npcs = rng.sample(panel_npc_ids, k=min(2, len(panel_npc_ids)))
-        while len(chosen_npcs) < 2:
-            candidate = rng.choice(["verstappen", "hamilton", "alonso", "norris", "leclerc"])
-            if candidate not in chosen_npcs:
-                chosen_npcs.append(candidate)
-
-        # Build 5-question driver sequence
-        driver_sequence = [chosen_npcs[0], human_drivers[0], human_drivers[1], chosen_npcs[1], human_drivers[2]]
+        driver_sequence = []
+        for i in range(5):
+            driver_sequence.append(shuffled_drivers[i % len(shuffled_drivers)])
         rng.shuffle(driver_sequence)
 
         # Sample 5 distinct journalists and themes
@@ -140,10 +128,14 @@ class PressConferenceSession:
             except Exception:
                 pass
 
-        # Load standings to select panel
+        # Load standings and Canon Ledger to select panel dynamically
         st_path = self.root_dir / "data" / "state" / "standings.json"
         st = json.loads(st_path.read_text(encoding="utf-8")) if st_path.exists() else {"drivers_standings": []}
-        panel = select_press_conference_panel(st, self.round_num)
+
+        ledger_path = self.root_dir / "data" / "state" / "canon_ledger.json"
+        ledger_data = json.loads(ledger_path.read_text(encoding="utf-8")) if ledger_path.exists() else {}
+
+        panel = select_press_conference_panel(st, self.round_num, canon_ledger=ledger_data)
         panel_names = [f"{d['name']} ({d['team_id'].upper()})" for d in panel]
 
         question_plan = self._generate_conference_plan(panel)
