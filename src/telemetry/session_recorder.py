@@ -259,6 +259,70 @@ class SessionRecorder:
 
         return None
 
+    def flush(self) -> Optional[Dict[str, Any]]:
+        """
+        Synthesize session export from in-memory telemetry if PacketFinalClassificationData
+        was not received (e.g. user quit to menu or stopped the listener right after race).
+        """
+        if self.saved_results:
+            return None
+        if not self.participants:
+            log_text("[SESSION RECORDER] Flush chamado, mas nenhum participante foi registrado nesta sessão.")
+            return None
+
+        log_text("[SESSION RECORDER] 💾 Sintetizando Classificação Oficial a partir da telemetria live...")
+
+        # Sort cars by penalty status and running position
+        active_indices = list(self.participants.keys())
+        active_indices.sort(key=lambda idx: (
+            1 if self.car_penalties.get(idx, 0) >= 255 else 0,
+            self.car_lap.get(idx, {}).get("pos", 99),
+            -self.car_lap.get(idx, {}).get("lap_num", 0)
+        ))
+
+        drivers: List[FinalClassificationDriver] = []
+        for rank, idx in enumerate(active_indices, start=1):
+            lap_info = self.car_lap.get(idx, {})
+            d_laps = self.lap_history.get(idx, [])
+            best_ms = min([l["time_ms"] for l in d_laps], default=lap_info.get("last_ms", 0))
+
+            pen_s = self.car_penalties.get(idx, 0)
+            status = 3  # Finished
+            if pen_s >= 255:
+                status = 4  # DNF / Colisão
+            elif pen_s > 0:
+                status = 3
+
+            vis_compound_code = 16
+            c_code = self.car_status.get(idx, {}).get("visual_tyre", "S")
+            for k, v in VISUAL_TYRE_COMPOUNDS.items():
+                if v == c_code:
+                    vis_compound_code = k
+                    break
+
+            drivers.append(
+                FinalClassificationDriver(
+                    vehicle_idx=idx,
+                    position=rank,
+                    num_laps=lap_info.get("lap_num", self.total_laps or 5),
+                    grid_position=rank,
+                    points=0,
+                    num_pit_stops=lap_info.get("num_pits", 0),
+                    result_status=status,
+                    best_lap_time_ms=best_ms,
+                    total_race_time=0.0,
+                    penalties_time=pen_s if pen_s < 255 else 0,
+                    num_penalties=1 if pen_s > 0 else 0,
+                    num_tyre_stints=1,
+                    tyre_stints_visual=[vis_compound_code],
+                )
+            )
+
+        fc_packet = FinalClassificationPacket(num_cars=len(drivers), classification=drivers)
+        res = self._export_session(fc_packet)
+        self.saved_results = True
+        return res
+
     def _process_event(self, raw_data: bytes) -> None:
         if len(raw_data) < 33:
             return
@@ -266,6 +330,9 @@ class SessionRecorder:
         if event_code == "CHQF":
             self.chequered_flag = True
             log_text("[SESSION RECORDER] 🏁 Bandeira quadriculada detectada no feed UDP!")
+        elif event_code == "SEND":
+            log_text("[SESSION RECORDER] 🏁 Evento SEND (Sessão Encerrada) detectado no feed UDP! Executando flush...")
+            self.flush()
         elif event_code == "PENA":
             # Penalty packet details
             if len(raw_data) >= 40:

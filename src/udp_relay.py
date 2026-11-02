@@ -166,6 +166,9 @@ class UdpTelemetryRelay:
 
     def stop(self) -> None:
         self.running = False
+        if not self.recorder.saved_results and len(self.recorder.participants) > 0:
+            print("💾 Gravando resultados e relatório da sessão antes de encerrar...")
+            self.recorder.flush()
         if self.rx_socket:
             try:
                 self.rx_socket.close()

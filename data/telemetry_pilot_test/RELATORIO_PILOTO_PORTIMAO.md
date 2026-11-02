@@ -1,6 +1,6 @@
 # 🏁 RELATÓRIO DO TESTE PILOTO DE TELEMETRIA UDP — F1 24
 **Circuito:** GP de Portugal (Portimão · Teste Piloto)  
-**Data da Sessão:** 02/11/2026 18:51:34  
+**Data da Sessão:** 02/11/2026 19:06:19  
 **Ambiente:** Totalmente isolado (`data/telemetry_pilot_test/` — Etapa 11 e campeonato NÃO afetados)  
 
 ---
@@ -10,19 +10,21 @@
 | Pos | Grid | $\Delta$ | Nº | Piloto | Equipe | Tempo / Gap | Melhor Volta | Stops | Pneu / Stint | Desgaste | Advertências | Punição | Pontos FIA | Status |
 | :---: | :---: | :---: | :---: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **P1** | 1 | = | #4 | **Lando Norris** | McLaren Formula 1 Team | `6:47.556` | `1:21.052` | 0 | `S (5v)` | 7.0% | — | — | **25** | FINISHED |
-| **P2** | 2 | = | #15 | **Davi (DaviMSSon)** | Williams Racing | `+1.739` | `1:20.763` | 0 | `S (5v)` | 0.0% | ⚠️ 1 adv | — | **19** | FINISHED |
-| **P3** | 3 | = | #81 | **Oscar Piastri** | McLaren Formula 1 Team | `+2.343` | `1:21.034` | 0 | `S (5v)` | 7.0% | — | — | **15** | FINISHED |
-| **P4** | 5 | +1 | #55 | **Carlos Sainz** | Scuderia Ferrari HP | `+2.780` | `1:21.114` | 0 | `S (5v)` | 7.0% | — | — | **12** | FINISHED |
-| **P5** | 4 | -1 | #14 | **Fernando Alonso** | Aston Martin Aramco | `+3.205` | `1:21.180` | 0 | `S (5v)` | 7.0% | — | — | **10** | FINISHED |
-| **P6** | 6 | = | #16 | **Charles Leclerc** | Scuderia Ferrari HP | `+3.700` | `1:21.169` | 0 | `S (5v)` | 7.0% | — | — | **8** | FINISHED |
-| **P7** | 7 | = | #11 | **Sergio Pérez** | Red Bull Racing | `+4.411` | `1:21.198` | 0 | `S (5v)` | 7.0% | — | — | **6** | FINISHED |
-| **P8** | 8 | = | #3 | **Daniel Ricciardo** | Visa Cash App RB | `+5.364` | `1:21.262` | 0 | `S (5v)` | 7.0% | — | — | **4** | FINISHED |
-| **P9** | 9 | = | #63 | **George Russell** | Mercedes-AMG Petronas | `+5.662` | `1:21.127` | 0 | `S (5v)` | 7.0% | — | — | **2** | FINISHED |
-| **P10** | 10 | = | #33 | **Max Verstappen** | Red Bull Racing | `+6.086` | `1:21.164` | 0 | `S (5v)` | 7.0% | ⚠️ 1 adv | — | **1** | FINISHED |
-| **P11** | 11 | = | #44 | **Lewis Hamilton** | Mercedes-AMG Petronas | `+7.663` | `1:20.694` | 0 | `S (5v)` | 6.0% | ⚠️ 1 adv | — | **0** | FINISHED |
-| **P12** | 12 | = | #22 | **Yuki Tsunoda** | Visa Cash App RB | `+8.295` | `1:21.661` | 0 | `S (5v)` | 7.0% | ⚠️ 1 adv | — | **0** | FINISHED |
-| **P13** | 13 | = | #18 | **Lance Stroll** | Aston Martin Aramco | `+9.243` | `1:21.349` | 0 | `S (5v)` | 7.0% | ⚠️ 1 adv | — | **0** | FINISHED |
-| **P14** | 14 | = | #27 | **Nico Hülkenberg** | MoneyGram Haas F1 Team | `+9.618` | `1:21.325` | 0 | `S (5v)` | 7.0% | — | — | **0** | FINISHED |
+| **P2** | 3 | +1 | #81 | **Oscar Piastri** | McLaren Formula 1 Team | `+2.343` | `1:21.034` | 0 | `S (5v)` | 7.0% | — | — | **18** | FINISHED |
+| **P3** | 5 | +2 | #55 | **Carlos Sainz** | Scuderia Ferrari HP | `+2.780` | `1:21.114` | 0 | `S (5v)` | 7.0% | — | — | **15** | FINISHED |
+| **P4** | 4 | = | #14 | **Fernando Alonso** | Aston Martin Aramco | `+3.205` | `1:21.180` | 0 | `S (5v)` | 7.0% | — | — | **12** | FINISHED |
+| **P5** | 6 | +1 | #16 | **Charles Leclerc** | Scuderia Ferrari HP | `+3.700` | `1:21.169` | 0 | `S (5v)` | 7.0% | — | — | **10** | FINISHED |
+| **P6** | 7 | +1 | #11 | **Sergio Pérez** | Red Bull Racing | `+4.411` | `1:21.198` | 0 | `S (5v)` | 7.0% | — | — | **8** | FINISHED |
+| **P7** | 9 | +2 | #63 | **George Russell** | Mercedes-AMG Petronas | `+5.662` | `1:21.127` | 0 | `S (5v)` | 7.0% | — | — | **6** | FINISHED |
+| **P8** | 10 | +2 | #33 | **Max Verstappen** | Red Bull Racing | `+6.086` | `1:21.164` | 0 | `S (5v)` | 7.0% | ⚠️ 1 adv | — | **4** | FINISHED |
+| **P9** | 11 | +2 | #44 | **Lewis Hamilton** | Mercedes-AMG Petronas | `+7.663` | `1:20.694` | 0 | `S (5v)` | 7.0% | ⚠️ 1 adv | — | **2** | FINISHED |
+| **P10** | 12 | +2 | #22 | **Yuki Tsunoda** | Visa Cash App RB | `+8.295` | `1:21.661` | 0 | `S (5v)` | 7.0% | — | — | **1** | FINISHED |
+| **P11** | 13 | +2 | #18 | **Lance Stroll** | Aston Martin Aramco | `+9.243` | `1:21.349` | 0 | `S (5v)` | 7.0% | — | — | **0** | FINISHED |
+| **P12** | 14 | +2 | #27 | **Nico Hülkenberg** | MoneyGram Haas F1 Team | `+9.618` | `1:21.325` | 0 | `S (5v)` | 7.0% | — | — | **0** | FINISHED |
+| **P13** | 2 | -11 | #15 | **Davi (DaviMSSon)** | Williams Racing | `DNF` | `1:22.400` | 0 | `S (5v)` | 0.0% | — | ⏱️ +255s | **0** | DNF |
+| **P14** | 15 | +1 | #5 | **Felipe (frdsilva)** | Stake F1 Team Kick Sauber | `DNF` | `1:23.100` | 0 | `S (5v)` | 7.0% | — | ⏱️ +255s | **0** | DNF |
+| **P15** | 8 | -7 | #3 | **Daniel Ricciardo** | Visa Cash App RB | `DNF` | `1:24.200` | 0 | `S (5v)` | 7.0% | — | ⏱️ +255s | **0** | DNF |
+| **P16** | 16 | = | #23 | **Alexander Albon** | Williams Racing | `DNF` | `1:25.000` | 0 | `S (5v)` | 7.0% | — | ⏱️ +255s | **0** | DNF |
 
 ---
 
@@ -30,7 +32,7 @@
 
 * **Vencedor da Corrida:** `Lando Norris` (McLaren Formula 1 Team) com tempo total de `6:47.556`.
 * **Volta Mais Rápida da Sessão:** `Lewis Hamilton` com `1:20.694` (Ponto extra da FIA).
-* **Maior Velocidade no Speed Trap:** `Davi (DaviMSSon)` com `312.4 km/h`.
+* **Maior Velocidade no Speed Trap:** `Davi (DaviMSSon)` com `311.8 km/h`.
 * **Total de Voltas Rastreadas Volta-a-Volta:** `0 voltas` com telemetria de S1, S2, S3, desgaste de pneu e posições.
 
 ---
@@ -39,18 +41,19 @@
 
 | Piloto | Equipe | Advertências (Limites de Pista) | Punição em Tempo | Impacto na Prova |
 | :--- | :--- | :---: | :---: | :--- |
-| **Davi (DaviMSSon)** | Williams Racing | `1 aviso(s)` | `Sem penalidade de tempo` | Advertência inicial por corte de curva |
 | **Max Verstappen** | Red Bull Racing | `1 aviso(s)` | `Sem penalidade de tempo` | Advertência inicial por corte de curva |
 | **Lewis Hamilton** | Mercedes-AMG Petronas | `1 aviso(s)` | `Sem penalidade de tempo` | Advertência inicial por corte de curva |
-| **Yuki Tsunoda** | Visa Cash App RB | `1 aviso(s)` | `Sem penalidade de tempo` | Advertência inicial por corte de curva |
-| **Lance Stroll** | Aston Martin Aramco | `1 aviso(s)` | `Sem penalidade de tempo` | Advertência inicial por corte de curva |
+| **Davi (DaviMSSon)** | Williams Racing | `Nenhum` | `+255s` | Advertência inicial por corte de curva |
+| **Felipe (frdsilva)** | Stake F1 Team Kick Sauber | `Nenhum` | `+255s` | Advertência inicial por corte de curva |
+| **Daniel Ricciardo** | Visa Cash App RB | `Nenhum` | `+255s` | Advertência inicial por corte de curva |
+| **Alexander Albon** | Williams Racing | `Nenhum` | `+255s` | Advertência inicial por corte de curva |
 
 ### Detalhamento dos Registros da Direção de Prova:
-- ⚠️ **WARNING:** DaviMSSon: Advertência por exceder limites de pista (Curva 1)
-- ⚠️ **WARNING:** Max Verstappen: Advertência por limites de pista (Curva 4)
-- ⚠️ **WARNING:** Lewis Hamilton: Advertência por limites de pista (Curva 1)
-- ⚠️ **WARNING:** Yuki Tsunoda: Advertência por limites de pista (Curva 1)
-- ⚠️ **WARNING:** Lance Stroll: Advertência por limites de pista (Curva 1)
+- ⚠️ **PENALTY:** Alexander Albon: Punição de abandono/desclassificação (255s) por colisão severa na Curva 1 (Volta 1)
+- ⚠️ **PENALTY:** Felipe (frdsilva): Punição de +3s por colisão com contato na Curva 1 (Volta 1)
+- ⚠️ **PENALTY:** Davi (DaviMSSon): Envolvimento no engavetamento da Curva 1, resultando em abandono/desclassificação (Volta 1)
+- ⚠️ **PENALTY:** Daniel Ricciardo: Colisão com abandono na Curva 1 (Volta 1)
+- ⚠️ **PENALTY:** Felipe (frdsilva): Danos terminais subsequentes na Sauber resultando em abandono definitivo (Volta 1)
 
 ---
 
