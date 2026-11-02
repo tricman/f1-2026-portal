@@ -25,3 +25,4 @@ __all__ = [
     "VISUAL_TYRE_COMPOUNDS",
     "RESULT_STATUS_MAP",
 ]
+
