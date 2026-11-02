@@ -130,11 +130,11 @@ class SessionRecorder:
         Main packet ingestion entry point.
         Returns a result dict if a final classification was completed and exported.
         """
-        if header.session_uid != self.session_uid and self.session_uid != 0:
-            # New session started
-            log_text(f"[SESSION RECORDER] Nova sessão detectada (UID: {header.session_uid}). Reiniciando agregador.")
-            self.reset()
-        self.session_uid = header.session_uid
+        if header.session_uid != 0 and header.session_uid != self.session_uid:
+            if self.session_uid != 0:
+                log_text(f"[SESSION RECORDER] Nova sessão detectada (UID: {header.session_uid}). Reiniciando agregador.")
+                self.reset()
+            self.session_uid = header.session_uid
 
         pid = header.packet_id
         if pid == PACKET_ID_SESSION:
@@ -447,3 +447,4 @@ class SessionRecorder:
             log_text(f"[SESSION RECORDER] ⚠️ Erro ao fundir telemetria automaticamente: {e}")
 
         return tv_overlay_data
+
