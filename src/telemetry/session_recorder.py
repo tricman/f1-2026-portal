@@ -64,6 +64,269 @@ def format_race_time(seconds: float) -> str:
     return f"{mins}:{secs:06.3f}"
 
 
+def evaluate_all_drivers(
+    results: List[Dict[str, Any]],
+    all_laps: List[Dict[str, Any]],
+    incidents: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Calculates performance rating (0 to 10) and produces persona-driven expert commentary for each driver."""
+    # Find true fastest lap
+    fastest_driver = None
+    min_lap_s = float("inf")
+    for r in results:
+        b = r.get("best_lap", "")
+        if b and b not in ("—", "0:00.000", "0.000") and ":" in b:
+            try:
+                parts = b.split(":")
+                secs = int(parts[0]) * 60 + float(parts[1])
+                if secs < min_lap_s:
+                    min_lap_s = secs
+                    fastest_driver = r.get("driver_name")
+            except Exception:
+                pass
+
+    # Top speed trap
+    max_speed = max([r.get("speed_trap_kmh", 0.0) for r in results], default=0.0)
+
+    evaluated: List[Dict[str, Any]] = []
+
+    for r in results:
+        pos = r.get("pos", 20)
+        grid = r.get("grid", pos)
+        delta = grid - pos
+        status = r.get("status", "FINISHED")
+        warns = r.get("warnings", 0)
+        pens_s = r.get("penalties_s", 0)
+        wear = r.get("max_wear_pct", 0.0)
+        best_lap = r.get("best_lap", "—")
+        speed = r.get("speed_trap_kmh", 0.0)
+        name = r.get("driver_name", "")
+        team = r.get("team", "")
+        gap = r.get("total_time_or_gap", "—")
+        delta_str = f"+{delta}" if delta > 0 else (str(delta) if delta < 0 else "=")
+
+        # Baseline score calculation
+        if status in ("DNF", "DSQ") or pens_s >= 255:
+            # Abandoned or Disqualified
+            is_collision_victim = any(
+                name.lower() in inc.get("driver", "").lower() and "colisão" in inc.get("details", "").lower()
+                for inc in incidents
+            )
+            if pens_s >= 255:
+                score = 2.5
+            elif is_collision_victim:
+                score = 3.5
+            else:
+                score = 3.0
+        else:
+            if pos == 1:
+                score = 9.3
+            elif pos == 2:
+                score = 8.7
+            elif pos == 3:
+                score = 8.3
+            elif pos <= 5:
+                score = 7.9
+            elif pos <= 8:
+                score = 7.3
+            elif pos <= 10:
+                score = 6.8
+            elif pos <= 14:
+                score = 5.8
+            else:
+                score = 5.0
+
+            # Delta positions adjustment
+            if delta > 0:
+                score += min(1.4, delta * 0.25)
+            elif delta < 0:
+                score -= min(1.4, abs(delta) * 0.2)
+
+            # Fastest lap bonus
+            if fastest_driver and name == fastest_driver:
+                score += 0.6
+
+            # Top speed bonus
+            if max_speed > 0 and speed >= max_speed:
+                score += 0.2
+
+            # Tyre wear bonus / penalty
+            if wear < 10.0 and pos <= 10:
+                score += 0.2
+            elif wear > 45.0:
+                score -= 0.3
+
+            # Warnings & penalties
+            score -= (warns * 0.4)
+            if 0 < pens_s < 255:
+                score -= min(2.0, (pens_s / 3.0) * 0.8)
+
+        score = max(1.0, min(10.0, round(score, 1)))
+
+        # Verdict Badge
+        if score >= 9.0:
+            verdict = "🌟 Pilotagem Impecável"
+        elif score >= 8.0:
+            verdict = "🔥 Atuação Notável"
+        elif score >= 7.0:
+            verdict = "✅ Corrida Sólida"
+        elif score >= 6.0:
+            verdict = "⚠️ Abaixo do Potencial"
+        elif score >= 4.0:
+            verdict = "🚨 Comprometido por Falhas"
+        else:
+            verdict = "💥 Desastre / Abandono Precoce"
+
+        # Persona-Driven Expert Commentary: Alain Prost ("Le Professeur")
+        lower_name = name.lower()
+        if "davi" in lower_name or "davimsson" in lower_name:
+            if status == "DNF" or pens_s >= 255:
+                comm = (
+                    f"\"Davi tem aquela centelha visceral e veloz que me lembra muito o início de carreira do Ayrton: "
+                    f"uma velocidade brutal nas retas ({speed} km/h no Speed Trap) e uma coragem cega. Mas um campeonato "
+                    f"não se ganha na Curva 1 da primeira volta. Querer definir a corrida nos primeiros 300 metros, provocando "
+                    f"um engavetamento terminal (+255s), é um erro de julgamento imperdoável para quem alinha na primeira fila (P2). "
+                    f"Velocidade ele tem de sobra, mas para ser campeão do mundo, você precisa primeiro aprender a terminar as corridas.\""
+                )
+            else:
+                comm = (
+                    f"\"Uma pilotagem vigorosa do jovem brasileiro da Williams. Davi soube extrair cada cavalo de potência nas retas ({speed} km/h), "
+                    f"impondo um ritmo agressivo ({best_lap}). Fico satisfeito em ver que ele soube dosar o ímpeto no miolo ondulado, "
+                    f"preservando a integridade dos pneus ({wear}% de desgaste) sem abrir mão de defender sua posição com bravura.\""
+                )
+        elif "felipe" in lower_name or "frdsilva" in lower_name:
+            if status == "DNF" or pens_s >= 255:
+                comm = (
+                    f"\"Um desfecho muito injusto para Felipe. Ele pensa a corrida exatamente como eu sempre pensei: "
+                    f"com método, cálculo e respeito à mecânica. Foi uma vítima colateral sem qualquer chance de defesa na Curva 1, "
+                    f"destroçando a asa e a geometria da Sauber no efeito dominó. Quando a suspensão quebra, nem o maior "
+                    f"estrategista do paddock consegue manter o carro na pista.\""
+                )
+            else:
+                comm = (
+                    f"\"Uma verdadeira aula de pilotagem inteligente dada por Felipe. 'O Professor' entende perfeitamente a máxima "
+                    f"de vencer na menor velocidade necessária para poupar o equipamento: gerenciou os pneus com maestria cirúrgica "
+                    f"({wear}% de degradação) e compensou o déficit de motor da Sauber com trajetórias limpas e milimétricas nas curvas lentas.\""
+                )
+        elif "sarah" in lower_name or "sarahmarinss" in lower_name:
+            if status == "DNF" or pens_s >= 255:
+                comm = (
+                    f"\"Uma tarde atípica para Sarah. A 'Ice Queen' raramente se coloca em posições vulneráveis no tráfego, "
+                    f"mas as corridas em pelotão compacto são impiedosas. Um abandono prematuro que precisa ser esquecido rapidamente.\""
+                )
+            else:
+                comm = (
+                    f"\"Uma exibição magnífica de disciplina mental e precisão técnica. Sarah pilota a Mercedes com a frieza de um "
+                    f"computador: a modulação de freio nas descidas cegas é cirúrgica, sem travar rodas ou desgastar desnecessariamente "
+                    f"a borracha dianteira. É com essa consistência matemática e zero advertências que se constroem dinastias na F1.\""
+                )
+        elif "norris" in lower_name:
+            comm = (
+                f"\"Uma vitória com a minha assinatura: controle absoluto do ritmo em ar limpo sem castigar o carro ({r.get('total_time_or_gap')}). "
+                f"Norris largou na pole, estabeleceu a distância necessária para Piastri e administrou o desgaste (apenas {wear}%) com enorme maturidade. "
+                f"Quando você tem o melhor carro e a cabeça fria, vencer parece fácil.\""
+            )
+        elif "piastri" in lower_name:
+            comm = (
+                f"\"Oscar é um piloto extremamente cerebral, muito parecido com o meu estilo nos anos de McLaren. "
+                f"Ele não força manobras suicidas; mantém a pressão constante (+2.343), faz voltas impecáveis ({best_lap}) "
+                f"e garante os pontos vitais para os Construtores. A dobradinha foi conquistada com inteligência e classe.\""
+            )
+        elif "sainz" in lower_name:
+            comm = (
+                f"\"Carlos é um dos pilotos mais táticos do grid moderno. Largou de P{grid}, soube esperar o momento exato em que "
+                f"os adversários começaram a perder tração ({delta_str} posições) e colocou a Ferrari no pódio. "
+                f"Ele pensa antes de agir no cockpit, e isso sempre faz a diferença no final de semana.\""
+            )
+        elif "alonso" in lower_name:
+            comm = (
+                f"\"Fernando segue sendo um mestre em maximizar o que tem nas mãos. Manter a Aston Martin em quarto lugar com pneus "
+                f"estáveis ({wear}%) e zero advertências diante de carros teoricamente mais rápidos é uma demonstração de pura astúcia. "
+                f"A experiência dele no posicionamento do carro na pista continua inigualável.\""
+            )
+        elif "leclerc" in lower_name:
+            comm = (
+                f"\"Charles tem uma velocidade natural espantosa, mas às vezes gasta pneus e paciência desnecessariamente "
+                f"ao ficar preso em trens de DRS. Tentou atacar com agressividade ({best_lap}), mas sobrecarregou a dianteira "
+                f"da Ferrari e teve que se contentar com o quinto posto.\""
+            )
+        elif "pérez" in lower_name or "perez" in lower_name:
+            comm = (
+                f"\"Corrida sólida e madura de Sergio. Em vez de se afobar após largar em P7, construiu a prova volta a volta ({delta_str}), "
+                f"cuidou da tração nas saídas de curva e entregou pontos consistentes para a garagem da Red Bull.\""
+            )
+        elif "russell" in lower_name:
+            comm = (
+                f"\"Muito bem executado por George. Ele tem uma visão de corrida apurada, soube evitar incidentes na largada "
+                f"e levou a Mercedes do nono para o sétimo posto com ultrapassagens limpas e ritmo constante.\""
+            )
+        elif "verstappen" in lower_name:
+            comm = (
+                f"\"Max é um fenômeno, mas hoje o carro não permitia vencer e ele lutou visivelmente contra o equilíbrio dianteiro. "
+                f"A advertência por limites de pista mostra certa frustração ao volante, mas salvar um P8 num dia ruim é o que mantém "
+                f"um piloto vivo na briga por títulos.\""
+            )
+        elif "hamilton" in lower_name:
+            comm = (
+                f"\"Lewis mostrou que aos 41 anos ainda é capaz de cravar a volta mais rápida da corrida ({best_lap}) com autoridade. "
+                f"Porém, a perda de tempo nas primeiras voltas e a advertência na zebra da Curva 4 impediram que ele transformasse "
+                f"esse ritmo avassalador em um lugar no pódio.\""
+            )
+        elif "tsunoda" in lower_name:
+            comm = (
+                f"\"Yuki fez exatamente o que um piloto de equipe intermediária precisa fazer: fugiu dos problemas, "
+                f"manteve um ritmo limpo e seguro e levou a RB à zona de pontuação em décimo. Nota 10 em objetividade.\""
+            )
+        elif "stroll" in lower_name:
+            comm = (
+                f"\"Faltou combatividade e sensibilidade com o acerto do carro. Lance esteve apagado ao longo do stint, "
+                f"sem ameaçar os carros à frente e terminando fora da zona de pontuação.\""
+            )
+        elif "hülkenberg" in lower_name or "hulkenberg" in lower_name:
+            comm = (
+                f"\"Nico é sempre rápido no sábado, mas no domingo o consumo excessivo de pneus da Haas ({wear}%) cobrou a conta. "
+                f"Quando a borracha acaba, não há mágica de cockpit que segure os adversários.\""
+            )
+        elif "ricciardo" in lower_name:
+            comm = (
+                f"\"Um abandono precoce e desolador. Daniel foi engolido pela confusão da Curva 1 sem ter para onde desviar. "
+                f"Uma pena, pois o carro da RB parecia equilibrado para brigar por pontos.\""
+            )
+        elif "albon" in lower_name:
+            comm = (
+                f"\"Corrida encerrada antes de começar. O impacto sofrido na primeira curva destruiu a suspensão da Williams "
+                f"sem qualquer responsabilidade direta de Alex. Puro azar de corrida.\""
+            )
+        else:
+            if status in ("DNF", "DSQ"):
+                comm = (
+                    f"\"Fim de prova prematuro. Em corridas de monopostos modernos, qualquer dano de contato inicial destrói "
+                    f"a aerodinâmica e força o abandono imediato.\""
+                )
+            else:
+                comm = (
+                    f"\"Uma atuação funcional de P{grid} para P{pos}. Cumpriu o programa da equipe, preservou os pneus ({wear}% de desgaste) "
+                    f"e manteve o carro longe de advertências dos comissários.\""
+                )
+
+        evaluated.append({
+            "pos": pos,
+            "driver_name": name,
+            "driver_number": r.get("driver_number", 0),
+            "team": team,
+            "grid": grid,
+            "delta": delta,
+            "delta_str": delta_str,
+            "best_lap": best_lap,
+            "total_time_or_gap": gap,
+            "rating": score,
+            "verdict": verdict,
+            "expert_commentary": comm,
+        })
+
+    return evaluated
+
+
 class SessionRecorder:
     """
     Maintains in-memory state for an active F1 24 session received via UDP.
@@ -580,6 +843,15 @@ class SessionRecorder:
                 "Pneu final": final_tyre,
             })
 
+        # 3. Laps list
+        all_laps: List[Dict[str, Any]] = []
+        for i, laps in self.lap_history.items():
+            all_laps.extend(laps)
+        all_laps.sort(key=lambda x: (x["lap"], x["pos"]))
+
+        # Driver performance evaluation & storytelling commentaries
+        ratings = evaluate_all_drivers(race_results, all_laps, self.incidents)
+
         # 1. tv_overlay
         overlay_filename = "tv_overlay_test.json" if self.is_pilot_test() else f"tv_overlay_et{round_num}.json"
         tv_overlay_data = {
@@ -592,6 +864,7 @@ class SessionRecorder:
             "time_or_gap_by_driver": time_or_gap_by_driver,
             "status_by_driver": status_by_driver,
             "incidents": self.incidents,
+            "driver_ratings": ratings,
         }
         with open(target_dir / overlay_filename, "w", encoding="utf-8") as f:
             json.dump(tv_overlay_data, f, indent=2, ensure_ascii=False)
@@ -608,10 +881,6 @@ class SessionRecorder:
         log_text(f"[SESSION RECORDER] Gravado: {summary_csv_path.name}")
 
         # 3. Laps CSV
-        all_laps: List[Dict[str, Any]] = []
-        for i, laps in self.lap_history.items():
-            all_laps.extend(laps)
-        all_laps.sort(key=lambda x: (x["lap"], x["pos"]))
 
         laps_csv_path = target_dir / "pacedex_udp_race_laps.csv"
         with open(laps_csv_path, "w", newline="", encoding="utf-8-sig") as f:
@@ -652,7 +921,7 @@ class SessionRecorder:
 
         # 5. Se for Teste Piloto, gera relatório markdown completo para auditoria
         if self.is_pilot_test():
-            self._generate_pilot_markdown_report(target_dir, gp_name, race_results, all_laps)
+            self._generate_pilot_markdown_report(target_dir, gp_name, race_results, all_laps, ratings)
 
         return tv_overlay_data
 
@@ -662,11 +931,29 @@ class SessionRecorder:
         gp_name: str,
         results: List[Dict[str, Any]],
         all_laps: List[Dict[str, Any]],
+        ratings: Optional[List[Dict[str, Any]]] = None,
     ) -> None:
         """Generate a complete Markdown audit report demonstrating all captured FIA and storytelling metrics."""
         report_path = target_dir / "RELATORIO_PILOTO_PORTIMAO.md"
 
-        fastest_lap_driver = min(results, key=lambda x: x["best_lap"]) if results else None
+        if ratings is None:
+            ratings = evaluate_all_drivers(results, all_laps, self.incidents)
+
+        # Find true fastest lap
+        fastest_lap_driver = None
+        min_lap_s = float("inf")
+        for r in results:
+            b = r.get("best_lap", "")
+            if b and b not in ("—", "0:00.000", "0.000") and ":" in b:
+                try:
+                    parts = b.split(":")
+                    secs = int(parts[0]) * 60 + float(parts[1])
+                    if secs < min_lap_s:
+                        min_lap_s = secs
+                        fastest_lap_driver = r
+                except Exception:
+                    pass
+
         top_speed_driver = max(results, key=lambda x: x.get("speed_trap_kmh", 0.0)) if results else None
 
         lines = [
@@ -698,20 +985,43 @@ class SessionRecorder:
                 f"{r['max_wear_pct']}% | {warn_str} | {pen_str} | **{pts}** | {status} |"
             )
 
+        # 2. Driver Ratings & Storytelling Commentary Section: Alain Prost
         lines.extend([
             "",
             "---",
             "",
-            "## 2. Destaques Técnicos & Narrativos Capturados via UDP",
+            "## 2. 🌟 Avaliação de Desempenho (0 a 10) — Comentários de Alain Prost (\"Le Professeur\")",
+            "",
+            "> **Análise de Alain Prost (Tetracampeão Mundial & \"Le Professeur\"):** Notas técnicas atribuídas de **0 a 10** "
+            "fundamentadas 100% na telemetria capturada via UDP. Sob a ótica de quem disputou e venceu 4 Mundiais de Pilotos, Prost "
+            "avalia inteligência de corrida, paciência tática, preservação de equipamento/pneus, modulação de ritmo em ar limpo e "
+            "o custo impiedoso de erros de julgamento nas primeiras voltas.",
+            "",
+            "| Pos | Piloto | Equipe | Grid ➔ Final | $\\Delta$ | Nota (0-10) | Avaliação Técnica | Veredito & Comentário de Alain Prost |",
+            "| :---: | :--- | :--- | :---: | :---: | :---: | :---: | :--- |",
+        ])
+
+        for ev in ratings:
+            lines.append(
+                f"| **P{ev['pos']}** | **{ev['driver_name']}** | {ev['team']} | "
+                f"P{ev['grid']} ➔ P{ev['pos']} | `{ev['delta_str']}` | **`{ev['rating']}`** / 10 | "
+                f"{ev['verdict']} | {ev['expert_commentary']} |"
+            )
+
+        lines.extend([
+            "",
+            "---",
+            "",
+            "## 3. Destaques Técnicos & Narrativos Capturados via UDP",
             "",
             f"* **Vencedor da Corrida:** `{results[0]['driver_name']}` ({results[0]['team']}) com tempo total de `{results[0]['total_time_or_gap']}`.",
-            f"* **Volta Mais Rápida da Sessão:** `{fastest_lap_driver['driver_name']}` com `{fastest_lap_driver['best_lap']}` (Ponto extra da FIA).",
-            f"* **Maior Velocidade no Speed Trap:** `{top_speed_driver['driver_name']}` com `{top_speed_driver['speed_trap_kmh']} km/h`.",
+            f"* **Volta Mais Rápida da Sessão:** `{fastest_lap_driver['driver_name'] if fastest_lap_driver else '—'}` com `{fastest_lap_driver['best_lap'] if fastest_lap_driver else '—'}` (Ponto extra da FIA).",
+            f"* **Maior Velocidade no Speed Trap:** `{top_speed_driver['driver_name'] if top_speed_driver else '—'}` com `{top_speed_driver['speed_trap_kmh'] if top_speed_driver else 0.0} km/h`.",
             f"* **Total de Voltas Rastreadas Volta-a-Volta:** `{len(all_laps)} voltas` com telemetria de S1, S2, S3, desgaste de pneu e posições.",
             "",
             "---",
             "",
-            "## 3. 🚨 Incidentes, Advertências e Punições dos Comissários (FIA Stewards)",
+            "## 4. 🚨 Incidentes, Advertências e Punições dos Comissários (FIA Stewards)",
             "",
         ])
 
@@ -736,7 +1046,7 @@ class SessionRecorder:
             "",
             "---",
             "",
-            "## 4. Matriz de Viabilidade para os 8 Módulos Narrativos da FIA",
+            "## 5. Matriz de Viabilidade para os 8 Módulos Narrativos da FIA",
             "",
             "| Módulo Narrativo | Dados Exigidos | Coletado pelo UDP? | Status |",
             "| :--- | :--- | :---: | :---: |",
