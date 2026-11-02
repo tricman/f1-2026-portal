@@ -60,22 +60,12 @@ def resolve_persona_for_filename(filename: str) -> str:
     return "FIA Official Media Center"
 
 
-def process_round_10_telemetry() -> None:
-    et10_dir = ROOT_DIR / "data" / "seasons" / "season_01" / "et_10_espanha"
-    tel_dir = et10_dir / "telemetry"
+def process_round_telemetry(r_num: int, r_folder: str) -> None:
+    round_dir = ROOT_DIR / "data" / "seasons" / "season_01" / r_folder
+    tel_dir = round_dir / "telemetry"
     tel_dir.mkdir(parents=True, exist_ok=True)
 
-    # Copy raw CSVs and TV screenshots into et_10_espanha/telemetry/ if in root
-    for item in ROOT_DIR.glob("pacedex_catalunya-espanha*"):
-        target = tel_dir / item.name
-        if not target.exists():
-            shutil.copy2(item, target)
-    for item in ROOT_DIR.glob("rn_image_picker_lib_temp_*.jpg"):
-        target = tel_dir / item.name
-        if not target.exists():
-            shutil.copy2(item, target)
-
-    # Resolve CSV files dynamically so any PaceDex date/circuit filename works
+    # 1. Resolve CSV files dynamically (PaceDex manual export or UDP live recorder)
     tl_summary_files = [p for p in tel_dir.glob("*_TL.csv") if not p.name.endswith("_laps_TL.csv")]
     tl_laps_files = list(tel_dir.glob("*_laps_TL.csv"))
     race_laps_files = [p for p in tel_dir.glob("*_laps.csv") if not p.name.endswith("_laps_TL.csv")]
@@ -84,56 +74,58 @@ def process_round_10_telemetry() -> None:
         if not p.name.endswith("_TL.csv") and not p.name.endswith("_laps.csv")
     ]
 
-    tl_csv = tl_summary_files[0] if tl_summary_files else (tel_dir / "pacedex_catalunya-espanha_2026-10-17_TL.csv")
-    tl_laps_csv = tl_laps_files[0] if tl_laps_files else (tel_dir / "pacedex_catalunya-espanha_2026-10-17_laps_TL.csv")
-    race_csv = race_summary_files[0] if race_summary_files else (tel_dir / "pacedex_catalunya-espanha_2026-10-17.csv")
-    race_laps_csv = race_laps_files[0] if race_laps_files else (tel_dir / "pacedex_catalunya-espanha_2026-10-17_laps.csv")
+    tl_csv = tl_summary_files[0] if tl_summary_files else None
+    tl_laps_csv = tl_laps_files[0] if tl_laps_files else None
+    race_csv = race_summary_files[0] if race_summary_files else None
+    race_laps_csv = race_laps_files[0] if race_laps_files else None
 
-    if tl_csv.exists() and tl_laps_csv.exists():
+    if tl_csv and tl_laps_csv and tl_csv.exists() and tl_laps_csv.exists():
         fp_summary = parse_free_practice_summary(tl_csv, tl_laps_csv)
         (tel_dir / "fp_telemetry_merged.json").write_text(
             json.dumps(fp_summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
         )
 
-    tv_overlay = json.loads((tel_dir / "tv_overlay_et10.json").read_text(encoding="utf-8"))
-    if race_csv.exists() and race_laps_csv.exists():
+    # 2. TV Overlay resolution (either from UDP Relay or Gemini Vision)
+    tv_candidates = [
+        tel_dir / f"tv_overlay_et{r_num:02d}.json",
+        tel_dir / f"tv_overlay_et{r_num}.json",
+        tel_dir / "tv_overlay.json",
+    ]
+    tv_file = next((f for f in tv_candidates if f.exists()), None)
+    tv_overlay = json.loads(tv_file.read_text(encoding="utf-8")) if tv_file else {}
+
+    if race_csv and race_laps_csv and race_csv.exists() and race_laps_csv.exists() and tv_overlay:
         race_merged = merge_race_telemetry(race_csv, race_laps_csv, tv_overlay)
+    elif (tel_dir / "race_telemetry_merged.json").exists():
+        race_merged = json.loads((tel_dir / "race_telemetry_merged.json").read_text(encoding="utf-8"))
     else:
         race_merged = tv_overlay
+
     (tel_dir / "race_telemetry_merged.json").write_text(
         json.dumps(race_merged, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
 
+    # 3. Update standings
+    meta = ROUND_METADATA.get(r_folder, {"name": f"GP da Etapa {r_num}"})
     standings_path = ROOT_DIR / "data" / "state" / "standings.json"
-    prev_standings = json.loads(standings_path.read_text(encoding="utf-8"))
-    if prev_standings.get("last_completed_round", 0) == 9:
-        updated_standings = update_championship_standings(
-            prev_standings,
-            race_merged,
-            round_number=10,
-            gp_name="GP da Espanha (Barcelona)",
-        )
-        (ROOT_DIR / "data" / "state" / "standings_et10.json").write_text(
-            json.dumps(updated_standings, indent=2, ensure_ascii=False) + "\n",
-            encoding="utf-8",
-        )
+    if standings_path.exists() and race_merged:
+        prev_standings = json.loads(standings_path.read_text(encoding="utf-8"))
+        if prev_standings.get("last_completed_round", 0) == r_num - 1:
+            updated_standings = update_championship_standings(
+                prev_standings,
+                race_merged,
+                round_number=r_num,
+                gp_name=meta.get("name", f"Etapa {r_num}"),
+            )
+            (ROOT_DIR / "data" / "state" / f"standings_et{r_num:02d}.json").write_text(
+                json.dumps(updated_standings, indent=2, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
+    print(f"Round {r_num} ({r_folder}) telemetry merged and state updated successfully.")
 
-    ledger = CanonLedgerManager(ROOT_DIR / "data" / "state" / "canon_ledger.json")
-    ledger.append_event(
-        event_id="ET10-ES-M5",
-        round_num=10,
-        module="M5_CORRIDA",
-        summary=(
-            "Terceiro pódio 100% brasileiro da história em Barcelona (2º consecutivo): "
-            "Sarah P1 + Pole + VR (1:17.035, batendo Davi por 0.004s); Davi P2 (estratégia "
-            "invertida M->S, colisão e aviso com Verstappen na Volta 2, assume 6º no Mundial "
-            "superando Leclerc nos critérios de desempate); Felipe P3 (pit stop mais rápido "
-            "do GP em 2.434s e aula de gestão térmica após 41.8% de desgaste no pneu macio)."
-        ),
-        entities=["sarah", "davi", "felipe", "verstappen", "leclerc", "piastri"],
-        status="OPEN",
-    )
-    print("Round 10 (Spain) telemetry merged and state updated successfully.")
+
+def process_round_10_telemetry() -> None:
+    process_round_telemetry(10, "et_10_espanha")
 
 
 def deploy_portal_to_github_pages(commit_msg: str = "Auto-update F1 2026 Editorial Portal & FIA Wiki") -> Path:
@@ -513,8 +505,7 @@ def main() -> None:
                             round_num=r_num,
                             round_name=meta["name"],
                         )
-                if r_num == 10:
-                    process_round_10_telemetry()
+                process_round_telemetry(r_num, r_folder)
                 if ai_client.api_key:
                     if client.bot_token and client.ingest_channel_id:
                         client.post_channel_message(
