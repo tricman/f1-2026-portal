@@ -4,7 +4,11 @@ Listens on UDP 20777 (from F1 24 game), instantly forwards all raw datagrams
 to UDP 20778 (for PaceDex), and parses the live stream into Showrunner artifacts.
 
 Usage:
-  python -m src.udp_relay [--listen-port 20777] [--relay-port 20778] [--relay-host 127.0.0.1]
+  # Modo Piloto de Teste (Isolado em data/telemetry_pilot_test/):
+  python -m src.udp_relay --test
+
+  # Modo Oficial da Etapa (Etapa correspondente detectada automaticamente):
+  python -m src.udp_relay
 """
 from __future__ import annotations
 
@@ -44,12 +48,14 @@ class UdpTelemetryRelay:
         relay_host: str = DEFAULT_RELAY_HOST,
         relay_port: int = DEFAULT_RELAY_PORT,
         override_round: int | None = None,
+        test_mode: bool = False,
     ):
         self.listen_host = listen_host
         self.listen_port = listen_port
         self.relay_host = relay_host
         self.relay_port = relay_port
-        self.recorder = SessionRecorder(override_round=override_round)
+        self.test_mode = test_mode
+        self.recorder = SessionRecorder(override_round=override_round, test_mode=test_mode)
 
         self.running = False
         self.rx_socket: socket.socket | None = None
@@ -64,10 +70,8 @@ class UdpTelemetryRelay:
         """Bind sockets and start the relay loop."""
         # 1. Receiver socket
         self.rx_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # Allow reuse of port to avoid conflict with lingering sockets
         if hasattr(socket, "SO_REUSEADDR"):
             self.rx_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # Large receive buffer (2MB) so bursts during 60Hz telemetry never drop frames
         try:
             self.rx_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 2 * 1024 * 1024)
         except Exception:
@@ -83,16 +87,22 @@ class UdpTelemetryRelay:
         relay_target = f"{self.relay_host}:{self.relay_port}"
         listen_addr = f"{self.listen_host}:{self.listen_port}"
 
-        print("=" * 72)
-        print("🏎️  F1 2024 UDP TELEMETRY PROXY & LIVE RECORDER")
+        print("=" * 76)
+        if self.recorder.is_pilot_test():
+            print("🏎️  F1 2024 UDP TELEMETRY PROXY & LIVE RECORDER [MODO PILOTO DE TESTE]")
+            print("🧪 Pista Alvo: GP de Portugal (Portimão) ou Sessão de Treino")
+            print("🛡️  ISOLAMENTO TOTAL ATIVO: Nenhum dado será gravado na Etapa 11 ou campeonato.")
+            print("📁 Resultados e Relatório da FIA serão salvos em: data/telemetry_pilot_test/")
+        else:
+            print("🏎️  F1 2024 UDP TELEMETRY PROXY & LIVE RECORDER [MODO OFICIAL]")
+            print("💾 Gravação automática de tv_overlay.json e CSVs habilitada.")
+
         print(f"📡 Escutando telemetria F1 24 em: {listen_addr}")
         print(f"⚡ Replicando em tempo real para PaceDex em: {relay_target}")
-        print("💾 Gravação automática de tv_overlay.json e CSVs habilitada.")
-        print("=" * 72)
+        print("=" * 76)
 
         try:
             while self.running:
-                # Use select with 0.1s timeout for non-blocking I/O and responsive Ctrl+C
                 ready = select.select([self.rx_socket], [], [], 0.1)
                 if ready[0]:
                     while True:
@@ -110,14 +120,18 @@ class UdpTelemetryRelay:
                         try:
                             self.tx_socket.sendto(data, (self.relay_host, self.relay_port))
                             self.packets_relayed += 1
-                        except Exception as e:
-                            # Non-critical if PaceDex is temporarily closed
+                        except Exception:
                             pass
 
                         # PROCESS LOCALLY
                         header = PacketHeader.unpack(data)
                         if header and header.packet_format == PACKET_FORMAT_2024:
-                            self.recorder.process_packet(header, data)
+                            res = self.recorder.process_packet(header, data)
+                            if res and self.recorder.is_pilot_test():
+                                print("\n" + "🎉 " * 15)
+                                print("🏆 TESTE PILOTO CONCLUÍDO COM SUCESSO!")
+                                print("📄 Relatório completo gerado em: data/telemetry_pilot_test/RELATORIO_PILOTO_PORTIMAO.md")
+                                print("🎉 " * 15 + "\n")
 
                 # Periodic Heartbeat & Status Display (every 5 seconds)
                 now = time.time()
@@ -139,10 +153,13 @@ class UdpTelemetryRelay:
         rate = self.packets_received
         mb = self.bytes_received / (1024 * 1024)
 
+        prefix = "🧪 [PILOTO TESTE]" if self.recorder.is_pilot_test() else "🟢 [RELAY STATUS]"
+        rnd_info = "PORTIMÃO (ISOLADO)" if self.recorder.is_pilot_test() else f"Etapa: {detected_rnd} ({folder})"
+
         status_line = (
-            f"🟢 [RELAY STATUS] Pkts: {rate} ({mb:.1f} MB) | "
+            f"{prefix} Pkts: {rate} ({mb:.1f} MB) | "
             f"PaceDex -> :{self.relay_port} (OK) | "
-            f"Etapa: {detected_rnd} ({folder}) | "
+            f"{rnd_info} | "
             f"Pista: {track_name} | Sessão: {stype} | Carros: {cars_count}/22"
         )
         print(status_line)
@@ -171,6 +188,7 @@ def main():
     parser.add_argument("--relay-host", default=DEFAULT_RELAY_HOST, help="IP do PaceDex (default: 127.0.0.1)")
     parser.add_argument("--relay-port", type=int, default=DEFAULT_RELAY_PORT, help="Porta configurada no PaceDex (default: 20778)")
     parser.add_argument("--round", type=int, default=None, help="Forçar número da etapa (ex: 11)")
+    parser.add_argument("--test", "--pilot", dest="test_mode", action="store_true", help="Ativar modo teste piloto isolado (não afeta etapa oficial)")
 
     args = parser.parse_args()
     relay = UdpTelemetryRelay(
@@ -179,6 +197,7 @@ def main():
         relay_host=args.relay_host,
         relay_port=args.relay_port,
         override_round=args.round,
+        test_mode=args.test_mode,
     )
     relay.start()
 

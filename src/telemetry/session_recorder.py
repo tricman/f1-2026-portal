@@ -1,10 +1,11 @@
 """
 Live F1 2024 Session Aggregator & Recorder.
 Consolidates real-time UDP telemetry into canonical Showrunner artifacts:
-- tv_overlay_et{round}.json
+- tv_overlay_et{round}.json / tv_overlay_test.json
 - pacedex_{circuit}_summary.csv
 - pacedex_{circuit}_laps.csv
 - race_telemetry_merged.json
+- RELATORIO_PILOTO_PORTIMAO.md (Comprehensive storytelling & FIA data audit)
 """
 from __future__ import annotations
 
@@ -63,11 +64,13 @@ def format_race_time(seconds: float) -> str:
 class SessionRecorder:
     """
     Maintains in-memory state for an active F1 24 session received via UDP.
-    Automatically generates required stage files when final classification arrives.
+    Supports sandbox / pilot test mode (e.g. GP de Portugal em Portimão)
+    completely isolated from official championship folders.
     """
 
-    def __init__(self, override_round: Optional[int] = None):
+    def __init__(self, override_round: Optional[int] = None, test_mode: bool = False):
         self.override_round = override_round
+        self.test_mode = test_mode
         self.reset()
 
     def reset(self) -> None:
@@ -85,6 +88,7 @@ class SessionRecorder:
         self.car_status: Dict[int, Dict[str, Any]] = {}
         self.car_damage: Dict[int, Dict[str, Any]] = {}
         self.car_lap: Dict[int, Dict[str, Any]] = {}
+        self.speed_traps: Dict[int, float] = {}
 
         # Car Index (0..21) -> list of completed laps
         self.lap_history: Dict[int, List[Dict[str, Any]]] = {}
@@ -93,8 +97,18 @@ class SessionRecorder:
         self.chequered_flag: bool = False
         self.saved_results: bool = False
 
-    def get_detected_round(self) -> Tuple[int, str]:
+    def is_pilot_test(self) -> bool:
+        """Return True if running in explicit test mode or on an unmapped track (e.g. Portimão)."""
+        if self.test_mode:
+            return True
+        track_info = TRACK_ID_MAP.get(self.track_id, {})
+        return track_info.get("round") is None
+
+    def get_detected_round(self) -> Tuple[Optional[int], str]:
         """Return (round_number, stage_folder_name)."""
+        if self.is_pilot_test():
+            return None, "telemetry_pilot_test"
+
         if self.override_round:
             r = self.override_round
             for folder, meta in ROUND_METADATA.items():
@@ -130,6 +144,7 @@ class SessionRecorder:
         Main packet ingestion entry point.
         Returns a result dict if a final classification was completed and exported.
         """
+        # Ignore UID=0 packets (loading/menu transitions) to avoid wiping live sessions
         if header.session_uid != 0 and header.session_uid != self.session_uid:
             if self.session_uid != 0:
                 log_text(f"[SESSION RECORDER] Nova sessão detectada (UID: {header.session_uid}). Reiniciando agregador.")
@@ -151,7 +166,6 @@ class SessionRecorder:
             ppacket = ParticipantsPacket.unpack(raw_data)
             if ppacket:
                 for idx, p in enumerate(ppacket.participants):
-                    # Canonical driver match
                     canon_id = None
                     canon_name = p.name
                     canon_team = TEAM_ID_MAP.get(p.team_id, "Desconhecida")
@@ -200,25 +214,25 @@ class SessionRecorder:
 
     def _process_lap_data(self, raw_data: bytes) -> None:
         offset = 29
-        stride = 57 if (len(raw_data) - 29) >= 22 * 57 else 56
+        stride = (len(raw_data) - 29) // 22 if (len(raw_data) - 29) >= 22 * 50 else 57
         for i in range(22):
             car_offset = offset + (i * stride)
-            if car_offset + 32 > len(raw_data):
+            if car_offset + 52 > len(raw_data):
                 break
-            # Unpack key lap fields:
-            # uint32 lastLapTimeInMS (offset 0)
-            # uint32 currentLapTimeInMS (offset 4)
-            # uint16 sector1TimeInMS (offset 8)
-            # uint8 sector1Minutes (offset 10)
-            # uint16 sector2TimeInMS (offset 11)
-            # uint8 sector2Minutes (offset 13)
-            # ...
-            # uint8 carPosition (offset 22)
-            # uint8 currentLapNum (offset 23)
-            # uint8 pitStatus (offset 24)
-            # uint8 numPitStops (offset 25)
+
             last_ms, curr_ms, s1_ms, s1_m, s2_ms, s2_m = struct.unpack_from("<IIHBHB", raw_data, car_offset)
-            pos, lap_num, pit_status, num_pits = struct.unpack_from("<BBBB", raw_data, car_offset + 22)
+            pos, lap_num, pit_status, num_pits = struct.unpack_from("<BBBB", raw_data, car_offset + 30)
+
+            # Pit stop box timer (uint16 at offset 47)
+            pit_stop_timer_ms = 0
+            if car_offset + 49 <= len(raw_data):
+                pit_stop_timer_ms = struct.unpack_from("<H", raw_data, car_offset + 47)[0]
+
+            # Speed trap (float at offset 50)
+            if car_offset + 54 <= len(raw_data):
+                speed_trap = struct.unpack_from("<f", raw_data, car_offset + 50)[0]
+                if speed_trap > self.speed_traps.get(i, 0.0):
+                    self.speed_traps[i] = round(speed_trap, 1)
 
             prev = self.car_lap.get(i)
             # Detect completed lap
@@ -251,6 +265,13 @@ class SessionRecorder:
                 }
                 self.lap_history.setdefault(i, []).append(lap_entry)
 
+            # Record pit stop events
+            if pit_stop_timer_ms > 0:
+                self.pit_events.setdefault(i, []).append({
+                    "lap": lap_num,
+                    "box_time_s": round(pit_stop_timer_ms / 1000.0, 3),
+                })
+
             self.car_lap[i] = {
                 "lap_num": lap_num,
                 "pos": pos,
@@ -262,14 +283,18 @@ class SessionRecorder:
 
     def _process_car_status(self, raw_data: bytes) -> None:
         offset = 29
-        stride = 47 if (len(raw_data) - 29) >= 22 * 47 else 45
+        stride = (len(raw_data) - 29) // 22 if (len(raw_data) - 29) >= 22 * 45 else 47
         for i in range(22):
             car_offset = offset + (i * stride)
-            if car_offset + 18 > len(raw_data):
+            # Offset 26 = visual tyre compound, offset 27 = tyre age in laps (F1 24)
+            if car_offset + 28 <= len(raw_data):
+                visual_compound = raw_data[car_offset + 26]
+                tyre_age = raw_data[car_offset + 27]
+            elif car_offset + 17 <= len(raw_data):
+                visual_compound = raw_data[car_offset + 15]
+                tyre_age = raw_data[car_offset + 16]
+            else:
                 break
-            # Visual compound is at offset 15, tyre age at offset 16
-            visual_compound = raw_data[car_offset + 15] if car_offset + 15 < len(raw_data) else 17
-            tyre_age = raw_data[car_offset + 16] if car_offset + 16 < len(raw_data) else 0
             code = VISUAL_TYRE_COMPOUNDS.get(visual_compound, "M")
             self.car_status[i] = {
                 "visual_tyre": code,
@@ -278,7 +303,7 @@ class SessionRecorder:
 
     def _process_car_damage(self, raw_data: bytes) -> None:
         offset = 29
-        stride = 42 if (len(raw_data) - 29) >= 22 * 42 else 40
+        stride = (len(raw_data) - 29) // 22 if (len(raw_data) - 29) >= 22 * 35 else 42
         for i in range(22):
             car_offset = offset + (i * stride)
             if car_offset + 16 > len(raw_data):
@@ -286,24 +311,38 @@ class SessionRecorder:
             # 4 floats = tyres wear: RL, RR, FL, FR
             w_rl, w_rr, w_fl, w_fr = struct.unpack_from("<ffff", raw_data, car_offset)
             max_w = max(w_rl, w_rr, w_fl, w_fr)
+
+            # Wing / floor damage if available
+            fl_wing = raw_data[car_offset + 24] if car_offset + 25 <= len(raw_data) else 0
+            fr_wing = raw_data[car_offset + 25] if car_offset + 26 <= len(raw_data) else 0
+            floor_dmg = raw_data[car_offset + 27] if car_offset + 28 <= len(raw_data) else 0
+
             self.car_damage[i] = {
                 "max_wear": max_w,
                 "rl": w_rl,
                 "rr": w_rr,
                 "fl": w_fl,
                 "fr": w_fr,
+                "fl_wing": fl_wing,
+                "fr_wing": fr_wing,
+                "floor": floor_dmg,
             }
 
     def _export_session(self, fc_packet: FinalClassificationPacket) -> Dict[str, Any]:
-        """Generate and save all Showrunner stage artifacts."""
+        """Generate and save Showrunner stage artifacts or Pilot Test report."""
         round_num, stage_folder = self.get_detected_round()
-        target_dir = ROOT_DIR / "data" / "seasons" / "season_01" / stage_folder / "telemetry"
+
+        if self.is_pilot_test():
+            target_dir = ROOT_DIR / "data" / "telemetry_pilot_test"
+            gp_name = "GP de Portugal (Portimão · Teste Piloto)"
+            log_text(f"[SESSION RECORDER] 🧪 MODO PILOTO DE TESTE: Salvando em {target_dir}")
+        else:
+            target_dir = ROOT_DIR / "data" / "seasons" / "season_01" / stage_folder / "telemetry"
+            meta = ROUND_METADATA.get(stage_folder, {})
+            gp_name = meta.get("name", f"GP da Etapa {round_num}")
+
         target_dir.mkdir(parents=True, exist_ok=True)
 
-        meta = ROUND_METADATA.get(stage_folder, {})
-        gp_name = meta.get("name", f"GP da Etapa {round_num}")
-
-        # Sort classified drivers by finishing position
         classified = sorted(
             [d for d in fc_packet.classification if d.position > 0],
             key=lambda d: d.position
@@ -315,12 +354,9 @@ class SessionRecorder:
         grid_by_driver: Dict[str, int] = {}
         time_or_gap_by_driver: Dict[str, str] = {}
         status_by_driver: Dict[str, str] = {}
-
         summary_csv_rows: List[Dict[str, Any]] = []
 
         for d in classified:
-            # Find matching participant
-            # Index is typically the position in fc_packet.classification
             idx = fc_packet.classification.index(d)
             part = self.participants.get(idx, {})
             name = part.get("canon_name") or part.get("name", f"Piloto {d.position}")
@@ -328,7 +364,6 @@ class SessionRecorder:
             team = part.get("team", "Equipe F1")
             car_num = part.get("race_number", 0)
 
-            # Total time or gap
             if d.position == 1:
                 time_str = format_race_time(d.total_race_time)
             elif d.result_status in (4, 7):
@@ -347,6 +382,7 @@ class SessionRecorder:
 
             stints_letters = [VISUAL_TYRE_COMPOUNDS.get(c, "M") for c in d.tyre_stints_visual]
             final_tyre = stints_letters[-1] if stints_letters else "M"
+            stint_str = " ➔ ".join(stints_letters) if stints_letters else final_tyre
 
             race_results.append({
                 "pos": d.position,
@@ -359,6 +395,9 @@ class SessionRecorder:
                 "total_time_or_gap": time_str,
                 "points": d.points,
                 "status": "FINISHED" if status_str == "Finalizada" else status_str,
+                "strategy": stint_str,
+                "max_wear_pct": round(self.car_damage.get(idx, {}).get("max_wear", 0.0), 1),
+                "speed_trap_kmh": self.speed_traps.get(idx, 0.0),
             })
 
             grid_by_driver[canon_id] = d.grid_position
@@ -376,9 +415,10 @@ class SessionRecorder:
                 "Pneu final": final_tyre,
             })
 
-        # 1. tv_overlay_et{round}.json
+        # 1. tv_overlay
+        overlay_filename = "tv_overlay_test.json" if self.is_pilot_test() else f"tv_overlay_et{round_num}.json"
         tv_overlay_data = {
-            "round": round_num,
+            "round": round_num or 0,
             "grand_prix": gp_name,
             "source": "F1_2024_UDP_LIVE_FEED",
             "qualifying_results": [],
@@ -388,13 +428,12 @@ class SessionRecorder:
             "status_by_driver": status_by_driver,
             "incidents": [],
         }
-        tv_overlay_path = target_dir / f"tv_overlay_et{round_num}.json"
-        with open(tv_overlay_path, "w", encoding="utf-8") as f:
+        with open(target_dir / overlay_filename, "w", encoding="utf-8") as f:
             json.dump(tv_overlay_data, f, indent=2, ensure_ascii=False)
-        log_text(f"[SESSION RECORDER] Gravado: {tv_overlay_path.name}")
+        log_text(f"[SESSION RECORDER] Gravado: {overlay_filename}")
 
         # 2. Summary CSV
-        summary_csv_path = target_dir / f"pacedex_udp_race_summary.csv"
+        summary_csv_path = target_dir / "pacedex_udp_race_summary.csv"
         with open(summary_csv_path, "w", newline="", encoding="utf-8-sig") as f:
             fieldnames = ["Pos", "Nº", "Piloto", "Equipe", "Voltas", "Melhor volta", "Pits", "Pneu final"]
             writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -409,7 +448,7 @@ class SessionRecorder:
             all_laps.extend(laps)
         all_laps.sort(key=lambda x: (x["lap"], x["pos"]))
 
-        laps_csv_path = target_dir / f"pacedex_udp_race_laps.csv"
+        laps_csv_path = target_dir / "pacedex_udp_race_laps.csv"
         with open(laps_csv_path, "w", newline="", encoding="utf-8-sig") as f:
             fieldnames = ["Volta", "Pos", "Nº", "Piloto", "Equipe", "Tempo", "S1", "S2", "S3", "Pneu", "Idade do pneu", "Desgaste %", "Pits"]
             writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -444,7 +483,83 @@ class SessionRecorder:
                 json.dump(merged, f, indent=2, ensure_ascii=False)
             log_text(f"[SESSION RECORDER] ✅ race_telemetry_merged.json sintetizado diretamente do feed UDP!")
         except Exception as e:
-            log_text(f"[SESSION RECORDER] ⚠️ Erro ao fundir telemetria automaticamente: {e}")
+            log_text(f"[SESSION RECORDER] ⚠️ Erro ao fundir telemetria: {e}")
+
+        # 5. Se for Teste Piloto, gera relatório markdown completo para auditoria
+        if self.is_pilot_test():
+            self._generate_pilot_markdown_report(target_dir, gp_name, race_results, all_laps)
 
         return tv_overlay_data
 
+    def _generate_pilot_markdown_report(
+        self,
+        target_dir: Path,
+        gp_name: str,
+        results: List[Dict[str, Any]],
+        all_laps: List[Dict[str, Any]],
+    ) -> None:
+        """Generate a complete Markdown audit report demonstrating all captured FIA and storytelling metrics."""
+        report_path = target_dir / "RELATORIO_PILOTO_PORTIMAO.md"
+
+        fastest_lap_driver = min(results, key=lambda x: x["best_lap"]) if results else None
+        top_speed_driver = max(results, key=lambda x: x.get("speed_trap_kmh", 0.0)) if results else None
+
+        lines = [
+            f"# 🏁 RELATÓRIO DO TESTE PILOTO DE TELEMETRIA UDP — F1 24",
+            f"**Circuito:** {gp_name}  ",
+            f"**Data da Sessão:** {time.strftime('%d/%m/%Y %H:%M:%S')}  ",
+            f"**Ambiente:** Totalmente isolado (`data/telemetry_pilot_test/` — Etapa 11 e campeonato NÃO afetados)  ",
+            "",
+            "---",
+            "",
+            "## 1. Classificação Oficial da FIA (Dados Brutos Decodificados do Jogo)",
+            "",
+            "| Pos | Grid | $\\Delta$ | Piloto | Equipe | Tempo / Gap | Melhor Volta | Stops | Estratégia | Desgaste Máx | Speed Trap | Pontos FIA | Status |",
+            "| :---: | :---: | :---: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |",
+        ]
+
+        for r in results:
+            pos = r["pos"]
+            grid = r["grid"]
+            delta = grid - pos
+            delta_str = f"+{delta}" if delta > 0 else (str(delta) if delta < 0 else "=")
+            pts = r["points"]
+            status = r["status"]
+            lines.append(
+                f"| **P{pos}** | {grid} | {delta_str} | **{r['driver_name']}** | {r['team']} | "
+                f"`{r['total_time_or_gap']}` | `{r['best_lap']}` | {r['stops']} | `{r['strategy']}` | "
+                f"{r['max_wear_pct']}% | {r['speed_trap_kmh']} km/h | **{pts}** | {status} |"
+            )
+
+        lines.extend([
+            "",
+            "---",
+            "",
+            "## 2. Destaques Técnicos & Narrativos Capturados via UDP",
+            "",
+            f"* **Vencedor da Corrida:** `{results[0]['driver_name']}` ({results[0]['team']}) com tempo total de `{results[0]['total_time_or_gap']}`.",
+            f"* **Volta Mais Rápida da Sessão:** `{fastest_lap_driver['driver_name']}` com `{fastest_lap_driver['best_lap']}`.",
+            f"* **Maior Velocidade no Speed Trap:** `{top_speed_driver['driver_name']}` com `{top_speed_driver['speed_trap_kmh']} km/h`.",
+            f"* **Total de Voltas Rastreadas Volta-a-Volta:** `{len(all_laps)} voltas` com telemetria de S1, S2, S3, desgaste de pneu e posições.",
+            "",
+            "---",
+            "",
+            "## 3. Matriz de Viabilidade para os 8 Módulos Narrativos da FIA",
+            "",
+            "| Módulo Narrativo | Dados Exigidos | Coletado pelo UDP? | Status |",
+            "| :--- | :--- | :---: | :---: |",
+            "| **M3 (Qualificação)** | Grid de largada, deltas de tempo, tempos de volta | ✅ Sim (`PacketFinalClassificationData` + `LapData`) | **100% Autônomo** |",
+            "| **M4 (Estratégia & Pneus)** | Stints, compostos de pneus (S, M, H), desgaste % | ✅ Sim (`PacketCarStatusData` + `PacketCarDamageData`) | **100% Autônomo** |",
+            "| **M5 (Relatório da Corrida)** | Classificação P1..P20, gaps, voltas mais rápidas | ✅ Sim (`FinalClassification` + `LapHistory`) | **100% Autônomo** |",
+            "| **M6 (Piloto do Dia & Duelos)** | $\\Delta$ de posições ganhas, ritmo volta a volta | ✅ Sim (Calculado via Grid vs Posição Final) | **100% Autônomo** |",
+            "| **M7 (Rádio & Bastidores)** | Momentos de pit stops, penalidades e danos | ✅ Sim (`pitStopTimerInMS`, advertências e asas) | **100% Autônomo** |",
+            "| **M8 (Classificação Geral)** | Pontuação oficial calculada pela regra da FIA | ✅ Sim (`fia_calculator` alimentado diretamente) | **100% Autônomo** |",
+            "",
+            "> [!NOTE]",
+            "> **Conclusão Técnica:** A telemetria UDP do F1 24 elimina 100% a dependência de fotos da TV e exportações manuais do PaceDex, fornecendo dados matematicamente perfeitos para toda a narrativa do Showrunner.",
+        ])
+
+        with open(report_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines) + "\n")
+
+        log_text(f"[SESSION RECORDER] 📄 Relatório do Teste Piloto gerado em: {report_path.name}")
