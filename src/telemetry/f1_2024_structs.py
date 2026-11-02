@@ -90,7 +90,7 @@ TRACK_ID_MAP = {
     20: {"name": "Baku City Circuit", "round": 17, "folder": "et_17_azerbaijao"},
     26: {"name": "Zandvoort", "round": 15, "folder": "et_15_holanda"},
     27: {"name": "Imola", "round": 7, "folder": "et_07_imola"},
-    28: {"name": "Portimao", "round": None, "folder": None},
+    28: {"name": "Autódromo Internacional do Algarve (Portimão)", "round": None, "folder": "telemetry_pilot_test"},
     29: {"name": "Jeddah Corniche", "round": 2, "folder": "et_02_jeddah"},
     30: {"name": "Miami International Autodrome", "round": 6, "folder": "et_06_miami"},
     31: {"name": "Las Vegas Strip Circuit", "round": 22, "folder": "et_22_las_vegas"},
@@ -109,6 +109,72 @@ TEAM_ID_MAP = {
     7: "MoneyGram Haas F1 Team",
     8: "McLaren Formula 1 Team",
     9: "Stake F1 Team Kick Sauber",
+}
+
+# Complete Codemasters Official F1 Driver IDs
+F1_2024_DRIVER_IDS = {
+    0: ("sainz", "Carlos Sainz", 55, "Scuderia Ferrari HP"),
+    2: ("ricciardo", "Daniel Ricciardo", 3, "Visa Cash App RB"),
+    3: ("alonso", "Fernando Alonso", 14, "Aston Martin Aramco"),
+    6: ("hamilton", "Lewis Hamilton", 44, "Mercedes-AMG Petronas"),
+    8: ("verstappen", "Max Verstappen", 1, "Red Bull Racing"),
+    9: ("hulkenberg", "Nico Hülkenberg", 27, "MoneyGram Haas F1 Team"),
+    10: ("magnussen", "Kevin Magnussen", 20, "MoneyGram Haas F1 Team"),
+    13: ("perez", "Sergio Pérez", 11, "Red Bull Racing"),
+    14: ("bottas", "Valtteri Bottas", 77, "Stake F1 Team Kick Sauber"),
+    15: ("ocon", "Esteban Ocon", 31, "BWT Alpine F1 Team"),
+    17: ("stroll", "Lance Stroll", 18, "Aston Martin Aramco"),
+    41: ("norris", "Lando Norris", 4, "McLaren Formula 1 Team"),
+    42: ("russell", "George Russell", 63, "Mercedes-AMG Petronas"),
+    49: ("zhou", "Guanyu Zhou", 24, "Stake F1 Team Kick Sauber"),
+    58: ("leclerc", "Charles Leclerc", 16, "Scuderia Ferrari HP"),
+    62: ("gasly", "Pierre Gasly", 10, "BWT Alpine F1 Team"),
+    69: ("albon", "Alexander Albon", 23, "Williams Racing"),
+    74: ("tsunoda", "Yuki Tsunoda", 22, "Visa Cash App RB"),
+    80: ("zhou", "Guanyu Zhou", 24, "Stake F1 Team Kick Sauber"),
+    84: ("piastri", "Oscar Piastri", 81, "McLaren Formula 1 Team"),
+    89: ("sargeant", "Logan Sargeant", 2, "Williams Racing"),
+    90: ("sargeant", "Logan Sargeant", 2, "Williams Racing"),
+}
+
+# Race Number to Canonical Driver Map
+F1_2024_CAR_NUMBERS = {
+    4: ("norris", "Lando Norris", 4, "McLaren Formula 1 Team"),
+    81: ("piastri", "Oscar Piastri", 81, "McLaren Formula 1 Team"),
+    15: ("davi", "Davi (DaviMSSon)", 15, "Williams Racing"),
+    5: ("felipe", "Felipe (frdsilva)", 5, "Stake F1 Team Kick Sauber"),
+    24: ("sarah", "Sarah (SarahMarinsS)", 24, "Mercedes-AMG Petronas"),
+    1: ("verstappen", "Max Verstappen", 1, "Red Bull Racing"),
+    33: ("verstappen", "Max Verstappen", 33, "Red Bull Racing"),
+    11: ("perez", "Sergio Pérez", 11, "Red Bull Racing"),
+    16: ("leclerc", "Charles Leclerc", 16, "Scuderia Ferrari HP"),
+    55: ("sainz", "Carlos Sainz", 55, "Scuderia Ferrari HP"),
+    14: ("alonso", "Fernando Alonso", 14, "Aston Martin Aramco"),
+    18: ("stroll", "Lance Stroll", 18, "Aston Martin Aramco"),
+    44: ("hamilton", "Lewis Hamilton", 44, "Mercedes-AMG Petronas"),
+    63: ("russell", "George Russell", 63, "Mercedes-AMG Petronas"),
+    10: ("gasly", "Pierre Gasly", 10, "BWT Alpine F1 Team"),
+    31: ("ocon", "Esteban Ocon", 31, "BWT Alpine F1 Team"),
+    23: ("albon", "Alexander Albon", 23, "Williams Racing"),
+    3: ("ricciardo", "Daniel Ricciardo", 3, "Visa Cash App RB"),
+    22: ("tsunoda", "Yuki Tsunoda", 22, "Visa Cash App RB"),
+    27: ("hulkenberg", "Nico Hülkenberg", 27, "MoneyGram Haas F1 Team"),
+    20: ("magnussen", "Kevin Magnussen", 20, "MoneyGram Haas F1 Team"),
+    77: ("bottas", "Valtteri Bottas", 77, "Stake F1 Team Kick Sauber"),
+}
+
+# Infringement Types (Codemasters F1)
+INFRINGEMENT_TYPES = {
+    0: "Bloqueio na pista",
+    1: "Corte de curva / Limites de pista",
+    2: "Corte de curva com ganho de vantagem",
+    3: "Colisão causando dano",
+    4: "Colisão causando abandono",
+    5: "Colisão com outro veículo",
+    6: "Ultrapassagem sob Safety Car",
+    7: "Excesso de velocidade no pit lane",
+    8: "Ignorar bandeira amarela",
+    9: "Ignorar bandeira azul",
 }
 
 
@@ -156,11 +222,9 @@ class SessionData:
     def unpack(cls, data: bytes) -> Optional[SessionData]:
         if len(data) < 29 + 17:
             return None
-        # offset 29: weather (B), trackTemp (b), airTemp (b), totalLaps (B), trackLength (H), sessionType (B), trackId (b), formula (B), timeLeft (H), duration (H), pitSpeedLimit (B)
         fmt = "<BbbBHBbBHHB"
         sub = data[29:29 + struct.calcsize(fmt)]
         values = struct.unpack(fmt, sub)
-        # values: (weather, trackTemp, airTemp, totalLaps, trackLength, sessionType, trackId, formula, timeLeft, duration, pitSpeedLimit)
         return cls(
             weather=values[0],
             track_temperature=values[1],
@@ -202,13 +266,12 @@ class ParticipantsPacket:
         cars: List[ParticipantData] = []
         offset = 30
         remaining = len(data) - 30
-        stride = remaining // 22 if remaining >= 22 * 54 else 56
+        stride = remaining // 22 if remaining >= 22 * 54 else 57
 
         for i in range(min(num_active, 22)):
             car_offset = offset + (i * stride)
             if car_offset + 54 > len(data):
                 break
-            # Unpack first 7 uint8 fields
             ai, drv_id, net_id, team, my_t, race_num, nat = struct.unpack_from("<BBBBBBB", data, car_offset)
             raw_name_bytes = data[car_offset + 7: car_offset + 7 + 48]
             name = raw_name_bytes.split(b"\x00")[0].decode("utf-8", errors="ignore").strip()
@@ -230,24 +293,8 @@ class ParticipantsPacket:
 
 
 @dataclass
-class LapDataRecord:
-    last_lap_time_ms: int
-    current_lap_time_ms: int
-    sector1_ms: int
-    sector2_ms: int
-    car_position: int
-    current_lap_num: int
-    pit_status: int
-    num_pit_stops: int
-    penalties: int
-    grid_position: int
-    driver_status: int
-    result_status: int
-    pit_stop_timer_ms: int
-
-
-@dataclass
 class FinalClassificationDriver:
+    vehicle_idx: int
     position: int
     num_laps: int
     grid_position: int
@@ -275,25 +322,24 @@ class FinalClassificationPacket:
         drivers: List[FinalClassificationDriver] = []
         offset = 30
         remaining = len(data) - 30
-        stride = remaining // 22 if remaining >= 22 * 40 else 44
+        stride = remaining // 22 if remaining >= 22 * 40 else 45
 
         for i in range(min(num_cars, 22)):
             car_offset = offset + (i * stride)
             if car_offset + 40 > len(data):
                 break
-            # Struct: position(B), numLaps(B), gridPos(B), points(B), numPitStops(B), resultStatus(B), bestLapTimeMS(I), totalRaceTime(d), penaltiesTime(B), numPenalties(B), numTyreStints(B)
             prefix_fmt = "<BBBBBBIdBBB"
             prefix_size = struct.calcsize(prefix_fmt)
             vals = struct.unpack_from(prefix_fmt, data, car_offset)
             pos, laps, grid, pts, stops, status, best_lap_ms, total_time, pen_time, n_pens, n_stints = vals
 
-            # Next 8 bytes: tyreStintsActual, Next 8 bytes: tyreStintsVisual
             visual_offset = car_offset + prefix_size + 8
             visual_stints = list(data[visual_offset: visual_offset + 8]) if visual_offset + 8 <= len(data) else []
             valid_stints = [stint for stint in visual_stints[:n_stints] if stint in VISUAL_TYRE_COMPOUNDS]
 
             drivers.append(
                 FinalClassificationDriver(
+                    vehicle_idx=i,
                     position=pos,
                     num_laps=laps,
                     grid_position=grid,

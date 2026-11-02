@@ -27,6 +27,11 @@ DRIVER_ID_MAP = {
     "ricciardo": ("ricciardo", "Daniel Ricciardo", 3, "Visa Cash App RB"),
     "bottas": ("bottas", "Valtteri Bottas", 77, "Stake F1 Team Kick Sauber"),
     "magnussen": ("magnussen", "Kevin Magnussen", 20, "MoneyGram Haas F1 Team"),
+    "russell": ("russell", "George Russell", 63, "Mercedes-AMG Petronas"),
+    "zhou": ("zhou", "Guanyu Zhou", 24, "Stake F1 Team Kick Sauber"),
+    "sargeant": ("sargeant", "Logan Sargeant", 2, "Williams Racing"),
+    "bearman": ("bearman", "Oliver Bearman", 38, "Scuderia Ferrari HP"),
+    "lawson": ("lawson", "Liam Lawson", 40, "Visa Cash App RB"),
 }
 
 FIA_RACE_POINTS = {1: 25, 2: 18, 3: 15, 4: 12, 5: 10, 6: 8, 7: 6, 8: 4, 9: 2, 10: 1}
@@ -52,7 +57,7 @@ def normalize_driver(raw_name: str) -> Tuple[str, str, int, str]:
     for k, val in DRIVER_ID_MAP.items():
         if k in key:
             return val
-    raise ValueError(f"Unknown driver identifier: {raw_name}")
+    return (key.replace(" ", "_"), raw_name.strip(), 0, "Equipe F1")
 
 
 def parse_pacedex_laps_csv(csv_path: Path) -> List[LapRecord]:

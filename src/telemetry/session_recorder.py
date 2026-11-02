@@ -31,9 +31,12 @@ from src.telemetry.f1_2024_structs import (
     FinalClassificationPacket,
     TRACK_ID_MAP,
     TEAM_ID_MAP,
+    F1_2024_DRIVER_IDS,
+    F1_2024_CAR_NUMBERS,
     VISUAL_TYRE_COMPOUNDS,
     RESULT_STATUS_MAP,
     SESSION_TYPE_MAP,
+    INFRINGEMENT_TYPES,
 )
 from src.telemetry_merger import DRIVER_ID_MAP, normalize_driver, merge_race_telemetry
 from src.portal_builder import ROUND_METADATA
@@ -89,6 +92,9 @@ class SessionRecorder:
         self.car_damage: Dict[int, Dict[str, Any]] = {}
         self.car_lap: Dict[int, Dict[str, Any]] = {}
         self.speed_traps: Dict[int, float] = {}
+        self.car_warnings: Dict[int, int] = {}
+        self.car_penalties: Dict[int, int] = {}
+        self.incidents: List[Dict[str, Any]] = []
 
         # Car Index (0..21) -> list of completed laps
         self.lap_history: Dict[int, List[Dict[str, Any]]] = {}
@@ -139,12 +145,65 @@ class SessionRecorder:
 
         return 11, "et_11_austria"
 
+    def resolve_driver(self, idx: int, p: Optional[Any] = None) -> Tuple[str, str, int, str]:
+        """
+        Robust 4-layer resolution for driver identity:
+        1. String name in participant packet (for human players or recognized strings)
+        2. Codemasters F1 2024 Driver ID enum
+        3. Official car number
+        4. Generic fallback with team
+        Returns: (canon_id, driver_name, car_number, team_name)
+        """
+        if isinstance(p, dict):
+            if p.get("canon_id") and p.get("canon_name"):
+                return p["canon_id"], p["canon_name"], p.get("race_number", 0), p.get("team", "Equipe F1")
+            p_name = p.get("name", "")
+            p_driver_id = p.get("driver_id", 255)
+            p_race_num = p.get("race_number", 0)
+            p_team_id = p.get("team_id", 255)
+        elif p is not None:
+            p_name = getattr(p, "name", "")
+            p_driver_id = getattr(p, "driver_id", 255)
+            p_race_num = getattr(p, "race_number", 0)
+            p_team_id = getattr(p, "team_id", 255)
+        else:
+            p_name, p_driver_id, p_race_num, p_team_id = "", 255, 0, 255
+
+        p_name = p_name.strip() if isinstance(p_name, str) else ""
+
+        # 1. Match string name
+        if p_name:
+            try:
+                cid, cname, cnum, cteam = normalize_driver(p_name)
+                return cid, cname, (p_race_num or cnum), cteam
+            except Exception:
+                pass
+
+        # 2. Match Codemasters driver ID enum
+        if p_driver_id in F1_2024_DRIVER_IDS:
+            cid, cname, cnum, cteam = F1_2024_DRIVER_IDS[p_driver_id]
+            # Override with team if team ID is valid
+            if p_team_id in TEAM_ID_MAP:
+                cteam = TEAM_ID_MAP[p_team_id]
+            return cid, cname, (p_race_num or cnum), cteam
+
+        # 3. Match by car number
+        if p_race_num in F1_2024_CAR_NUMBERS:
+            cid, cname, cnum, cteam = F1_2024_CAR_NUMBERS[p_race_num]
+            if p_team_id in TEAM_ID_MAP:
+                cteam = TEAM_ID_MAP[p_team_id]
+            return cid, cname, p_race_num, cteam
+
+        # 4. Fallback
+        team_str = TEAM_ID_MAP.get(p_team_id, "Equipe F1")
+        name_str = p_name if p_name else f"Piloto #{p_race_num or idx+1}"
+        return f"pilot_{idx+1}", name_str, p_race_num, team_str
+
     def process_packet(self, header: PacketHeader, raw_data: bytes) -> Optional[Dict[str, Any]]:
         """
         Main packet ingestion entry point.
         Returns a result dict if a final classification was completed and exported.
         """
-        # Ignore UID=0 packets (loading/menu transitions) to avoid wiping live sessions
         if header.session_uid != 0 and header.session_uid != self.session_uid:
             if self.session_uid != 0:
                 log_text(f"[SESSION RECORDER] Nova sessão detectada (UID: {header.session_uid}). Reiniciando agregador.")
@@ -166,23 +225,15 @@ class SessionRecorder:
             ppacket = ParticipantsPacket.unpack(raw_data)
             if ppacket:
                 for idx, p in enumerate(ppacket.participants):
-                    canon_id = None
-                    canon_name = p.name
-                    canon_team = TEAM_ID_MAP.get(p.team_id, "Desconhecida")
-                    try:
-                        cid, cname, _, cteam = normalize_driver(p.name)
-                        canon_id = cid
-                        canon_name = cname
-                        canon_team = cteam
-                    except Exception:
-                        pass
-
+                    cid, cname, cnum, cteam = self.resolve_driver(idx, p)
                     self.participants[idx] = {
-                        "name": p.name,
-                        "canon_id": canon_id,
-                        "canon_name": canon_name,
-                        "team": canon_team,
-                        "race_number": p.race_number,
+                        "name": p.name or cname,
+                        "driver_id": p.driver_id,
+                        "team_id": p.team_id,
+                        "canon_id": cid,
+                        "canon_name": cname,
+                        "team": cteam,
+                        "race_number": cnum or p.race_number,
                         "ai_controlled": bool(p.ai_controlled),
                     }
 
@@ -196,11 +247,7 @@ class SessionRecorder:
             self._process_car_damage(raw_data)
 
         elif pid == PACKET_ID_EVENT:
-            if len(raw_data) >= 33:
-                event_code = raw_data[29:33].decode("ascii", errors="ignore")
-                if event_code == "CHQF":
-                    self.chequered_flag = True
-                    log_text("[SESSION RECORDER] 🏁 Bandeira quadriculada detectada no feed UDP!")
+            self._process_event(raw_data)
 
         elif pid == PACKET_ID_FINAL_CLASSIFICATION:
             fc_packet = FinalClassificationPacket.unpack(raw_data)
@@ -211,6 +258,31 @@ class SessionRecorder:
                 return res
 
         return None
+
+    def _process_event(self, raw_data: bytes) -> None:
+        if len(raw_data) < 33:
+            return
+        event_code = raw_data[29:33].decode("ascii", errors="ignore")
+        if event_code == "CHQF":
+            self.chequered_flag = True
+            log_text("[SESSION RECORDER] 🏁 Bandeira quadriculada detectada no feed UDP!")
+        elif event_code == "PENA":
+            # Penalty packet details
+            if len(raw_data) >= 40:
+                pen_type, inf_type, veh_idx, other_idx, pen_time, pen_lap, places = struct.unpack_from("<BBBBBBB", raw_data, 33)
+                part = self.participants.get(veh_idx, {})
+                dname = part.get("canon_name") or f"Carro #{veh_idx+1}"
+                inf_desc = INFRINGEMENT_TYPES.get(inf_type, f"Infração #{inf_type}")
+                log_text(f"[SESSION RECORDER] 🚨 PUNIÇÃO: {dname} recebeu {pen_time}s na Volta {pen_lap} ({inf_desc})")
+                self.incidents.append({
+                    "type": "PENALTY",
+                    "driver": dname,
+                    "car_idx": veh_idx,
+                    "time_s": pen_time,
+                    "lap": pen_lap,
+                    "infringement": inf_desc,
+                    "details": f"{dname}: Punição de +{pen_time}s por {inf_desc.lower()}",
+                })
 
     def _process_lap_data(self, raw_data: bytes) -> None:
         offset = 29
@@ -223,12 +295,19 @@ class SessionRecorder:
             last_ms, curr_ms, s1_ms, s1_m, s2_ms, s2_m = struct.unpack_from("<IIHBHB", raw_data, car_offset)
             pos, lap_num, pit_status, num_pits = struct.unpack_from("<BBBB", raw_data, car_offset + 30)
 
-            # Pit stop box timer (uint16 at offset 47)
+            # Warnings & penalties in LapData
+            penalties_s = raw_data[car_offset + 36] if car_offset + 37 <= len(raw_data) else 0
+            warnings = raw_data[car_offset + 37] if car_offset + 38 <= len(raw_data) else 0
+
+            self.car_warnings[i] = warnings
+            self.car_penalties[i] = penalties_s
+
+            # Pit stop box timer (offset 47)
             pit_stop_timer_ms = 0
             if car_offset + 49 <= len(raw_data):
                 pit_stop_timer_ms = struct.unpack_from("<H", raw_data, car_offset + 47)[0]
 
-            # Speed trap (float at offset 50)
+            # Speed trap (offset 50)
             if car_offset + 54 <= len(raw_data):
                 speed_trap = struct.unpack_from("<f", raw_data, car_offset + 50)[0]
                 if speed_trap > self.speed_traps.get(i, 0.0):
@@ -250,7 +329,7 @@ class SessionRecorder:
                     "lap": prev.get("lap_num", 1),
                     "pos": pos,
                     "car_number": part.get("race_number", 0),
-                    "driver": part.get("canon_id") or part.get("name", f"Car_{i}"),
+                    "driver": part.get("canon_name") or part.get("name", f"Car_{i}"),
                     "raw_name": part.get("name", f"Car_{i}"),
                     "team": part.get("team", "Unknown"),
                     "time_str": format_ms(last_ms),
@@ -265,7 +344,6 @@ class SessionRecorder:
                 }
                 self.lap_history.setdefault(i, []).append(lap_entry)
 
-            # Record pit stop events
             if pit_stop_timer_ms > 0:
                 self.pit_events.setdefault(i, []).append({
                     "lap": lap_num,
@@ -286,7 +364,6 @@ class SessionRecorder:
         stride = (len(raw_data) - 29) // 22 if (len(raw_data) - 29) >= 22 * 45 else 47
         for i in range(22):
             car_offset = offset + (i * stride)
-            # Offset 26 = visual tyre compound, offset 27 = tyre age in laps (F1 24)
             if car_offset + 28 <= len(raw_data):
                 visual_compound = raw_data[car_offset + 26]
                 tyre_age = raw_data[car_offset + 27]
@@ -303,19 +380,28 @@ class SessionRecorder:
 
     def _process_car_damage(self, raw_data: bytes) -> None:
         offset = 29
-        stride = (len(raw_data) - 29) // 22 if (len(raw_data) - 29) >= 22 * 35 else 42
+        stride = (len(raw_data) - 29) // 22 if (len(raw_data) - 29) >= 22 * 35 else 41
         for i in range(22):
             car_offset = offset + (i * stride)
             if car_offset + 16 > len(raw_data):
                 break
-            # 4 floats = tyres wear: RL, RR, FL, FR
             w_rl, w_rr, w_fl, w_fr = struct.unpack_from("<ffff", raw_data, car_offset)
             max_w = max(w_rl, w_rr, w_fl, w_fr)
 
-            # Wing / floor damage if available
             fl_wing = raw_data[car_offset + 24] if car_offset + 25 <= len(raw_data) else 0
             fr_wing = raw_data[car_offset + 25] if car_offset + 26 <= len(raw_data) else 0
             floor_dmg = raw_data[car_offset + 27] if car_offset + 28 <= len(raw_data) else 0
+
+            # Record wing/floor damage incident once if significant
+            if (fl_wing > 0 or fr_wing > 0) and i not in [inc.get("car_idx") for inc in self.incidents if inc.get("type") == "DAMAGE"]:
+                part = self.participants.get(i, {})
+                dname = part.get("canon_name") or f"Carro #{i+1}"
+                self.incidents.append({
+                    "type": "DAMAGE",
+                    "car_idx": i,
+                    "driver": dname,
+                    "details": f"{dname}: Dano aerodinâmico na asa dianteira (E: {fl_wing}%, D: {fr_wing}%)",
+                })
 
             self.car_damage[i] = {
                 "max_wear": max_w,
@@ -357,12 +443,11 @@ class SessionRecorder:
         summary_csv_rows: List[Dict[str, Any]] = []
 
         for d in classified:
-            idx = fc_packet.classification.index(d)
-            part = self.participants.get(idx, {})
-            name = part.get("canon_name") or part.get("name", f"Piloto {d.position}")
-            canon_id = part.get("canon_id") or part.get("name", f"pilot_{d.position}").lower()
-            team = part.get("team", "Equipe F1")
-            car_num = part.get("race_number", 0)
+            idx = d.vehicle_idx
+            part = self.participants.get(idx)
+
+            # Resolve driver using 4-layer resolution
+            cid, cname, car_num, team = self.resolve_driver(idx, part)
 
             if d.position == 1:
                 time_str = format_race_time(d.total_race_time)
@@ -380,14 +465,23 @@ class SessionRecorder:
             elif d.result_status == 5:
                 status_str = "DSQ"
 
+            # Tyres & Stints
             stints_letters = [VISUAL_TYRE_COMPOUNDS.get(c, "M") for c in d.tyre_stints_visual]
-            final_tyre = stints_letters[-1] if stints_letters else "M"
-            stint_str = " ➔ ".join(stints_letters) if stints_letters else final_tyre
+            current_tyre = self.car_status.get(idx, {}).get("visual_tyre")
+            tyre_age = self.car_status.get(idx, {}).get("tyre_age", d.num_laps)
+            final_tyre = current_tyre or (stints_letters[-1] if stints_letters else "S")
+
+            stint_str = " ➔ ".join(stints_letters) if len(stints_letters) > 1 else f"{final_tyre} ({tyre_age}v)"
+            wear_pct = round(self.car_damage.get(idx, {}).get("max_wear", 0.0), 1)
+
+            # Warnings & Penalties
+            warns = self.car_warnings.get(idx, 0)
+            pens_s = d.penalties_time or self.car_penalties.get(idx, 0)
 
             race_results.append({
                 "pos": d.position,
                 "driver_number": car_num,
-                "driver_name": name,
+                "driver_name": cname,
                 "team": team,
                 "grid": d.grid_position,
                 "stops": d.num_pit_stops,
@@ -396,18 +490,22 @@ class SessionRecorder:
                 "points": d.points,
                 "status": "FINISHED" if status_str == "Finalizada" else status_str,
                 "strategy": stint_str,
-                "max_wear_pct": round(self.car_damage.get(idx, {}).get("max_wear", 0.0), 1),
+                "tyre": final_tyre,
+                "tyre_age": tyre_age,
+                "max_wear_pct": wear_pct,
                 "speed_trap_kmh": self.speed_traps.get(idx, 0.0),
+                "warnings": warns,
+                "penalties_s": pens_s,
             })
 
-            grid_by_driver[canon_id] = d.grid_position
-            time_or_gap_by_driver[canon_id] = time_str
-            status_by_driver[canon_id] = status_str
+            grid_by_driver[cid] = d.grid_position
+            time_or_gap_by_driver[cid] = time_str
+            status_by_driver[cid] = status_str
 
             summary_csv_rows.append({
                 "Pos": d.position,
                 "Nº": car_num,
-                "Piloto": name,
+                "Piloto": cname,
                 "Equipe": team,
                 "Voltas": d.num_laps,
                 "Melhor volta": format_ms(d.best_lap_time_ms),
@@ -426,7 +524,7 @@ class SessionRecorder:
             "grid_by_driver": grid_by_driver,
             "time_or_gap_by_driver": time_or_gap_by_driver,
             "status_by_driver": status_by_driver,
-            "incidents": [],
+            "incidents": self.incidents,
         }
         with open(target_dir / overlay_filename, "w", encoding="utf-8") as f:
             json.dump(tv_overlay_data, f, indent=2, ensure_ascii=False)
@@ -458,7 +556,7 @@ class SessionRecorder:
                     "Volta": l["lap"],
                     "Pos": l["pos"],
                     "Nº": l["car_number"],
-                    "Piloto": l["raw_name"],
+                    "Piloto": l["driver"],
                     "Equipe": l["team"],
                     "Tempo": l["time_str"],
                     "S1": l["s1_str"],
@@ -514,8 +612,8 @@ class SessionRecorder:
             "",
             "## 1. Classificação Oficial da FIA (Dados Brutos Decodificados do Jogo)",
             "",
-            "| Pos | Grid | $\\Delta$ | Piloto | Equipe | Tempo / Gap | Melhor Volta | Stops | Estratégia | Desgaste Máx | Speed Trap | Pontos FIA | Status |",
-            "| :---: | :---: | :---: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |",
+            "| Pos | Grid | $\\Delta$ | Nº | Piloto | Equipe | Tempo / Gap | Melhor Volta | Stops | Pneu / Stint | Desgaste | Advertências | Punição | Pontos FIA | Status |",
+            "| :---: | :---: | :---: | :---: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |",
         ]
 
         for r in results:
@@ -525,10 +623,12 @@ class SessionRecorder:
             delta_str = f"+{delta}" if delta > 0 else (str(delta) if delta < 0 else "=")
             pts = r["points"]
             status = r["status"]
+            warn_str = f"⚠️ {r['warnings']} adv" if r["warnings"] > 0 else "—"
+            pen_str = f"⏱️ +{r['penalties_s']}s" if r["penalties_s"] > 0 else "—"
             lines.append(
-                f"| **P{pos}** | {grid} | {delta_str} | **{r['driver_name']}** | {r['team']} | "
+                f"| **P{pos}** | {grid} | {delta_str} | #{r['driver_number']} | **{r['driver_name']}** | {r['team']} | "
                 f"`{r['total_time_or_gap']}` | `{r['best_lap']}` | {r['stops']} | `{r['strategy']}` | "
-                f"{r['max_wear_pct']}% | {r['speed_trap_kmh']} km/h | **{pts}** | {status} |"
+                f"{r['max_wear_pct']}% | {warn_str} | {pen_str} | **{pts}** | {status} |"
             )
 
         lines.extend([
@@ -538,13 +638,38 @@ class SessionRecorder:
             "## 2. Destaques Técnicos & Narrativos Capturados via UDP",
             "",
             f"* **Vencedor da Corrida:** `{results[0]['driver_name']}` ({results[0]['team']}) com tempo total de `{results[0]['total_time_or_gap']}`.",
-            f"* **Volta Mais Rápida da Sessão:** `{fastest_lap_driver['driver_name']}` com `{fastest_lap_driver['best_lap']}`.",
+            f"* **Volta Mais Rápida da Sessão:** `{fastest_lap_driver['driver_name']}` com `{fastest_lap_driver['best_lap']}` (Ponto extra da FIA).",
             f"* **Maior Velocidade no Speed Trap:** `{top_speed_driver['driver_name']}` com `{top_speed_driver['speed_trap_kmh']} km/h`.",
             f"* **Total de Voltas Rastreadas Volta-a-Volta:** `{len(all_laps)} voltas` com telemetria de S1, S2, S3, desgaste de pneu e posições.",
             "",
             "---",
             "",
-            "## 3. Matriz de Viabilidade para os 8 Módulos Narrativos da FIA",
+            "## 3. 🚨 Incidentes, Advertências e Punições dos Comissários (FIA Stewards)",
+            "",
+        ])
+
+        drivers_with_warnings = [r for r in results if r["warnings"] > 0 or r["penalties_s"] > 0]
+        if drivers_with_warnings:
+            lines.append("| Piloto | Equipe | Advertências (Limites de Pista) | Punição em Tempo | Impacto na Prova |")
+            lines.append("| :--- | :--- | :---: | :---: | :--- |")
+            for d in drivers_with_warnings:
+                adv = f"{d['warnings']} aviso(s)" if d['warnings'] > 0 else "Nenhum"
+                pen = f"+{d['penalties_s']}s" if d['penalties_s'] > 0 else "Sem penalidade de tempo"
+                impact = "Sob risco de punição de 3s" if d['warnings'] >= 2 else "Advertência inicial por corte de curva"
+                lines.append(f"| **{d['driver_name']}** | {d['team']} | `{adv}` | `{pen}` | {impact} |")
+        else:
+            lines.append("* Nenhuma advertência ou punição formal aplicada pelos comissários nesta sessão.")
+
+        if self.incidents:
+            lines.append("\n### Detalhamento dos Registros da Direção de Prova:")
+            for inc in self.incidents:
+                lines.append(f"- ⚠️ **{inc.get('type')}:** {inc.get('details')}")
+
+        lines.extend([
+            "",
+            "---",
+            "",
+            "## 4. Matriz de Viabilidade para os 8 Módulos Narrativos da FIA",
             "",
             "| Módulo Narrativo | Dados Exigidos | Coletado pelo UDP? | Status |",
             "| :--- | :--- | :---: | :---: |",
