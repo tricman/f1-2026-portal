@@ -37,7 +37,7 @@ from src.telemetry.session_recorder import SessionRecorder
 DEFAULT_LISTEN_HOST = "0.0.0.0"
 DEFAULT_LISTEN_PORT = 20777
 DEFAULT_RELAY_HOST = "127.0.0.1"
-DEFAULT_RELAY_PORT = 20778
+DEFAULT_RELAY_PORT = None  # PaceDex desabilitado por padrão
 
 
 class UdpTelemetryRelay:
@@ -46,7 +46,7 @@ class UdpTelemetryRelay:
         listen_host: str = DEFAULT_LISTEN_HOST,
         listen_port: int = DEFAULT_LISTEN_PORT,
         relay_host: str = DEFAULT_RELAY_HOST,
-        relay_port: int = DEFAULT_RELAY_PORT,
+        relay_port: int | None = None,
         override_round: int | None = None,
         test_mode: bool = False,
     ):
@@ -67,38 +67,41 @@ class UdpTelemetryRelay:
         self.last_status_time = time.time()
 
     def start(self) -> None:
-        """Bind sockets and start the relay loop."""
+        """Bind sockets and start the receiver loop."""
         # 1. Receiver socket
         self.rx_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         if hasattr(socket, "SO_REUSEADDR"):
             self.rx_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
-            self.rx_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 2 * 1024 * 1024)
+            self.rx_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4 * 1024 * 1024)
         except Exception:
             pass
 
         self.rx_socket.bind((self.listen_host, self.listen_port))
         self.rx_socket.setblocking(False)
 
-        # 2. Transmitter socket (Relay to PaceDex)
-        self.tx_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # 2. Transmitter socket (opcional se relay_port estiver configurado)
+        if self.relay_port:
+            self.tx_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         self.running = True
-        relay_target = f"{self.relay_host}:{self.relay_port}"
         listen_addr = f"{self.listen_host}:{self.listen_port}"
 
         print("=" * 76)
         if self.recorder.is_pilot_test():
-            print("🏎️  F1 2024 UDP TELEMETRY PROXY & LIVE RECORDER [MODO PILOTO DE TESTE]")
+            print("🏎️  F1 2024 UDP TELEMETRY RECORDER [MODO PILOTO DE TESTE]")
             print("🧪 Pista Alvo: GP de Portugal (Portimão) ou Sessão de Treino")
             print("🛡️  ISOLAMENTO TOTAL ATIVO: Nenhum dado será gravado na Etapa 11 ou campeonato.")
             print("📁 Resultados e Relatório da FIA serão salvos em: data/telemetry_pilot_test/")
         else:
-            print("🏎️  F1 2024 UDP TELEMETRY PROXY & LIVE RECORDER [MODO OFICIAL]")
+            print("🏎️  F1 2024 UDP TELEMETRY RECORDER [MODO OFICIAL]")
             print("💾 Gravação automática de tv_overlay.json e CSVs habilitada.")
 
         print(f"📡 Escutando telemetria F1 24 em: {listen_addr}")
-        print(f"⚡ Replicando em tempo real para PaceDex em: {relay_target}")
+        if self.relay_port:
+            print(f"⚡ Replicando em tempo real para: {self.relay_host}:{self.relay_port}")
+        else:
+            print("⚡ Modo Direto: Recepção exclusiva sem intermediários (PaceDex desativado).")
         print("=" * 76)
 
         try:
@@ -116,12 +119,13 @@ class UdpTelemetryRelay:
                         self.packets_received += 1
                         self.bytes_received += len(data)
 
-                        # ZERO-LATENCY RELAY: forward immediately to PaceDex
-                        try:
-                            self.tx_socket.sendto(data, (self.relay_host, self.relay_port))
-                            self.packets_relayed += 1
-                        except Exception:
-                            pass
+                        # Opcional Relay se configurado
+                        if self.tx_socket and self.relay_port:
+                            try:
+                                self.tx_socket.sendto(data, (self.relay_host, self.relay_port))
+                                self.packets_relayed += 1
+                            except Exception:
+                                pass
 
                         # PROCESS LOCALLY
                         header = PacketHeader.unpack(data)
@@ -140,7 +144,7 @@ class UdpTelemetryRelay:
                     self.last_status_time = now
 
         except KeyboardInterrupt:
-            print("\n🛑 Encerrando UDP Relay graciosamente...")
+            print("\n🛑 Encerrando UDP Listener graciosamente...")
         finally:
             self.stop()
 
@@ -153,20 +157,27 @@ class UdpTelemetryRelay:
         rate = self.packets_received
         mb = self.bytes_received / (1024 * 1024)
 
-        prefix = "🧪 [PILOTO TESTE]" if self.recorder.is_pilot_test() else "🟢 [RELAY STATUS]"
+        prefix = "🧪 [PILOTO TESTE]" if self.recorder.is_pilot_test() else "🟢 [LIVE STATUS]"
         rnd_info = "PORTIMÃO (ISOLADO)" if self.recorder.is_pilot_test() else f"Etapa: {detected_rnd} ({folder})"
+
+        drivers_summary = ""
+        if cars_count > 0:
+            sample = [p["canon_name"].split()[0] for p in list(self.recorder.participants.values())[:3]]
+            drivers_summary = f" (ex: {', '.join(sample)}...)"
+
+        relay_str = f"Relay :{self.relay_port} | " if self.relay_port else ""
 
         status_line = (
             f"{prefix} Pkts: {rate} ({mb:.1f} MB) | "
-            f"PaceDex -> :{self.relay_port} (OK) | "
+            f"{relay_str}"
             f"{rnd_info} | "
-            f"Pista: {track_name} | Sessão: {stype} | Carros: {cars_count}/22"
+            f"Pista: {track_name} | Sessão: {stype} | Pilotos: {cars_count}/22{drivers_summary}"
         )
         print(status_line)
 
     def stop(self) -> None:
         self.running = False
-        if not self.recorder.saved_results and len(self.recorder.participants) > 0:
+        if len(self.recorder.participants) > 0:
             print("💾 Gravando resultados e relatório da sessão antes de encerrar...")
             self.recorder.flush()
         if self.rx_socket:
@@ -189,7 +200,7 @@ def main():
     parser.add_argument("--listen-host", default=DEFAULT_LISTEN_HOST, help="IP de escuta UDP (default: 0.0.0.0)")
     parser.add_argument("--listen-port", type=int, default=DEFAULT_LISTEN_PORT, help="Porta do jogo F1 24 (default: 20777)")
     parser.add_argument("--relay-host", default=DEFAULT_RELAY_HOST, help="IP do PaceDex (default: 127.0.0.1)")
-    parser.add_argument("--relay-port", type=int, default=DEFAULT_RELAY_PORT, help="Porta configurada no PaceDex (default: 20778)")
+    parser.add_argument("--relay-port", type=int, default=None, help="Porta opcional de relay (ex: 20778, desabilitado por padrão)")
     parser.add_argument("--round", type=int, default=None, help="Forçar número da etapa (ex: 11)")
     parser.add_argument("--test", "--pilot", dest="test_mode", action="store_true", help="Ativar modo teste piloto isolado (não afeta etapa oficial)")
 

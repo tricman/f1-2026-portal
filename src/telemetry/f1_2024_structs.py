@@ -117,14 +117,17 @@ F1_2024_DRIVER_IDS = {
     2: ("ricciardo", "Daniel Ricciardo", 3, "Visa Cash App RB"),
     3: ("alonso", "Fernando Alonso", 14, "Aston Martin Aramco"),
     6: ("hamilton", "Lewis Hamilton", 44, "Mercedes-AMG Petronas"),
+    7: ("hamilton", "Lewis Hamilton", 44, "Mercedes-AMG Petronas"),
     8: ("verstappen", "Max Verstappen", 1, "Red Bull Racing"),
-    9: ("hulkenberg", "Nico Hülkenberg", 27, "MoneyGram Haas F1 Team"),
-    10: ("magnussen", "Kevin Magnussen", 20, "MoneyGram Haas F1 Team"),
+    9: ("verstappen", "Max Verstappen", 1, "Red Bull Racing"),
+    10: ("hulkenberg", "Nico Hülkenberg", 27, "MoneyGram Haas F1 Team"),
+    11: ("magnussen", "Kevin Magnussen", 20, "MoneyGram Haas F1 Team"),
     13: ("perez", "Sergio Pérez", 11, "Red Bull Racing"),
     14: ("bottas", "Valtteri Bottas", 77, "Stake F1 Team Kick Sauber"),
     15: ("ocon", "Esteban Ocon", 31, "BWT Alpine F1 Team"),
     17: ("stroll", "Lance Stroll", 18, "Aston Martin Aramco"),
     41: ("norris", "Lando Norris", 4, "McLaren Formula 1 Team"),
+    54: ("norris", "Lando Norris", 4, "McLaren Formula 1 Team"),
     42: ("russell", "George Russell", 63, "Mercedes-AMG Petronas"),
     49: ("zhou", "Guanyu Zhou", 24, "Stake F1 Team Kick Sauber"),
     58: ("leclerc", "Charles Leclerc", 16, "Scuderia Ferrari HP"),
@@ -133,8 +136,11 @@ F1_2024_DRIVER_IDS = {
     74: ("tsunoda", "Yuki Tsunoda", 22, "Visa Cash App RB"),
     80: ("zhou", "Guanyu Zhou", 24, "Stake F1 Team Kick Sauber"),
     84: ("piastri", "Oscar Piastri", 81, "McLaren Formula 1 Team"),
+    112: ("piastri", "Oscar Piastri", 81, "McLaren Formula 1 Team"),
     89: ("sargeant", "Logan Sargeant", 2, "Williams Racing"),
     90: ("sargeant", "Logan Sargeant", 2, "Williams Racing"),
+    118: ("bearman", "Oliver Bearman", 38, "Scuderia Ferrari HP"),
+    119: ("lawson", "Liam Lawson", 40, "Visa Cash App RB"),
 }
 
 # Race Number to Canonical Driver Map
@@ -156,11 +162,14 @@ F1_2024_CAR_NUMBERS = {
     10: ("gasly", "Pierre Gasly", 10, "BWT Alpine F1 Team"),
     31: ("ocon", "Esteban Ocon", 31, "BWT Alpine F1 Team"),
     23: ("albon", "Alexander Albon", 23, "Williams Racing"),
+    2: ("sargeant", "Logan Sargeant", 2, "Williams Racing"),
     3: ("ricciardo", "Daniel Ricciardo", 3, "Visa Cash App RB"),
     22: ("tsunoda", "Yuki Tsunoda", 22, "Visa Cash App RB"),
     27: ("hulkenberg", "Nico Hülkenberg", 27, "MoneyGram Haas F1 Team"),
     20: ("magnussen", "Kevin Magnussen", 20, "MoneyGram Haas F1 Team"),
     77: ("bottas", "Valtteri Bottas", 77, "Stake F1 Team Kick Sauber"),
+    38: ("bearman", "Oliver Bearman", 38, "Scuderia Ferrari HP"),
+    40: ("lawson", "Liam Lawson", 40, "Visa Cash App RB"),
 }
 
 # Infringement Types (Codemasters F1)
@@ -266,9 +275,10 @@ class ParticipantsPacket:
         cars: List[ParticipantData] = []
         offset = 30
         remaining = len(data) - 30
-        stride = remaining // 22 if remaining >= 22 * 54 else 57
+        stride = remaining // 22 if remaining >= 22 * 54 else 60
+        total_to_check = num_active if 0 < num_active <= 22 else 22
 
-        for i in range(min(num_active, 22)):
+        for i in range(total_to_check):
             car_offset = offset + (i * stride)
             if car_offset + 54 > len(data):
                 break
@@ -289,7 +299,7 @@ class ParticipantsPacket:
                     your_telemetry=your_telemetry,
                 )
             )
-        return cls(num_active_cars=num_active, participants=cars)
+        return cls(num_active_cars=num_active or len(cars), participants=cars)
 
 
 @dataclass

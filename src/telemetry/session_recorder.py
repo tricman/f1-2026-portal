@@ -501,6 +501,7 @@ class SessionRecorder:
         elif pid == PACKET_ID_PARTICIPANTS:
             ppacket = ParticipantsPacket.unpack(raw_data)
             if ppacket:
+                first_time = (len(self.participants) == 0 and len(ppacket.participants) > 0)
                 for idx, p in enumerate(ppacket.participants):
                     cid, cname, cnum, cteam = self.resolve_driver(idx, p)
                     self.participants[idx] = {
@@ -513,6 +514,11 @@ class SessionRecorder:
                         "race_number": cnum or p.race_number,
                         "ai_controlled": bool(p.ai_controlled),
                     }
+                if first_time:
+                    print(f"\n🏎️ [GRID DETECTADO] {len(self.participants)} pilotos registrados:")
+                    for idx, part in sorted(self.participants.items(), key=lambda x: x[0]):
+                        print(f"   Carro #{part['race_number']} | {part['canon_name']} ({part['team']})")
+                    print()
 
         elif pid == PACKET_ID_CAR_SETUPS:
             self._process_car_setups(raw_data)

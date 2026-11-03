@@ -313,11 +313,59 @@ def test_advanced_packets_unpacking():
     print("Test passed: Packets 5, 6, 7, 10 and 11 successfully unpacked!")
 
 
+def test_grand_prix_local_driver_resolution():
+    recorder = SessionRecorder(override_round=0, test_mode=True)
+    hdr_p = create_header(PACKET_ID_PARTICIPANTS)
+    data = bytearray(hdr_p)
+    data.append(20) # num_active_cars
+
+    # Sample Grand Prix local grid:
+    # (ai, driver_id, net_id, team_id, my_team, race_number, nationality, name)
+    grid = [
+        (1, 54, 0, 8, 0, 4, 1, "Lando Norris"),
+        (1, 9, 0, 2, 0, 1, 2, "Max Verstappen"),
+        (1, 58, 0, 1, 0, 16, 3, "Charles Leclerc"),
+        (1, 7, 0, 0, 0, 44, 1, "Lewis Hamilton"),
+        (1, 112, 0, 8, 0, 81, 4, "Oscar Piastri"),
+        (1, 0, 0, 1, 0, 55, 5, "Carlos Sainz"),
+        (1, 3, 0, 4, 0, 14, 5, "Fernando Alonso"),
+        (1, 13, 0, 2, 0, 11, 6, "Sergio Perez"),
+    ]
+
+    for p in grid:
+        name_bytes = p[7].encode("utf-8").ljust(48, b"\x00")
+        entry = struct.pack("<BBBBBBB", p[0], p[1], p[2], p[3], p[4], p[5], p[6]) + name_bytes + struct.pack("<BBHB", 1, 1, 100, 1)
+        data.extend(entry)
+
+    # Pad remaining 14 cars
+    for i in range(14):
+        entry = struct.pack("<BBBBBBB", 1, 255, 0, 255, 0, 0, 0) + (b"\x00" * 48) + struct.pack("<BBHB", 1, 1, 0, 1)
+        data.extend(entry)
+
+    pkt_bytes = bytes(data)
+    recorder.process_packet(PacketHeader.unpack(pkt_bytes), pkt_bytes)
+
+    assert len(recorder.participants) >= 8
+    assert recorder.participants[0]["canon_name"] == "Lando Norris"
+    assert recorder.participants[0]["team"] == "McLaren Formula 1 Team"
+    assert recorder.participants[1]["canon_name"] == "Max Verstappen"
+    assert recorder.participants[1]["team"] == "Red Bull Racing"
+    assert recorder.participants[2]["canon_name"] == "Charles Leclerc"
+    assert recorder.participants[2]["team"] == "Scuderia Ferrari HP"
+    assert recorder.participants[3]["canon_name"] == "Lewis Hamilton"
+    assert recorder.participants[3]["team"] == "Mercedes-AMG Petronas"
+    assert recorder.participants[4]["canon_name"] == "Oscar Piastri"
+    assert recorder.participants[4]["team"] == "McLaren Formula 1 Team"
+    print("Test passed: Grand Prix local driver and team resolution 100% verified!")
+
+
 if __name__ == "__main__":
     print("Running test_session_recorder_parsing()...")
     test_session_recorder_parsing()
     print("Running test_advanced_packets_unpacking()...")
     test_advanced_packets_unpacking()
+    print("Running test_grand_prix_local_driver_resolution()...")
+    test_grand_prix_local_driver_resolution()
     print("Running test_udp_relay_packet_forwarding()...")
     test_udp_relay_packet_forwarding()
     print("ALL UDP RELAY TESTS PASSED SUCCESSFULLY!")

@@ -72,7 +72,8 @@ def parse_pacedex_laps_csv(csv_path: Path) -> List[LapRecord]:
             team_raw = row["Equipe"].strip()
             t_str = row["Tempo"].strip()
             t_ms = parse_lap_time_ms(t_str)
-            wear = float(row["Desgaste %"]) if row.get("Desgaste %") and row["Desgaste %"].strip() else None
+            wear_raw = row.get("Desgaste %", "").replace("%", "").strip()
+            wear = float(wear_raw) if wear_raw and wear_raw not in ("—", "-", "") else None
             age = int(row["Idade do pneu"]) if row.get("Idade do pneu") and row["Idade do pneu"].strip() else None
             pits = int(row["Pits"]) if row.get("Pits") and row["Pits"].strip() else None
             records.append(
