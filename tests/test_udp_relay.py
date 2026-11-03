@@ -20,7 +20,12 @@ from src.telemetry.f1_2024_structs import (
     PACKET_ID_SESSION,
     PACKET_ID_PARTICIPANTS,
     PACKET_ID_LAP_DATA,
+    PACKET_ID_CAR_SETUPS,
+    PACKET_ID_CAR_TELEMETRY,
+    PACKET_ID_CAR_STATUS,
     PACKET_ID_FINAL_CLASSIFICATION,
+    PACKET_ID_CAR_DAMAGE,
+    PACKET_ID_SESSION_HISTORY,
     PacketHeader,
 )
 from src.telemetry.session_recorder import SessionRecorder
@@ -171,6 +176,10 @@ def test_session_recorder_parsing():
     telemetry_dir = Path("data/seasons/season_01/et_11_austria/telemetry")
     assert (telemetry_dir / "tv_overlay_et11.json").exists()
     assert (telemetry_dir / "pacedex_udp_race_summary.csv").exists()
+    
+    # Clean up test artifacts to keep season 01 clean
+    import shutil
+    shutil.rmtree(telemetry_dir.parent, ignore_errors=True)
     print("Test passed: SessionRecorder generated valid Etapa 11 artifacts.")
 
 
@@ -209,9 +218,106 @@ def test_udp_relay_packet_forwarding():
         mock_pacedex.close()
 
 
+def test_advanced_packets_unpacking():
+    recorder = SessionRecorder(override_round=0, test_mode=True)
+
+    # 1. Test Car Setups Packet (ID 5)
+    hdr_5 = create_header(PACKET_ID_CAR_SETUPS)
+    # <BBBBffffBBBBBBBBffffBf (49 bytes)
+    setup_raw = struct.pack(
+        "<BBBBffffBBBBBBBBffffBf",
+        28, 22, 65, 55, -3.2, -1.8, 0.08, 0.22, 9, 7, 8, 6, 33, 45, 100, 56, 23.5, 23.5, 24.5, 24.5, 5, 25.0
+    )
+    data_5 = bytearray(hdr_5)
+    for _ in range(22):
+        data_5.extend(setup_raw)
+    recorder.process_packet(PacketHeader.unpack(bytes(data_5)), bytes(data_5))
+    assert 0 in recorder.car_setups
+    assert recorder.car_setups[0]["front_wing"] == 28
+    assert recorder.car_setups[0]["rear_wing"] == 22
+    assert recorder.car_setups[0]["brake_bias"] == 56
+
+    # 2. Test Car Telemetry Packet (ID 6)
+    hdr_6 = create_header(PACKET_ID_CAR_TELEMETRY)
+    # <HfffbbHBBH + 4H + 4B + 4B + H + 4f + 4B (60 bytes)
+    c_tel = (
+        struct.pack("<HfffbbHBBH", 315, 1.0, 0.05, 0.0, 0, 8, 12500, 1, 95, 0)
+        + struct.pack("<4H", 450, 440, 520, 510)  # brakes temp
+        + struct.pack("<4B", 102, 101, 108, 107)  # tyres surf
+        + struct.pack("<4B", 98, 97, 103, 102)    # tyres inner
+        + struct.pack("<H", 112)                  # engine temp
+        + struct.pack("<4f", 23.2, 23.2, 24.1, 24.1) # tyres press
+        + struct.pack("<4B", 0, 0, 0, 0)          # surface
+    )
+    data_6 = bytearray(hdr_6)
+    for _ in range(22):
+        data_6.extend(c_tel)
+    data_6.extend(b"\xff\x00\x08") # tail MFD
+    recorder.process_packet(PacketHeader.unpack(bytes(data_6)), bytes(data_6))
+    assert 0 in recorder.car_telemetry
+    assert recorder.car_telemetry[0]["peak_speed_kmh"] == 315
+    assert recorder.car_telemetry[0]["max_brake_temp_c"] == 520
+    assert recorder.car_telemetry[0]["max_tyre_surf_temp_c"] == 108
+
+    # 3. Test Car Status Packet (ID 7)
+    hdr_7 = create_header(PACKET_ID_CAR_STATUS)
+    # tc, abs, mix, bb, pit, tank, cap, rem, max_rpm, idle, gears, drs_all, drs_dist, act_t, vis_t, age, fia, ers_store, mode, h_mguk, h_mguh, dep
+    c_stat = (
+        struct.pack("<BBBBB", 1, 0, 1, 56, 0)
+        + struct.pack("<fff", 18.5, 110.0, 12.3)
+        + struct.pack("<HHBBH", 13500, 4500, 8, 1, 0)
+        + struct.pack("<BBBb", 16, 16, 4, 0)
+        + struct.pack("<fBfff", 3200000.0, 3, 150000.0, 80000.0, 600000.0)
+    )
+    data_7 = bytearray(hdr_7)
+    for _ in range(22):
+        data_7.extend(c_stat)
+    recorder.process_packet(PacketHeader.unpack(bytes(data_7)), bytes(data_7))
+    assert 0 in recorder.car_status
+    assert recorder.car_status[0]["fuel_in_tank"] == 18.5
+    assert recorder.car_status[0]["ers_pct"] == 80.0
+    assert recorder.car_status[0]["ers_mode_str"] == "Ultrapassagem (Overtake)"
+
+    # 4. Test Car Damage Packet (ID 10)
+    hdr_10 = create_header(PACKET_ID_CAR_DAMAGE)
+    c_dmg = (
+        struct.pack("<ffff", 14.5, 13.8, 18.2, 17.9) # tyres wear
+        + struct.pack("<4B", 0, 0, 0, 0)              # tyres damage
+        + struct.pack("<4B", 0, 0, 0, 0)              # brakes damage
+        + struct.pack("<10B", 5, 0, 0, 2, 0, 0, 0, 0, 8, 4) # wings, floor, drs, ers, gb, eng
+        + struct.pack("<8B", 12, 10, 8, 15, 9, 14, 0, 0)    # PU wear
+    )
+    data_10 = bytearray(hdr_10)
+    for _ in range(22):
+        data_10.extend(c_dmg)
+    recorder.process_packet(PacketHeader.unpack(bytes(data_10)), bytes(data_10))
+    assert 0 in recorder.car_damage
+    assert recorder.car_damage[0]["max_wear"] == 18.2
+    assert recorder.car_damage[0]["fl_wing"] == 5
+    assert recorder.car_damage[0]["pu_ice_wear"] == 15
+
+    # 5. Test Session History Packet (ID 11)
+    hdr_11 = create_header(PACKET_ID_SESSION_HISTORY)
+    # car_idx(0), num_laps(2), num_stints(1), best_lap(1), best_s1(1), best_s2(1), best_s3(1)
+    prefix_11 = struct.pack("<BBBBBBB", 0, 2, 1, 1, 1, 1, 1)
+    l1 = struct.pack("<IHBHBHBB", 78500, 24500, 0, 28100, 0, 25900, 0, 0x0F)
+    l2 = struct.pack("<IHBHBHBB", 78900, 24600, 0, 28200, 0, 26100, 0, 0x0F)
+    laps_11 = l1 + l2 + (b"\x00" * 14 * 98)
+    stint_11 = struct.pack("<BBB", 255, 16, 16) + (b"\x00" * 3 * 7)
+    data_11 = hdr_11 + prefix_11 + laps_11 + stint_11
+    recorder.process_packet(PacketHeader.unpack(data_11), data_11)
+    assert 0 in recorder.session_history
+    assert recorder.session_history[0]["num_laps"] == 2
+    assert len(recorder.session_history[0]["laps"]) == 2
+    assert recorder.session_history[0]["laps"][0]["time_str"] == "1:18.500"
+    print("Test passed: Packets 5, 6, 7, 10 and 11 successfully unpacked!")
+
+
 if __name__ == "__main__":
     print("Running test_session_recorder_parsing()...")
     test_session_recorder_parsing()
+    print("Running test_advanced_packets_unpacking()...")
+    test_advanced_packets_unpacking()
     print("Running test_udp_relay_packet_forwarding()...")
     test_udp_relay_packet_forwarding()
     print("ALL UDP RELAY TESTS PASSED SUCCESSFULLY!")

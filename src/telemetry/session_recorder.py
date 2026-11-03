@@ -22,13 +22,21 @@ from src.telemetry.f1_2024_structs import (
     PACKET_ID_LAP_DATA,
     PACKET_ID_EVENT,
     PACKET_ID_PARTICIPANTS,
+    PACKET_ID_CAR_SETUPS,
+    PACKET_ID_CAR_TELEMETRY,
     PACKET_ID_CAR_STATUS,
     PACKET_ID_FINAL_CLASSIFICATION,
     PACKET_ID_CAR_DAMAGE,
+    PACKET_ID_SESSION_HISTORY,
     PacketHeader,
     SessionData,
     ParticipantsPacket,
     FinalClassificationPacket,
+    CarSetupsPacket,
+    CarTelemetryPacket,
+    CarStatusFullPacket,
+    CarDamageFullPacket,
+    SessionHistoryPacket,
     TRACK_ID_MAP,
     TEAM_ID_MAP,
     F1_2024_DRIVER_IDS,
@@ -353,6 +361,9 @@ class SessionRecorder:
         # Car Index (0..21) -> current lap, position, tyre wear, etc.
         self.car_status: Dict[int, Dict[str, Any]] = {}
         self.car_damage: Dict[int, Dict[str, Any]] = {}
+        self.car_setups: Dict[int, Dict[str, Any]] = {}
+        self.car_telemetry: Dict[int, Dict[str, Any]] = {}
+        self.session_history: Dict[int, Dict[str, Any]] = {}
         self.car_lap: Dict[int, Dict[str, Any]] = {}
         self.speed_traps: Dict[int, float] = {}
         self.car_warnings: Dict[int, int] = {}
@@ -477,6 +488,9 @@ class SessionRecorder:
         if pid == PACKET_ID_SESSION:
             sdata = SessionData.unpack(raw_data)
             if sdata:
+                if (self.track_id != -1 and self.track_id != sdata.track_id) or (self.session_type != 0 and self.session_type != sdata.session_type):
+                    log_text(f"[SESSION RECORDER] Mudança de pista ou sessão detectada (Pista: {sdata.track_id}, Tipo: {sdata.session_type}). Reiniciando agregador.")
+                    self.reset()
                 self.session_type = sdata.session_type
                 self.track_id = sdata.track_id
                 self.total_laps = sdata.total_laps
@@ -500,6 +514,12 @@ class SessionRecorder:
                         "ai_controlled": bool(p.ai_controlled),
                     }
 
+        elif pid == PACKET_ID_CAR_SETUPS:
+            self._process_car_setups(raw_data)
+
+        elif pid == PACKET_ID_CAR_TELEMETRY:
+            self._process_car_telemetry(raw_data)
+
         elif pid == PACKET_ID_LAP_DATA:
             self._process_lap_data(raw_data)
 
@@ -509,12 +529,15 @@ class SessionRecorder:
         elif pid == PACKET_ID_CAR_DAMAGE:
             self._process_car_damage(raw_data)
 
+        elif pid == PACKET_ID_SESSION_HISTORY:
+            self._process_session_history(raw_data)
+
         elif pid == PACKET_ID_EVENT:
             self._process_event(raw_data)
 
         elif pid == PACKET_ID_FINAL_CLASSIFICATION:
             fc_packet = FinalClassificationPacket.unpack(raw_data)
-            if fc_packet and not self.saved_results:
+            if fc_packet:
                 log_text("[SESSION RECORDER] 🏆 Pacote de Classificação Final recebido. Gerando artefatos...")
                 res = self._export_session(fc_packet)
                 self.saved_results = True
@@ -525,10 +548,8 @@ class SessionRecorder:
     def flush(self) -> Optional[Dict[str, Any]]:
         """
         Synthesize session export from in-memory telemetry if PacketFinalClassificationData
-        was not received (e.g. user quit to menu or stopped the listener right after race).
+        was not received or to ensure disk is updated on exit.
         """
-        if self.saved_results:
-            return None
         if not self.participants:
             log_text("[SESSION RECORDER] Flush chamado, mas nenhum participante foi registrado nesta sessão.")
             return None
@@ -689,38 +710,105 @@ class SessionRecorder:
                 "last_ms": last_ms,
             }
 
+    def _process_car_setups(self, raw_data: bytes) -> None:
+        packet = CarSetupsPacket.unpack(raw_data)
+        if not packet:
+            return
+        for i, setup in enumerate(packet.car_setups):
+            self.car_setups[i] = {
+                "front_wing": setup.front_wing,
+                "rear_wing": setup.rear_wing,
+                "on_throttle": setup.on_throttle,
+                "off_throttle": setup.off_throttle,
+                "front_camber": setup.front_camber,
+                "rear_camber": setup.rear_camber,
+                "front_toe": setup.front_toe,
+                "rear_toe": setup.rear_toe,
+                "front_suspension": setup.front_suspension,
+                "rear_suspension": setup.rear_suspension,
+                "front_anti_roll_bar": setup.front_anti_roll_bar,
+                "rear_anti_roll_bar": setup.rear_anti_roll_bar,
+                "front_ride_height": setup.front_suspension_height,
+                "rear_ride_height": setup.rear_suspension_height,
+                "brake_pressure": setup.brake_pressure,
+                "brake_bias": setup.brake_bias,
+                "tyre_pressures_psi": (
+                    setup.rear_left_tyre_pressure,
+                    setup.rear_right_tyre_pressure,
+                    setup.front_left_tyre_pressure,
+                    setup.front_right_tyre_pressure,
+                ),
+                "ballast": setup.ballast,
+                "fuel_load": setup.fuel_load,
+            }
+
+    def _process_car_telemetry(self, raw_data: bytes) -> None:
+        packet = CarTelemetryPacket.unpack(raw_data)
+        if not packet:
+            return
+        for i, t in enumerate(packet.car_telemetry):
+            curr = self.car_telemetry.get(i, {})
+            peak_speed = max(curr.get("peak_speed_kmh", 0), t.speed)
+            max_brake_temp = max(curr.get("max_brake_temp_c", 0), max(t.brakes_temperature) if t.brakes_temperature else 0)
+            max_surf_temp = max(curr.get("max_tyre_surf_temp_c", 0), max(t.tyres_surface_temperature) if t.tyres_surface_temperature else 0)
+            max_inner_temp = max(curr.get("max_tyre_inner_temp_c", 0), max(t.tyres_inner_temperature) if t.tyres_inner_temperature else 0)
+
+            # Update speed trap tracker if speed is higher
+            if t.speed > self.speed_traps.get(i, 0.0):
+                self.speed_traps[i] = float(t.speed)
+
+            self.car_telemetry[i] = {
+                "latest_speed_kmh": t.speed,
+                "peak_speed_kmh": peak_speed,
+                "engine_rpm": t.engine_rpm,
+                "gear": t.gear,
+                "drs": bool(t.drs),
+                "throttle": t.throttle,
+                "brake": t.brake,
+                "brakes_temp_c": t.brakes_temperature,
+                "max_brake_temp_c": max_brake_temp,
+                "tyres_surf_temp_c": t.tyres_surface_temperature,
+                "max_tyre_surf_temp_c": max_surf_temp,
+                "tyres_inner_temp_c": t.tyres_inner_temperature,
+                "max_tyre_inner_temp_c": max_inner_temp,
+                "engine_temp_c": t.engine_temperature,
+                "tyres_press_psi": t.tyres_pressure,
+            }
+
     def _process_car_status(self, raw_data: bytes) -> None:
-        offset = 29
-        stride = (len(raw_data) - 29) // 22 if (len(raw_data) - 29) >= 22 * 45 else 47
-        for i in range(22):
-            car_offset = offset + (i * stride)
-            if car_offset + 28 <= len(raw_data):
-                visual_compound = raw_data[car_offset + 26]
-                tyre_age = raw_data[car_offset + 27]
-            elif car_offset + 17 <= len(raw_data):
-                visual_compound = raw_data[car_offset + 15]
-                tyre_age = raw_data[car_offset + 16]
-            else:
-                break
-            code = VISUAL_TYRE_COMPOUNDS.get(visual_compound, "M")
+        packet = CarStatusFullPacket.unpack(raw_data)
+        if not packet:
+            return
+        for i, st in enumerate(packet.car_status):
+            ers_pct = round(min(100.0, (st.ers_store_energy / 4_000_000.0) * 100.0), 1) if st.ers_store_energy > 0 else 0.0
+            ers_mode_str = {0: "Nenhum", 1: "Médio", 2: "Hotlap", 3: "Ultrapassagem (Overtake)"}.get(st.ers_deploy_mode, "Padrão")
+
             self.car_status[i] = {
-                "visual_tyre": code,
-                "tyre_age": tyre_age,
+                "visual_tyre": st.tyre_code,
+                "visual_compound_id": st.visual_tyre_compound,
+                "actual_compound_id": st.actual_tyre_compound,
+                "tyre_age": st.tyres_age_laps,
+                "fuel_in_tank": st.fuel_in_tank,
+                "fuel_capacity": st.fuel_capacity,
+                "fuel_remaining_laps": st.fuel_remaining_laps,
+                "ers_store_energy_j": st.ers_store_energy,
+                "ers_pct": ers_pct,
+                "ers_deploy_mode": st.ers_deploy_mode,
+                "ers_mode_str": ers_mode_str,
+                "ers_deployed_this_lap_j": st.ers_deployed_this_lap,
+                "drs_allowed": bool(st.drs_allowed),
+                "traction_control": st.traction_control,
+                "abs": st.anti_lock_brakes,
             }
 
     def _process_car_damage(self, raw_data: bytes) -> None:
-        offset = 29
-        stride = (len(raw_data) - 29) // 22 if (len(raw_data) - 29) >= 22 * 35 else 41
-        for i in range(22):
-            car_offset = offset + (i * stride)
-            if car_offset + 16 > len(raw_data):
-                break
-            w_rl, w_rr, w_fl, w_fr = struct.unpack_from("<ffff", raw_data, car_offset)
-            max_w = max(w_rl, w_rr, w_fl, w_fr)
-
-            fl_wing = raw_data[car_offset + 24] if car_offset + 25 <= len(raw_data) else 0
-            fr_wing = raw_data[car_offset + 25] if car_offset + 26 <= len(raw_data) else 0
-            floor_dmg = raw_data[car_offset + 27] if car_offset + 28 <= len(raw_data) else 0
+        packet = CarDamageFullPacket.unpack(raw_data)
+        if not packet:
+            return
+        for i, dmg in enumerate(packet.car_damage):
+            fl_wing = dmg.front_left_wing_damage
+            fr_wing = dmg.front_right_wing_damage
+            floor_dmg = dmg.floor_damage
 
             # Record wing/floor damage incident once if significant
             if (fl_wing > 0 or fr_wing > 0) and i not in [inc.get("car_idx") for inc in self.incidents if inc.get("type") == "DAMAGE"]:
@@ -734,15 +822,60 @@ class SessionRecorder:
                 })
 
             self.car_damage[i] = {
-                "max_wear": max_w,
-                "rl": w_rl,
-                "rr": w_rr,
-                "fl": w_fl,
-                "fr": w_fr,
+                "max_wear": dmg.max_wear,
+                "tyres_wear": dmg.tyres_wear,
                 "fl_wing": fl_wing,
                 "fr_wing": fr_wing,
+                "rear_wing": dmg.rear_wing_damage,
                 "floor": floor_dmg,
+                "diffuser": dmg.diffuser_damage,
+                "sidepod": dmg.sidepod_damage,
+                "gearbox_damage": dmg.gearbox_damage,
+                "engine_damage": dmg.engine_damage,
+                "pu_ice_wear": dmg.engine_ice_wear,
+                "pu_mguk_wear": dmg.engine_mguk_wear,
+                "pu_mguh_wear": dmg.engine_mguh_wear,
+                "pu_tc_wear": dmg.engine_tc_wear,
+                "pu_es_wear": dmg.engine_es_wear,
+                "engine_blown": dmg.engine_blown,
+                "engine_seized": dmg.engine_seized,
             }
+
+    def _process_session_history(self, raw_data: bytes) -> None:
+        packet = SessionHistoryPacket.unpack(raw_data)
+        if not packet:
+            return
+        part = self.participants.get(packet.car_idx, {})
+        dname = part.get("canon_name") or f"Carro #{packet.car_idx+1}"
+
+        self.session_history[packet.car_idx] = {
+            "driver": dname,
+            "num_laps": packet.num_laps,
+            "best_lap_lap_num": packet.best_lap_time_lap_num,
+            "best_s1_lap_num": packet.best_sector1_lap_num,
+            "best_s2_lap_num": packet.best_sector2_lap_num,
+            "best_s3_lap_num": packet.best_sector3_lap_num,
+            "laps": [
+                {
+                    "lap": l.lap_num,
+                    "time_ms": l.lap_time_ms,
+                    "time_str": format_ms(l.lap_time_ms),
+                    "s1_str": f"{l.sector1_ms / 1000.0:.3f}" if l.sector1_ms > 0 else "—",
+                    "s2_str": f"{l.sector2_ms / 1000.0:.3f}" if l.sector2_ms > 0 else "—",
+                    "s3_str": f"{l.sector3_ms / 1000.0:.3f}" if l.sector3_ms > 0 else "—",
+                    "valid": l.lap_valid,
+                }
+                for l in packet.lap_history if l.lap_time_ms > 0
+            ],
+            "stints": [
+                {
+                    "stint": s.stint_num,
+                    "end_lap": s.end_lap,
+                    "compound": s.visual_code,
+                }
+                for s in packet.tyre_stints
+            ],
+        }
 
     def _export_session(self, fc_packet: FinalClassificationPacket) -> Dict[str, Any]:
         """Generate and save Showrunner stage artifacts or Pilot Test report."""
@@ -808,6 +941,22 @@ class SessionRecorder:
             warns = self.car_warnings.get(idx, 0)
             pens_s = d.penalties_time or self.car_penalties.get(idx, 0)
 
+            # Advanced telemetry (Packets 5, 6, 7, 10)
+            tel = self.car_telemetry.get(idx, {})
+            c_stat = self.car_status.get(idx, {})
+            dmg = self.car_damage.get(idx, {})
+            setup = self.car_setups.get(idx, {})
+
+            max_brake_temp = tel.get("max_brake_temp_c", 0)
+            max_inner_temp = tel.get("max_tyre_inner_temp_c", 0)
+            fuel_rem = c_stat.get("fuel_in_tank", 0.0)
+            ers_pct = c_stat.get("ers_pct", 0.0)
+            ers_mode_str = c_stat.get("ers_mode_str", "Médio")
+            pu_ice = dmg.get("pu_ice_wear", 0)
+            pu_mguk = dmg.get("pu_mguk_wear", 0)
+            front_wing_aero = setup.get("front_wing", 0)
+            rear_wing_aero = setup.get("rear_wing", 0)
+
             race_results.append({
                 "pos": d.position,
                 "driver_number": car_num,
@@ -823,7 +972,16 @@ class SessionRecorder:
                 "tyre": final_tyre,
                 "tyre_age": tyre_age,
                 "max_wear_pct": wear_pct,
-                "speed_trap_kmh": self.speed_traps.get(idx, 0.0),
+                "speed_trap_kmh": tel.get("peak_speed_kmh") or self.speed_traps.get(idx, 0.0),
+                "max_brake_temp_c": max_brake_temp,
+                "max_tyre_inner_temp_c": max_inner_temp,
+                "fuel_remaining_kg": fuel_rem,
+                "ers_pct": ers_pct,
+                "ers_mode": ers_mode_str,
+                "pu_ice_wear": pu_ice,
+                "pu_mguk_wear": pu_mguk,
+                "front_wing": front_wing_aero,
+                "rear_wing": rear_wing_aero,
                 "warnings": warns,
                 "penalties_s": pens_s,
             })
@@ -843,10 +1001,35 @@ class SessionRecorder:
                 "Pneu final": final_tyre,
             })
 
-        # 3. Laps list
+        # 3. Laps list (Enrich with Packet 11 Session History if available)
         all_laps: List[Dict[str, Any]] = []
-        for i, laps in self.lap_history.items():
-            all_laps.extend(laps)
+        if self.session_history:
+            for idx, hist in self.session_history.items():
+                part = self.participants.get(idx, {})
+                c_num = part.get("race_number", 0)
+                d_name = part.get("canon_name") or part.get("name", f"Car_{idx}")
+                team_name = part.get("team", "Unknown")
+                for lap in hist.get("laps", []):
+                    all_laps.append({
+                        "lap": lap["lap"],
+                        "pos": self.car_lap.get(idx, {}).get("pos", 0),
+                        "car_number": c_num,
+                        "driver": d_name,
+                        "raw_name": part.get("name", f"Car_{idx}"),
+                        "team": team_name,
+                        "time_str": lap["time_str"],
+                        "time_ms": lap["time_ms"],
+                        "s1_str": lap["s1_str"],
+                        "s2_str": lap["s2_str"],
+                        "s3_str": lap["s3_str"],
+                        "tyre": self.car_status.get(idx, {}).get("visual_tyre", "M"),
+                        "tyre_age": lap["lap"],
+                        "wear_pct": round(self.car_damage.get(idx, {}).get("max_wear", 0.0), 1),
+                        "pits": self.car_lap.get(idx, {}).get("num_pits", 0),
+                    })
+        if not all_laps:
+            for i, laps in self.lap_history.items():
+                all_laps.extend(laps)
         all_laps.sort(key=lambda x: (x["lap"], x["pos"]))
 
         # Driver performance evaluation & storytelling commentaries
@@ -865,6 +1048,9 @@ class SessionRecorder:
             "status_by_driver": status_by_driver,
             "incidents": self.incidents,
             "driver_ratings": ratings,
+            "car_setups": self.car_setups,
+            "car_telemetry": self.car_telemetry,
+            "session_history": self.session_history,
         }
         with open(target_dir / overlay_filename, "w", encoding="utf-8") as f:
             json.dump(tv_overlay_data, f, indent=2, ensure_ascii=False)
@@ -1008,11 +1194,41 @@ class SessionRecorder:
                 f"{ev['verdict']} | {ev['expert_commentary']} |"
             )
 
+        # 3. Advanced Engineering & Telemetry (Packets 5, 6, 7, 10)
         lines.extend([
             "",
             "---",
             "",
-            "## 3. Destaques Técnicos & Narrativos Capturados via UDP",
+            "## 3. ⚙️ Telemetria Avançada dos Motores, Freios & ERS (Packets 5, 6, 7 e 10)",
+            "",
+            "> **Parâmetros Decodificados em Tempo Real:** Temperaturas máximas de discos de freio e miolo de pneus (Packet 6), "
+            "carga e modo de implementação de bateria ERS (Packet 7), desgaste interno dos componentes de unidade de potência "
+            "ICE e MGU-K (Packet 10), e ajustes de carga aerodinâmica de asas dianteira e traseira (Packet 5).",
+            "",
+            "| Pos | Piloto | Equipe | Temp. Max Freios | Temp. Max Pneus (Miolo) | Bateria ERS | Combustível | Desgaste Motor (ICE / MGU-K) | Asas (D / T) |",
+            "| :---: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |",
+        ])
+
+        for r in results:
+            pos = r["pos"]
+            name = r["driver_name"]
+            team = r["team"]
+            b_temp = f"{r.get('max_brake_temp_c', 0)} °C" if r.get('max_brake_temp_c', 0) > 0 else "—"
+            t_temp = f"{r.get('max_tyre_inner_temp_c', 0)} °C" if r.get('max_tyre_inner_temp_c', 0) > 0 else "—"
+            ers = f"{r.get('ers_pct', 0.0)}% ({r.get('ers_mode', 'Padrão')})" if r.get('ers_pct', 0.0) > 0 else "—"
+            fuel = f"{r.get('fuel_remaining_kg', 0.0):.1f} kg" if r.get('fuel_remaining_kg', 0.0) > 0 else "—"
+            pu = f"ICE: {r.get('pu_ice_wear', 0)}% / K: {r.get('pu_mguk_wear', 0)}%" if (r.get('pu_ice_wear', 0) > 0 or r.get('pu_mguk_wear', 0) > 0) else "0% (Novo)"
+            wings = f"{r.get('front_wing', 0)} / {r.get('rear_wing', 0)}" if (r.get('front_wing', 0) > 0 or r.get('rear_wing', 0) > 0) else "Padrão"
+
+            lines.append(
+                f"| **P{pos}** | **{name}** | {team} | `{b_temp}` | `{t_temp}` | `{ers}` | `{fuel}` | `{pu}` | `{wings}` |"
+            )
+
+        lines.extend([
+            "",
+            "---",
+            "",
+            "## 4. Destaques Técnicos & Narrativos Capturados via UDP",
             "",
             f"* **Vencedor da Corrida:** `{results[0]['driver_name']}` ({results[0]['team']}) com tempo total de `{results[0]['total_time_or_gap']}`.",
             f"* **Volta Mais Rápida da Sessão:** `{fastest_lap_driver['driver_name'] if fastest_lap_driver else '—'}` com `{fastest_lap_driver['best_lap'] if fastest_lap_driver else '—'}` (Ponto extra da FIA).",
@@ -1021,7 +1237,7 @@ class SessionRecorder:
             "",
             "---",
             "",
-            "## 4. 🚨 Incidentes, Advertências e Punições dos Comissários (FIA Stewards)",
+            "## 5. 🚨 Incidentes, Advertências e Punições dos Comissários (FIA Stewards)",
             "",
         ])
 
@@ -1046,7 +1262,7 @@ class SessionRecorder:
             "",
             "---",
             "",
-            "## 5. Matriz de Viabilidade para os 8 Módulos Narrativos da FIA",
+            "## 6. Matriz de Viabilidade para os 8 Módulos Narrativos da FIA",
             "",
             "| Módulo Narrativo | Dados Exigidos | Coletado pelo UDP? | Status |",
             "| :--- | :--- | :---: | :---: |",
