@@ -95,3 +95,81 @@
 * **O comentário ácido do Insider:**
 > *"Zero pontos na tabela, mas campeões mundiais de vergonha alheia no TikTok. Se a VCARB corresse com a mesma velocidade com que força mico corporativo, talvez saíssem do zero."*
 > — **Il Cavallino Spia**
+
+---
+
+## 📅 DIA 2/4: TERÇA-FEIRA
+
+### A F1 Que Você Não Vê — Dossiê Especial de Bastidores
+**Módulo 1 · Dia 2 de 4 (Terça-Feira pré-GP da Áustria, Spielberg)**
+*O consórcio internacional de jornalistas investigativos traz o que os chefes de equipe e a Liberty Media tentam esconder a sete chaves.*
+
+---
+
+### 1. Mercedes-AMG Petronas (Brackley / Spielberg)
+**Local / Cidade:** Brackley, Reino Unido (Reuniões de crise) / Viagem relâmpago para o Red Bull Ring.
+**O Fato de Bastidor:** Enquanto a "Ice Queen" Sarah lidera o Mundial com mãos de ferro e cinco vitórias no W17, o clima nos bastidores do motorhome prateado está prestes a derreter. Jules Moreau, empresário da prodígio de 16 anos, foi visto saindo de uma sala reservada com Toto Wolff e emissários de uma rival histórica (sussurra-se Maranello e Hinwil). A mesa tinha rascunhos de multas rescisórias astronômicas e exigências de prioridade absoluta em cima de Lewis Hamilton — que, por sua vez, assiste a tudo com o semblante de quem prefere tomar um chá gelado a comentar a ascensão implacável da sua jovem companheira de equipe. 
+> > *“Jules Moreau não acorda cedo para tomar café na Inglaterra. Se ele está circulando pelos motorhomes com aquela pasta de couro preto, é porque a 'Silly Season' de 2027 começou cedo demais, e alguém vai ter que pagar uma multa com tantos zeros que vai faltar tinta na impressora da FIA.”* — **The Silver Bullet / Lady Paddock**
+
+---
+
+### 2. Stake F1 Team Kick Sauber / Audi (Hinwil / Spielberg)
+**Local / Cidade:** Hinwil, Suíça (Fábrica) e chegada aos Alpes Austríacos.
+**O Fato de Bastidor:** O "Monge de Hinwil", Felipe, voltou da Espanha direto para o simulador na Suíça. A ordem de Marcus Thorne ("O Tubarão de Silverstone") foi clara: esmiuçar cada milésimo de perda de tração nas curvas lentas para manter a vice-liderança do campeonato diante da sanha da Red Bull. Enquanto isso, o infeliz Bottas continua relegado ao papel de testador de peças que parecem ter saído de um ferro-velho espacial. A telemetria comparativa de Felipe virou dogma na fábrica da futura Audi; os engenheiros alemães já o tratam menos como piloto e mais como o diretor técnico de fato.
+> > *“O Felipe não pilota o Sauber, ele faz autópsia no carro a 300 por hora. O Marcus Thorne está tão focado na transição para a Audi que já deve ter colocado o contrato de patrocínio até na lapela do terno do CEO da montadora.”* — **The Paddock Mole / Lady Paddock**
+
+---
+
+### 3. Red Bull Racing (Milton Keynes / Spielberg)
+**Local / Cidade:** Milton Keynes, Reino Unido / Fábrica e simulador de emergência.
+**O Fato de Bastidor:** O clima em Milton Keynes tem a consistência de nitrogênio líquido. Após a punição homérica de -10 pontos no Mundial de Construtores pós-Mônaco (graças ao toque criminoso na Sauber), Christian Horner passou a terça-feira trancado em reuniões de crise com os advogados da equipe. Max Verstappen, amargando a 5ª posição no campeonato, mal esconde a irritação com a falta de confiabilidade e o ritmo do RB22. Enquanto isso, Sergio Pérez tenta entender se o seu crachá ainda funcionará após as férias de verão, sofrendo sondagens veladas de equipes de meio de grid.
+> > *“A Red Bull perdeu pontos na pista, perdeu pontos na secretaria da FIA e, pelo andar da carruagem, está perdendo a paciência. O Horner gesticula tanto nas reuniões que se inventassem aerofólio de braço, a Red Bull ganhava mais dois décimos por volta.”* — **The Paddock Mole**
+
+---
+
+### 4. McLaren Formula 1 Team (Woking / Spielberg)
+**Local / Cidade:** Woking, Reino Unido / Deslocamento para o Red Bull Ridge.
+**O Fato de Bastidor:** Alguém no departamento de marketing da McLaren achou que seria uma excelente ideia colocar Lando Norris e Oscar Piastri para gravar um desafio de TikTok usando trajes típicos austríacos (lederhosen) e cantando yodelling enquanto comiam schnitzel. O resultado foi um silêncio mortal de dez segundos no estúdio, seguido por uma recusa educada, porém cortante, de Piastri, e um palavrão ao vivo de Lando que precisou ser abafado por três camadas de edição. A equipe prometeu que o vídeo nunca verá a luz do dia — a menos que percam o P4 no campeonato.
+> > *“O Lando prefere largar em último com pista encharcada a ter que dançar valsa na câmera para agradar o algoritmo do TikTok. A dignidade dos pilotos da McLaren tem preço, e a gerência de marketing quase faliu o caixa tentando pagar.”* — **The Paddock Mole**
+
+---
+
+### 5. Aston Martin Aramco F1 Team (Silverstone / Spielberg)
+**Local / Cidade:** Silverstone, Reino Unido / Chegada ao Red Bull Ring.
+**O Fato de Bastidor:** Fernando Alonso continua fazendo milagres políticos e esportivos, garantindo a 3ª posição no Mundial e colocando a Aston Martin à frente da Ferrari nos Construtores. Aproveitando a terça-feira, o espanhol exigiu uma ação de marketing exótica em um castelo medieval próximo a Graz, obrigando os executivos da marca a assistirem a uma palestra de três horas sobre aerodinâmica passiva ministrada por ele mesmo. Lance Stroll, por sua vez, passou o dia no simulador batendo contra as barreiras virtuais da curva 3 e ignorando solenemente os pedidos de entrevista da assessoria.
+> > *“O Alonso não é piloto, ele é o proprietário moral da Aston Martin disfarçado de funcionário. Ele bota o Lawrence Stroll para sentar na primeira fila da aula dele e ainda sai cobrando café fresco.”* — **El Chisme de Montmeló**
+
+---
+
+### 6. Scuderia Ferrari HP (Maranello / Spielberg)
+**Local / Cidade:** Maranello, Itália / Fábrica da Gestione Sportiva.
+**O Fato de Bastidor:** Em Maranello, a terça-feira foi marcada por gritos em italiano clássico vindos da sala de simuladores. Charles Leclerc, frustrado com a falta de constância do bólido vermelho (6º no Mundial), exigiu mudanças radicais no acerto mecânico para a Áustria. Carlos Sainz, lidando com uma discreta 11ª posição na tabela, assiste a tudo de camarote, sabendo que sua mala está praticamente pronta para o próximo destino de sua carreira. Os tifosi do lado de fora protestavam pacificamente com bandeiras rasgadas e espresso frio.
+> > *“A Ferrari consegue transformar uma terça-feira comum em uma ópera dramática em três atos. Se a telemetria gritasse, o complexo de Maranello já teria sido interditado por poluição sonora pela prefeitura.”* — **Il Cavallino Spia**
+
+---
+
+### 7. Williams Racing (Grove / Spielberg)
+**Local / Cidade:** Grove, Reino Unido / Viagem para os Alpes.
+**O Fato de Bastidor:** A "Brazilian Storm" liderada por Davi (o "Leão de Grove") colocou a Williams em um patamar que o time tradicional não via há anos (7º nos Construtores). Chloe Vance ("A Máquina de Hype") desembarcou em Spielberg com uma equipe de produção própria, transformando o motorhome da Williams num set de gravação de docusérie estilo Netflix. Davi teve que gravar vinhetas promocionais usando óculos escuros e jaqueta de couro retrô, enquanto Alexander Albon tentava, em vão, achar um canto silencioso para calibrar os amortecedores.
+> > *“A Chloe Vance não contrata patrocinadores, ela cria cultos à personalidade. O Davi mal pisa no paddock e já tem três equipes de filmagem seguindo até a bica de água do motorhome.”* — **The Paddock Mole / Lady Paddock**
+
+---
+
+### 8. BWT Alpine F1 Team (Enstone / Spielberg)
+**Local / Cidade:** Enstone, Reino Unido / Deslocamento para o GP da Áustria.
+**O Fato de Bastidor:** O clima na Alpine é de velório corporativo com pitadas de comédia pastelão. Com apenas 6 míseros pontos no campeonato, Pierre Gasly e Jack Doohan foram flagrados por um olheiro em um restaurante rústico perto de Graz discutindo quem freia pior nas freadas de final de reta. A conversa, vazada por um garçom entusiasmado com a F1, detalhava apostas sobre quantos GPs a equipe demorará para demitir o chefe de engenharia atual. O clima de união de equipe passou longe do cardápio.
+> > *“Na Alpine, o único motor que funciona perfeitamente é o de boatos. Eles gastam mais tempo tramando nos bastidores do que ajustando a asa traseira.”* — **El Chisme de Montmeló**
+
+---
+
+### 9. MoneyGram Haas F1 Team (Kannapolis / Banbury / Spielberg)
+**Local / Cidade:** Banbury, Reino Unido / Voo privativo para Viena.
+**O Fato de Bastidor:** Aproveitando a pausa entre as etapas, Oliver Bearman e Esteban Ocon foram arrastados por patrocinadores para uma festa exclusiva em um clube privado nas margens de um lago austríaco, cercados de influenciadores digitais e celebridades menores de Hollywood. Ocon passou a noite inteira reclamando do volume da música e recusando fotos com tiktoks, enquanto Bearman tentava, sem sucesso, explicar o funcionamento do diferencial de um F1 para uma modelo que achava que o carro era elétrico.
+> > *“A Haas é o único lugar onde a festa é mais cara que o orçamento de desenvolvimento da asa dianteira. O Guenther Steiner já se foi, mas o espírito de caos alcoólico e glamour de província continua intacto.”* — **The Paddock Mole**
+
+---
+
+### 10. Visa Cash App RB (Faenza / Spielberg)
+**Local / Cidade:** Faenza, Itália / Viagem rápida para o Red Bull Ring.
+**O Fato de Bastidor:** Lanterna solitária no Mundial de Construtores com zero pontos, a VCARB vive um clima de terra arrasada. Yuki Tsunoda passou a terça-feira reunido a portas fechadas com seus empresários e emissários de outras equipes, avaliando cláusulas de fuga para 2027 antes que o barco afunde de vez. Liam Lawson, acuado pela pressão da matriz da Red Bull, recusou dar entrevistas à imprensa italiana, preferindo descontar sua raiva no simulador até que a placa de circuito impresso superaquecesse.
+> > *“A VCARB é o purgatório oficial da Fórmula 1. Ninguém quer ficar lá, todo mundo quer sair, e os únicos que prestam atenção neles são os comissários da FIA quando aplicam punições por limite de pista.”* — **Il Cavallino Spia**
