@@ -1,17 +1,21 @@
 ﻿Pos,Nº,Piloto,Equipe,Voltas,Melhor volta,Pits,Pneu final
-1,4,Lando Norris,McLaren Formula 1 Team,5,1:21.052,0,S
-2,81,Oscar Piastri,McLaren Formula 1 Team,5,1:21.034,0,S
-3,55,Carlos Sainz,Scuderia Ferrari HP,5,1:21.114,0,S
-4,14,Fernando Alonso,Aston Martin Aramco,5,1:21.180,0,S
-5,16,Charles Leclerc,Scuderia Ferrari HP,5,1:21.169,0,S
-6,11,Sergio Pérez,Red Bull Racing,5,1:21.198,0,S
-7,63,George Russell,Mercedes-AMG Petronas,5,1:21.127,0,S
-8,33,Max Verstappen,Red Bull Racing,5,1:21.164,0,S
-9,44,Lewis Hamilton,Mercedes-AMG Petronas,5,1:20.694,0,S
-10,22,Yuki Tsunoda,Visa Cash App RB,5,1:21.661,0,S
-11,18,Lance Stroll,Aston Martin Aramco,5,1:21.349,0,S
-12,27,Nico Hülkenberg,MoneyGram Haas F1 Team,5,1:21.325,0,S
-13,15,Davi (DaviMSSon),Williams Racing,1,1:22.400,0,S
-14,5,Felipe (frdsilva),Stake F1 Team Kick Sauber,1,1:23.100,0,S
-15,3,Daniel Ricciardo,Visa Cash App RB,1,1:24.200,0,S
-16,23,Alexander Albon,Williams Racing,1,1:25.000,0,S
+1,33,Max Verstappen,Red Bull Racing,5,1:20.778,0,S
+2,4,Lando Norris,McLaren Formula 1 Team,5,1:20.778,0,S
+3,81,Oscar Piastri,McLaren Formula 1 Team,5,1:20.778,0,S
+4,16,Charles Leclerc,Scuderia Ferrari HP,5,1:20.778,0,S
+5,55,Carlos Sainz,Scuderia Ferrari HP,5,1:20.778,0,S
+6,11,Sergio Pérez,Red Bull Racing,5,1:20.778,0,S
+7,63,George Russell,Mercedes-AMG Petronas,5,1:20.778,0,S
+8,14,Fernando Alonso,Aston Martin Aramco,5,1:20.778,0,S
+9,18,Lance Stroll,Aston Martin Aramco,5,1:20.778,0,S
+10,44,Lewis Hamilton,Mercedes-AMG Petronas,5,1:20.778,0,S
+11,22,Yuki Tsunoda,Visa Cash App RB,5,1:20.778,0,S
+12,24,Guanyu Zhou,Stake F1 Team Kick Sauber,5,1:20.778,0,S
+13,3,Daniel Ricciardo,Visa Cash App RB,5,1:20.778,0,S
+14,10,Pierre Gasly,BWT Alpine F1 Team,5,1:20.778,0,S
+15,31,Esteban Ocon,BWT Alpine F1 Team,5,1:20.778,0,S
+16,23,Alexander Albon,Williams Racing,5,1:20.778,0,S
+17,77,Valtteri Bottas,Stake F1 Team Kick Sauber,5,1:20.778,0,S
+18,20,Kevin Magnussen,MoneyGram Haas F1 Team,5,1:20.778,0,S
+19,27,Nico Hülkenberg,MoneyGram Haas F1 Team,5,1:20.778,0,S
+20,2,Logan Sargeant,Williams Racing,5,1:20.778,0,S

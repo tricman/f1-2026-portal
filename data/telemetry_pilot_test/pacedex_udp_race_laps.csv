@@ -1,1 +1,101 @@
 ﻿Volta,Pos,Nº,Piloto,Equipe,Tempo,S1,S2,S3,Pneu,Idade do pneu,Desgaste %,Pits
+1,0,18,Lance Stroll,Aston Martin Aramco,1:24.099,25.661,31.661,26.775,M,1,0.0,0
+1,0,16,Charles Leclerc,Scuderia Ferrari HP,1:22.735,24.671,31.451,26.612,M,1,0.0,0
+1,0,2,Logan Sargeant,Williams Racing,1:25.970,26.927,32.056,26.986,M,1,0.0,0
+1,0,11,Sergio Pérez,Red Bull Racing,1:23.233,24.961,31.673,26.597,M,1,0.0,0
+1,0,33,Max Verstappen,Red Bull Racing,1:22.258,24.371,31.496,26.390,M,1,0.0,0
+1,0,10,Pierre Gasly,BWT Alpine F1 Team,1:25.031,26.683,31.634,26.712,M,1,0.0,0
+1,0,77,Valtteri Bottas,Stake F1 Team Kick Sauber,1:25.112,26.327,31.820,26.963,M,1,0.0,0
+1,0,44,Lewis Hamilton,Mercedes-AMG Petronas,1:24.426,26.032,31.737,26.657,M,1,0.0,0
+1,0,3,Daniel Ricciardo,Visa Cash App RB,1:24.198,25.636,31.821,26.740,M,1,0.0,0
+1,0,55,Carlos Sainz,Scuderia Ferrari HP,1:23.337,25.241,31.530,26.564,M,1,0.0,0
+1,0,63,George Russell,Mercedes-AMG Petronas,1:23.945,25.778,31.523,26.643,M,1,0.0,0
+1,0,14,Fernando Alonso,Aston Martin Aramco,1:23.678,25.363,31.642,26.672,M,1,0.0,0
+1,0,20,Kevin Magnussen,MoneyGram Haas F1 Team,1:25.466,26.905,31.764,26.795,M,1,0.0,0
+1,0,22,Yuki Tsunoda,Visa Cash App RB,1:23.787,25.380,31.693,26.713,M,1,0.0,0
+1,0,4,Lando Norris,McLaren Formula 1 Team,1:22.881,25.093,31.443,26.343,M,1,0.0,0
+1,0,23,Alexander Albon,Williams Racing,1:25.147,26.497,31.854,26.795,M,1,0.0,0
+1,0,27,Nico Hülkenberg,MoneyGram Haas F1 Team,1:25.415,26.800,31.773,26.842,M,1,0.0,0
+1,0,31,Esteban Ocon,BWT Alpine F1 Team,1:24.876,26.486,31.679,26.709,M,1,0.0,0
+1,0,81,Oscar Piastri,McLaren Formula 1 Team,1:22.927,24.899,31.554,26.473,M,1,0.0,0
+1,0,24,Guanyu Zhou,Stake F1 Team Kick Sauber,1:25.577,26.958,32.083,26.535,M,1,0.0,0
+2,0,18,Lance Stroll,Aston Martin Aramco,1:21.704,23.436,31.582,26.685,M,2,0.0,0
+2,0,16,Charles Leclerc,Scuderia Ferrari HP,1:21.354,23.445,31.466,26.442,M,2,0.0,0
+2,0,2,Logan Sargeant,Williams Racing,1:22.704,23.705,31.970,27.029,M,2,0.0,0
+2,0,11,Sergio Pérez,Red Bull Racing,1:21.446,23.479,31.457,26.508,M,2,0.0,0
+2,0,33,Max Verstappen,Red Bull Racing,1:21.019,23.291,31.424,26.302,M,2,0.0,0
+2,0,10,Pierre Gasly,BWT Alpine F1 Team,1:22.114,23.586,31.813,26.714,M,2,0.0,0
+2,0,77,Valtteri Bottas,Stake F1 Team Kick Sauber,1:22.224,23.573,31.821,26.829,M,2,0.0,0
+2,0,44,Lewis Hamilton,Mercedes-AMG Petronas,1:21.559,23.384,31.548,26.627,M,2,0.0,0
+2,0,3,Daniel Ricciardo,Visa Cash App RB,1:22.104,23.555,31.769,26.779,M,2,0.0,0
+2,0,55,Carlos Sainz,Scuderia Ferrari HP,1:21.448,23.486,31.506,26.456,M,2,0.0,0
+2,0,63,George Russell,Mercedes-AMG Petronas,1:21.463,23.350,31.431,26.680,M,2,0.0,0
+2,0,14,Fernando Alonso,Aston Martin Aramco,1:21.690,23.430,31.675,26.584,M,2,0.0,0
+2,0,20,Kevin Magnussen,MoneyGram Haas F1 Team,1:22.331,23.680,31.792,26.859,M,2,0.0,0
+2,0,22,Yuki Tsunoda,Visa Cash App RB,1:22.016,23.528,31.778,26.709,M,2,0.0,0
+2,0,4,Lando Norris,McLaren Formula 1 Team,1:21.202,23.354,31.457,26.389,M,2,0.0,0
+2,0,23,Alexander Albon,Williams Racing,1:22.234,23.590,31.800,26.844,M,2,0.0,0
+2,0,27,Nico Hülkenberg,MoneyGram Haas F1 Team,1:22.130,23.583,31.761,26.785,M,2,0.0,0
+2,0,31,Esteban Ocon,BWT Alpine F1 Team,1:21.964,23.643,31.643,26.676,M,2,0.0,0
+2,0,81,Oscar Piastri,McLaren Formula 1 Team,1:21.271,23.316,31.488,26.466,M,2,0.0,0
+2,0,24,Guanyu Zhou,Stake F1 Team Kick Sauber,1:21.856,23.641,31.600,26.613,M,2,0.0,0
+3,0,18,Lance Stroll,Aston Martin Aramco,1:21.629,23.248,31.641,26.739,M,3,0.0,0
+3,0,16,Charles Leclerc,Scuderia Ferrari HP,1:21.214,23.173,31.475,26.565,M,3,0.0,0
+3,0,2,Logan Sargeant,Williams Racing,1:22.454,23.519,31.944,26.989,M,3,0.0,0
+3,0,11,Sergio Pérez,Red Bull Racing,1:21.368,23.250,31.657,26.459,M,3,0.0,0
+3,0,33,Max Verstappen,Red Bull Racing,1:21.169,23.329,31.403,26.436,M,3,0.0,0
+3,0,10,Pierre Gasly,BWT Alpine F1 Team,1:21.627,23.437,31.561,26.627,M,3,0.0,0
+3,0,77,Valtteri Bottas,Stake F1 Team Kick Sauber,1:21.959,23.416,31.775,26.766,M,3,0.0,0
+3,0,44,Lewis Hamilton,Mercedes-AMG Petronas,1:21.342,23.146,31.555,26.640,M,3,0.0,0
+3,0,3,Daniel Ricciardo,Visa Cash App RB,1:21.875,23.402,31.741,26.731,M,3,0.0,0
+3,0,55,Carlos Sainz,Scuderia Ferrari HP,1:21.166,23.139,31.552,26.474,M,3,0.0,0
+3,0,63,George Russell,Mercedes-AMG Petronas,1:21.164,23.200,31.403,26.560,M,3,0.0,0
+3,0,14,Fernando Alonso,Aston Martin Aramco,1:21.355,23.190,31.529,26.636,M,3,0.0,0
+3,0,20,Kevin Magnussen,MoneyGram Haas F1 Team,1:21.936,23.352,31.769,26.815,M,3,0.0,0
+3,0,22,Yuki Tsunoda,Visa Cash App RB,1:21.726,23.303,31.655,26.767,M,3,0.0,0
+3,0,4,Lando Norris,McLaren Formula 1 Team,1:20.906,23.102,31.434,26.369,M,3,0.0,0
+3,0,23,Alexander Albon,Williams Racing,1:22.072,23.408,31.798,26.864,M,3,0.0,0
+3,0,27,Nico Hülkenberg,MoneyGram Haas F1 Team,1:22.350,23.445,32.111,26.792,M,3,0.0,0
+3,0,31,Esteban Ocon,BWT Alpine F1 Team,1:21.835,23.460,31.621,26.753,M,3,0.0,0
+3,0,81,Oscar Piastri,McLaren Formula 1 Team,1:20.995,23.150,31.403,26.441,M,3,0.0,0
+3,0,24,Guanyu Zhou,Stake F1 Team Kick Sauber,1:21.518,23.238,31.616,26.663,M,3,0.0,0
+4,0,18,Lance Stroll,Aston Martin Aramco,1:21.630,23.298,31.606,26.725,M,4,0.0,0
+4,0,16,Charles Leclerc,Scuderia Ferrari HP,1:21.009,23.217,31.308,26.483,M,4,0.0,0
+4,0,2,Logan Sargeant,Williams Racing,1:22.824,23.716,32.021,27.087,M,4,0.0,0
+4,0,11,Sergio Pérez,Red Bull Racing,1:21.274,23.160,31.622,26.490,M,4,0.0,0
+4,0,33,Max Verstappen,Red Bull Racing,1:21.127,23.251,31.587,26.287,M,4,0.0,0
+4,0,10,Pierre Gasly,BWT Alpine F1 Team,1:21.586,23.394,31.631,26.561,M,4,0.0,0
+4,0,77,Valtteri Bottas,Stake F1 Team Kick Sauber,1:22.023,23.351,31.909,26.761,M,4,0.0,0
+4,0,44,Lewis Hamilton,Mercedes-AMG Petronas,1:22.574,23.138,32.773,26.661,M,4,0.0,0
+4,0,3,Daniel Ricciardo,Visa Cash App RB,1:21.890,23.402,31.770,26.717,M,4,0.0,0
+4,0,55,Carlos Sainz,Scuderia Ferrari HP,1:21.185,23.174,31.487,26.523,M,4,0.0,0
+4,0,63,George Russell,Mercedes-AMG Petronas,1:21.484,23.289,31.577,26.618,M,4,0.0,0
+4,0,14,Fernando Alonso,Aston Martin Aramco,1:21.291,23.161,31.450,26.679,M,4,0.0,0
+4,0,20,Kevin Magnussen,MoneyGram Haas F1 Team,1:21.941,23.392,31.745,26.803,M,4,0.0,0
+4,0,22,Yuki Tsunoda,Visa Cash App RB,1:21.675,23.322,31.674,26.677,M,4,0.0,0
+4,0,4,Lando Norris,McLaren Formula 1 Team,1:20.848,23.096,31.303,26.448,M,4,0.0,0
+4,0,23,Alexander Albon,Williams Racing,1:21.987,23.365,31.824,26.797,M,4,0.0,0
+4,0,27,Nico Hülkenberg,MoneyGram Haas F1 Team,1:22.057,23.467,31.774,26.814,M,4,0.0,0
+4,0,31,Esteban Ocon,BWT Alpine F1 Team,1:21.745,23.381,31.733,26.630,M,4,0.0,0
+4,0,81,Oscar Piastri,McLaren Formula 1 Team,1:21.158,23.210,31.495,26.452,M,4,0.0,0
+4,0,24,Guanyu Zhou,Stake F1 Team Kick Sauber,1:21.247,23.300,31.501,26.445,M,4,0.0,0
+5,0,18,Lance Stroll,Aston Martin Aramco,1:21.384,23.095,31.586,26.702,M,5,0.0,0
+5,0,16,Charles Leclerc,Scuderia Ferrari HP,1:21.051,23.117,31.489,26.444,M,5,0.0,0
+5,0,2,Logan Sargeant,Williams Racing,1:22.817,23.586,32.094,27.137,M,5,0.0,0
+5,0,11,Sergio Pérez,Red Bull Racing,1:21.174,22.982,31.514,26.677,M,5,0.0,0
+5,0,33,Max Verstappen,Red Bull Racing,1:21.100,23.223,31.402,26.475,M,5,0.0,0
+5,0,10,Pierre Gasly,BWT Alpine F1 Team,1:21.482,23.220,31.589,26.672,M,5,0.0,0
+5,0,77,Valtteri Bottas,Stake F1 Team Kick Sauber,1:21.907,23.151,32.007,26.748,M,5,0.0,0
+5,0,44,Lewis Hamilton,Mercedes-AMG Petronas,1:20.937,22.943,31.335,26.658,M,5,0.0,0
+5,0,3,Daniel Ricciardo,Visa Cash App RB,1:21.484,23.155,31.619,26.709,M,5,0.0,0
+5,0,55,Carlos Sainz,Scuderia Ferrari HP,1:20.866,22.990,31.423,26.452,M,5,0.0,0
+5,0,63,George Russell,Mercedes-AMG Petronas,1:21.039,22.938,31.410,26.690,M,5,0.0,0
+5,0,14,Fernando Alonso,Aston Martin Aramco,1:21.110,23.001,31.418,26.690,M,5,0.0,0
+5,0,20,Kevin Magnussen,MoneyGram Haas F1 Team,1:21.893,23.261,31.712,26.919,M,5,0.0,0
+5,0,22,Yuki Tsunoda,Visa Cash App RB,1:21.684,23.245,31.645,26.792,M,5,0.0,0
+5,0,4,Lando Norris,McLaren Formula 1 Team,1:20.857,22.980,31.528,26.349,M,5,0.0,0
+5,0,23,Alexander Albon,Williams Racing,1:21.683,23.124,31.721,26.836,M,5,0.0,0
+5,0,27,Nico Hülkenberg,MoneyGram Haas F1 Team,1:21.831,23.240,31.779,26.810,M,5,0.0,0
+5,0,31,Esteban Ocon,BWT Alpine F1 Team,1:21.542,23.189,31.641,26.711,M,5,0.0,0
+5,0,81,Oscar Piastri,McLaren Formula 1 Team,1:20.778,22.984,31.400,26.393,M,5,0.0,0
+5,0,24,Guanyu Zhou,Stake F1 Team Kick Sauber,1:20.944,22.894,31.425,26.624,M,5,0.0,0

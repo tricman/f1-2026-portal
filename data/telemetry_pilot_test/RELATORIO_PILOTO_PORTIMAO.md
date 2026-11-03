@@ -1,6 +1,6 @@
 # 🏁 RELATÓRIO DO TESTE PILOTO DE TELEMETRIA UDP — F1 24
 **Circuito:** GP de Portugal (Portimão · Teste Piloto)  
-**Data da Sessão:** 02/11/2026 19:18:48  
+**Data da Sessão:** 03/11/2026 20:08:21  
 **Ambiente:** Totalmente isolado (`data/telemetry_pilot_test/` — Etapa 11 e campeonato NÃO afetados)  
 
 ---
@@ -9,22 +9,26 @@
 
 | Pos | Grid | $\Delta$ | Nº | Piloto | Equipe | Tempo / Gap | Melhor Volta | Stops | Pneu / Stint | Desgaste | Advertências | Punição | Pontos FIA | Status |
 | :---: | :---: | :---: | :---: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **P1** | 1 | = | #4 | **Lando Norris** | McLaren Formula 1 Team | `6:47.556` | `1:21.052` | 0 | `S (5v)` | 7.0% | — | — | **25** | FINISHED |
-| **P2** | 3 | +1 | #81 | **Oscar Piastri** | McLaren Formula 1 Team | `+2.343` | `1:21.034` | 0 | `S (5v)` | 7.0% | — | — | **18** | FINISHED |
-| **P3** | 5 | +2 | #55 | **Carlos Sainz** | Scuderia Ferrari HP | `+2.780` | `1:21.114` | 0 | `S (5v)` | 7.0% | — | — | **15** | FINISHED |
-| **P4** | 4 | = | #14 | **Fernando Alonso** | Aston Martin Aramco | `+3.205` | `1:21.180` | 0 | `S (5v)` | 7.0% | — | — | **12** | FINISHED |
-| **P5** | 6 | +1 | #16 | **Charles Leclerc** | Scuderia Ferrari HP | `+3.700` | `1:21.169` | 0 | `S (5v)` | 7.0% | — | — | **10** | FINISHED |
-| **P6** | 7 | +1 | #11 | **Sergio Pérez** | Red Bull Racing | `+4.411` | `1:21.198` | 0 | `S (5v)` | 7.0% | — | — | **8** | FINISHED |
-| **P7** | 9 | +2 | #63 | **George Russell** | Mercedes-AMG Petronas | `+5.662` | `1:21.127` | 0 | `S (5v)` | 7.0% | — | — | **6** | FINISHED |
-| **P8** | 10 | +2 | #33 | **Max Verstappen** | Red Bull Racing | `+6.086` | `1:21.164` | 0 | `S (5v)` | 7.0% | ⚠️ 1 adv | — | **4** | FINISHED |
-| **P9** | 11 | +2 | #44 | **Lewis Hamilton** | Mercedes-AMG Petronas | `+7.663` | `1:20.694` | 0 | `S (5v)` | 7.0% | ⚠️ 1 adv | — | **2** | FINISHED |
-| **P10** | 12 | +2 | #22 | **Yuki Tsunoda** | Visa Cash App RB | `+8.295` | `1:21.661` | 0 | `S (5v)` | 7.0% | — | — | **1** | FINISHED |
-| **P11** | 13 | +2 | #18 | **Lance Stroll** | Aston Martin Aramco | `+9.243` | `1:21.349` | 0 | `S (5v)` | 7.0% | — | — | **0** | FINISHED |
-| **P12** | 14 | +2 | #27 | **Nico Hülkenberg** | MoneyGram Haas F1 Team | `+9.618` | `1:21.325` | 0 | `S (5v)` | 7.0% | — | — | **0** | FINISHED |
-| **P13** | 2 | -11 | #15 | **Davi (DaviMSSon)** | Williams Racing | `DNF` | `1:22.400` | 0 | `S (5v)` | 0.0% | — | ⏱️ +255s | **0** | DNF |
-| **P14** | 15 | +1 | #5 | **Felipe (frdsilva)** | Stake F1 Team Kick Sauber | `DNF` | `1:23.100` | 0 | `S (5v)` | 7.0% | — | ⏱️ +255s | **0** | DNF |
-| **P15** | 8 | -7 | #3 | **Daniel Ricciardo** | Visa Cash App RB | `DNF` | `1:24.200` | 0 | `S (5v)` | 7.0% | — | ⏱️ +255s | **0** | DNF |
-| **P16** | 16 | = | #23 | **Alexander Albon** | Williams Racing | `DNF` | `1:25.000` | 0 | `S (5v)` | 7.0% | — | ⏱️ +255s | **0** | DNF |
+| **P1** | 1 | = | #33 | **Max Verstappen** | Red Bull Racing | `6:46.675` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **25** | FINISHED |
+| **P2** | 4 | +2 | #4 | **Lando Norris** | McLaren Formula 1 Team | `+0.021` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **18** | FINISHED |
+| **P3** | 2 | -1 | #81 | **Oscar Piastri** | McLaren Formula 1 Team | `+0.456` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **16** | FINISHED |
+| **P4** | 3 | -1 | #16 | **Charles Leclerc** | Scuderia Ferrari HP | `+0.690` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **12** | FINISHED |
+| **P5** | 6 | +1 | #55 | **Carlos Sainz** | Scuderia Ferrari HP | `+1.329` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **10** | FINISHED |
+| **P6** | 5 | -1 | #11 | **Sergio Pérez** | Red Bull Racing | `+1.822` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **8** | FINISHED |
+| **P7** | 11 | +4 | #63 | **George Russell** | Mercedes-AMG Petronas | `+2.422` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **6** | FINISHED |
+| **P8** | 10 | +2 | #14 | **Fernando Alonso** | Aston Martin Aramco | `+2.450` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **4** | FINISHED |
+| **P9** | 9 | = | #18 | **Lance Stroll** | Aston Martin Aramco | `+3.773` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **2** | FINISHED |
+| **P10** | 12 | +2 | #44 | **Lewis Hamilton** | Mercedes-AMG Petronas | `+4.165` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **1** | FINISHED |
+| **P11** | 7 | -4 | #22 | **Yuki Tsunoda** | Visa Cash App RB | `+4.215` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **0** | FINISHED |
+| **P12** | 13 | +1 | #24 | **Guanyu Zhou** | Stake F1 Team Kick Sauber | `+4.469` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **0** | FINISHED |
+| **P13** | 8 | -5 | #3 | **Daniel Ricciardo** | Visa Cash App RB | `+4.878` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **0** | FINISHED |
+| **P14** | 20 | +6 | #10 | **Pierre Gasly** | BWT Alpine F1 Team | `+5.167` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **0** | FINISHED |
+| **P15** | 16 | +1 | #31 | **Esteban Ocon** | BWT Alpine F1 Team | `+5.289` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **0** | FINISHED |
+| **P16** | 15 | -1 | #23 | **Alexander Albon** | Williams Racing | `+6.450` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **0** | FINISHED |
+| **P17** | 14 | -3 | #77 | **Valtteri Bottas** | Stake F1 Team Kick Sauber | `+6.553` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **0** | FINISHED |
+| **P18** | 18 | = | #20 | **Kevin Magnussen** | MoneyGram Haas F1 Team | `+6.894` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **0** | FINISHED |
+| **P19** | 17 | -2 | #27 | **Nico Hülkenberg** | MoneyGram Haas F1 Team | `+7.110` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **0** | FINISHED |
+| **P20** | 19 | -1 | #2 | **Logan Sargeant** | Williams Racing | `+10.097` | `1:20.778` | 0 | `S (5v)` | 0.0% | — | — | **0** | FINISHED |
 
 ---
 
@@ -34,48 +38,74 @@
 
 | Pos | Piloto | Equipe | Grid ➔ Final | $\Delta$ | Nota (0-10) | Avaliação Técnica | Veredito & Comentário de Alain Prost |
 | :---: | :--- | :--- | :---: | :---: | :---: | :---: | :--- |
-| **P1** | **Lando Norris** | McLaren Formula 1 Team | P1 ➔ P1 | `=` | **`9.5`** / 10 | 🌟 Pilotagem Impecável | "Uma vitória com a minha assinatura: controle absoluto do ritmo em ar limpo sem castigar o carro (6:47.556). Norris largou na pole, estabeleceu a distância necessária para Piastri e administrou o desgaste (apenas 7.0%) com enorme maturidade. Quando você tem o melhor carro e a cabeça fria, vencer parece fácil." |
-| **P2** | **Oscar Piastri** | McLaren Formula 1 Team | P3 ➔ P2 | `+1` | **`9.1`** / 10 | 🌟 Pilotagem Impecável | "Oscar é um piloto extremamente cerebral, muito parecido com o meu estilo nos anos de McLaren. Ele não força manobras suicidas; mantém a pressão constante (+2.343), faz voltas impecáveis (1:21.034) e garante os pontos vitais para os Construtores. A dobradinha foi conquistada com inteligência e classe." |
-| **P3** | **Carlos Sainz** | Scuderia Ferrari HP | P5 ➔ P3 | `+2` | **`9.0`** / 10 | 🌟 Pilotagem Impecável | "Carlos é um dos pilotos mais táticos do grid moderno. Largou de P5, soube esperar o momento exato em que os adversários começaram a perder tração (+2 posições) e colocou a Ferrari no pódio. Ele pensa antes de agir no cockpit, e isso sempre faz a diferença no final de semana." |
-| **P4** | **Fernando Alonso** | Aston Martin Aramco | P4 ➔ P4 | `=` | **`8.1`** / 10 | 🔥 Atuação Notável | "Fernando segue sendo um mestre em maximizar o que tem nas mãos. Manter a Aston Martin em quarto lugar com pneus estáveis (7.0%) e zero advertências diante de carros teoricamente mais rápidos é uma demonstração de pura astúcia. A experiência dele no posicionamento do carro na pista continua inigualável." |
-| **P5** | **Charles Leclerc** | Scuderia Ferrari HP | P6 ➔ P5 | `+1` | **`8.3`** / 10 | 🔥 Atuação Notável | "Charles tem uma velocidade natural espantosa, mas às vezes gasta pneus e paciência desnecessariamente ao ficar preso em trens de DRS. Tentou atacar com agressividade (1:21.169), mas sobrecarregou a dianteira da Ferrari e teve que se contentar com o quinto posto." |
-| **P6** | **Sergio Pérez** | Red Bull Racing | P7 ➔ P6 | `+1` | **`7.8`** / 10 | ✅ Corrida Sólida | "Corrida sólida e madura de Sergio. Em vez de se afobar após largar em P7, construiu a prova volta a volta (+1), cuidou da tração nas saídas de curva e entregou pontos consistentes para a garagem da Red Bull." |
-| **P7** | **George Russell** | Mercedes-AMG Petronas | P9 ➔ P7 | `+2` | **`8.0`** / 10 | 🔥 Atuação Notável | "Muito bem executado por George. Ele tem uma visão de corrida apurada, soube evitar incidentes na largada e levou a Mercedes do nono para o sétimo posto com ultrapassagens limpas e ritmo constante." |
-| **P8** | **Max Verstappen** | Red Bull Racing | P10 ➔ P8 | `+2` | **`7.6`** / 10 | ✅ Corrida Sólida | "Max é um fenômeno, mas hoje o carro não permitia vencer e ele lutou visivelmente contra o equilíbrio dianteiro. A advertência por limites de pista mostra certa frustração ao volante, mas salvar um P8 num dia ruim é o que mantém um piloto vivo na briga por títulos." |
-| **P9** | **Lewis Hamilton** | Mercedes-AMG Petronas | P11 ➔ P9 | `+2` | **`7.7`** / 10 | ✅ Corrida Sólida | "Lewis mostrou que aos 41 anos ainda é capaz de cravar a volta mais rápida da corrida (1:20.694) com autoridade. Porém, a perda de tempo nas primeiras voltas e a advertência na zebra da Curva 4 impediram que ele transformasse esse ritmo avassalador em um lugar no pódio." |
-| **P10** | **Yuki Tsunoda** | Visa Cash App RB | P12 ➔ P10 | `+2` | **`7.5`** / 10 | ✅ Corrida Sólida | "Yuki fez exatamente o que um piloto de equipe intermediária precisa fazer: fugiu dos problemas, manteve um ritmo limpo e seguro e levou a RB à zona de pontuação em décimo. Nota 10 em objetividade." |
-| **P11** | **Lance Stroll** | Aston Martin Aramco | P13 ➔ P11 | `+2` | **`6.3`** / 10 | ⚠️ Abaixo do Potencial | "Faltou combatividade e sensibilidade com o acerto do carro. Lance esteve apagado ao longo do stint, sem ameaçar os carros à frente e terminando fora da zona de pontuação." |
-| **P12** | **Nico Hülkenberg** | MoneyGram Haas F1 Team | P14 ➔ P12 | `+2` | **`6.3`** / 10 | ⚠️ Abaixo do Potencial | "Nico é sempre rápido no sábado, mas no domingo o consumo excessivo de pneus da Haas (7.0%) cobrou a conta. Quando a borracha acaba, não há mágica de cockpit que segure os adversários." |
-| **P13** | **Davi (DaviMSSon)** | Williams Racing | P2 ➔ P13 | `-11` | **`2.5`** / 10 | 💥 Desastre / Abandono Precoce | "Davi tem aquela centelha visceral e veloz que me lembra muito o início de carreira do Ayrton: uma velocidade brutal nas retas (311.8 km/h no Speed Trap) e uma coragem cega. Mas um campeonato não se ganha na Curva 1 da primeira volta. Querer definir a corrida nos primeiros 300 metros, provocando um engavetamento terminal (+255s), é um erro de julgamento imperdoável para quem alinha na primeira fila (P2). Velocidade ele tem de sobra, mas para ser campeão do mundo, você precisa primeiro aprender a terminar as corridas." |
-| **P14** | **Felipe (frdsilva)** | Stake F1 Team Kick Sauber | P15 ➔ P14 | `+1` | **`2.5`** / 10 | 💥 Desastre / Abandono Precoce | "Um desfecho muito injusto para Felipe. Ele pensa a corrida exatamente como eu sempre pensei: com método, cálculo e respeito à mecânica. Foi uma vítima colateral sem qualquer chance de defesa na Curva 1, destroçando a asa e a geometria da Sauber no efeito dominó. Quando a suspensão quebra, nem o maior estrategista do paddock consegue manter o carro na pista." |
-| **P15** | **Daniel Ricciardo** | Visa Cash App RB | P8 ➔ P15 | `-7` | **`2.5`** / 10 | 💥 Desastre / Abandono Precoce | "Um abandono precoce e desolador. Daniel foi engolido pela confusão da Curva 1 sem ter para onde desviar. Uma pena, pois o carro da RB parecia equilibrado para brigar por pontos." |
-| **P16** | **Alexander Albon** | Williams Racing | P16 ➔ P16 | `=` | **`2.5`** / 10 | 💥 Desastre / Abandono Precoce | "Corrida encerrada antes de começar. O impacto sofrido na primeira curva destruiu a suspensão da Williams sem qualquer responsabilidade direta de Alex. Puro azar de corrida." |
+| **P1** | **Max Verstappen** | Red Bull Racing | P1 ➔ P1 | `=` | **`10.0`** / 10 | 🌟 Pilotagem Impecável | "Max é um fenômeno, mas hoje o carro não permitia vencer e ele lutou visivelmente contra o equilíbrio dianteiro. A advertência por limites de pista mostra certa frustração ao volante, mas salvar um P8 num dia ruim é o que mantém um piloto vivo na briga por títulos." |
+| **P2** | **Lando Norris** | McLaren Formula 1 Team | P4 ➔ P2 | `+2` | **`9.4`** / 10 | 🌟 Pilotagem Impecável | "Uma vitória com a minha assinatura: controle absoluto do ritmo em ar limpo sem castigar o carro (+0.021). Norris largou na pole, estabeleceu a distância necessária para Piastri e administrou o desgaste (apenas 0.0%) com enorme maturidade. Quando você tem o melhor carro e a cabeça fria, vencer parece fácil." |
+| **P3** | **Oscar Piastri** | McLaren Formula 1 Team | P2 ➔ P3 | `-1` | **`8.3`** / 10 | 🔥 Atuação Notável | "Oscar é um piloto extremamente cerebral, muito parecido com o meu estilo nos anos de McLaren. Ele não força manobras suicidas; mantém a pressão constante (+2.343), faz voltas impecáveis (1:20.778) e garante os pontos vitais para os Construtores. A dobradinha foi conquistada com inteligência e classe." |
+| **P4** | **Charles Leclerc** | Scuderia Ferrari HP | P3 ➔ P4 | `-1` | **`7.9`** / 10 | ✅ Corrida Sólida | "Charles tem uma velocidade natural espantosa, mas às vezes gasta pneus e paciência desnecessariamente ao ficar preso em trens de DRS. Tentou atacar com agressividade (1:20.778), mas sobrecarregou a dianteira da Ferrari e teve que se contentar com o quinto posto." |
+| **P5** | **Carlos Sainz** | Scuderia Ferrari HP | P6 ➔ P5 | `+1` | **`8.3`** / 10 | 🔥 Atuação Notável | "Carlos é um dos pilotos mais táticos do grid moderno. Largou de P6, soube esperar o momento exato em que os adversários começaram a perder tração (+1 posições) e colocou a Ferrari no pódio. Ele pensa antes de agir no cockpit, e isso sempre faz a diferença no final de semana." |
+| **P6** | **Sergio Pérez** | Red Bull Racing | P5 ➔ P6 | `-1` | **`7.3`** / 10 | ✅ Corrida Sólida | "Corrida sólida e madura de Sergio. Em vez de se afobar após largar em P7, construiu a prova volta a volta (-1), cuidou da tração nas saídas de curva e entregou pontos consistentes para a garagem da Red Bull." |
+| **P7** | **George Russell** | Mercedes-AMG Petronas | P11 ➔ P7 | `+4` | **`8.5`** / 10 | 🔥 Atuação Notável | "Muito bem executado por George. Ele tem uma visão de corrida apurada, soube evitar incidentes na largada e levou a Mercedes do nono para o sétimo posto com ultrapassagens limpas e ritmo constante." |
+| **P8** | **Fernando Alonso** | Aston Martin Aramco | P10 ➔ P8 | `+2` | **`8.0`** / 10 | 🔥 Atuação Notável | "Fernando segue sendo um mestre em maximizar o que tem nas mãos. Manter a Aston Martin em quarto lugar com pneus estáveis (0.0%) e zero advertências diante de carros teoricamente mais rápidos é uma demonstração de pura astúcia. A experiência dele no posicionamento do carro na pista continua inigualável." |
+| **P9** | **Lance Stroll** | Aston Martin Aramco | P9 ➔ P9 | `=` | **`7.0`** / 10 | ✅ Corrida Sólida | "Faltou combatividade e sensibilidade com o acerto do carro. Lance esteve apagado ao longo do stint, sem ameaçar os carros à frente e terminando fora da zona de pontuação." |
+| **P10** | **Lewis Hamilton** | Mercedes-AMG Petronas | P12 ➔ P10 | `+2` | **`7.5`** / 10 | ✅ Corrida Sólida | "Lewis mostrou que aos 41 anos ainda é capaz de cravar a volta mais rápida da corrida (1:20.778) com autoridade. Porém, a perda de tempo nas primeiras voltas e a advertência na zebra da Curva 4 impediram que ele transformasse esse ritmo avassalador em um lugar no pódio." |
+| **P11** | **Yuki Tsunoda** | Visa Cash App RB | P7 ➔ P11 | `-4` | **`5.0`** / 10 | 🚨 Comprometido por Falhas | "Yuki fez exatamente o que um piloto de equipe intermediária precisa fazer: fugiu dos problemas, manteve um ritmo limpo e seguro e levou a RB à zona de pontuação em décimo. Nota 10 em objetividade." |
+| **P12** | **Guanyu Zhou** | Stake F1 Team Kick Sauber | P13 ➔ P12 | `+1` | **`6.0`** / 10 | ⚠️ Abaixo do Potencial | "Uma atuação funcional de P13 para P12. Cumpriu o programa da equipe, preservou os pneus (0.0% de desgaste) e manteve o carro longe de advertências dos comissários." |
+| **P13** | **Daniel Ricciardo** | Visa Cash App RB | P8 ➔ P13 | `-5` | **`4.8`** / 10 | 🚨 Comprometido por Falhas | "Um abandono precoce e desolador. Daniel foi engolido pela confusão da Curva 1 sem ter para onde desviar. Uma pena, pois o carro da RB parecia equilibrado para brigar por pontos." |
+| **P14** | **Pierre Gasly** | BWT Alpine F1 Team | P20 ➔ P14 | `+6` | **`7.2`** / 10 | ✅ Corrida Sólida | "Uma atuação funcional de P20 para P14. Cumpriu o programa da equipe, preservou os pneus (0.0% de desgaste) e manteve o carro longe de advertências dos comissários." |
+| **P15** | **Esteban Ocon** | BWT Alpine F1 Team | P16 ➔ P15 | `+1` | **`5.2`** / 10 | 🚨 Comprometido por Falhas | "Uma atuação funcional de P16 para P15. Cumpriu o programa da equipe, preservou os pneus (0.0% de desgaste) e manteve o carro longe de advertências dos comissários." |
+| **P16** | **Alexander Albon** | Williams Racing | P15 ➔ P16 | `-1` | **`4.8`** / 10 | 🚨 Comprometido por Falhas | "Corrida encerrada antes de começar. O impacto sofrido na primeira curva destruiu a suspensão da Williams sem qualquer responsabilidade direta de Alex. Puro azar de corrida." |
+| **P17** | **Valtteri Bottas** | Stake F1 Team Kick Sauber | P14 ➔ P17 | `-3` | **`4.4`** / 10 | 🚨 Comprometido por Falhas | "Uma atuação funcional de P14 para P17. Cumpriu o programa da equipe, preservou os pneus (0.0% de desgaste) e manteve o carro longe de advertências dos comissários." |
+| **P18** | **Kevin Magnussen** | MoneyGram Haas F1 Team | P18 ➔ P18 | `=` | **`5.0`** / 10 | 🚨 Comprometido por Falhas | "Uma atuação funcional de P18 para P18. Cumpriu o programa da equipe, preservou os pneus (0.0% de desgaste) e manteve o carro longe de advertências dos comissários." |
+| **P19** | **Nico Hülkenberg** | MoneyGram Haas F1 Team | P17 ➔ P19 | `-2` | **`4.6`** / 10 | 🚨 Comprometido por Falhas | "Nico é sempre rápido no sábado, mas no domingo o consumo excessivo de pneus da Haas (0.0%) cobrou a conta. Quando a borracha acaba, não há mágica de cockpit que segure os adversários." |
+| **P20** | **Logan Sargeant** | Williams Racing | P19 ➔ P20 | `-1` | **`4.8`** / 10 | 🚨 Comprometido por Falhas | "Uma atuação funcional de P19 para P20. Cumpriu o programa da equipe, preservou os pneus (0.0% de desgaste) e manteve o carro longe de advertências dos comissários." |
 
 ---
 
-## 3. Destaques Técnicos & Narrativos Capturados via UDP
+## 3. ⚙️ Telemetria Avançada dos Motores, Freios & ERS (Packets 5, 6, 7 e 10)
 
-* **Vencedor da Corrida:** `Lando Norris` (McLaren Formula 1 Team) com tempo total de `6:47.556`.
-* **Volta Mais Rápida da Sessão:** `Lewis Hamilton` com `1:20.694` (Ponto extra da FIA).
-* **Maior Velocidade no Speed Trap:** `Davi (DaviMSSon)` com `311.8 km/h`.
-* **Total de Voltas Rastreadas Volta-a-Volta:** `0 voltas` com telemetria de S1, S2, S3, desgaste de pneu e posições.
+> **Parâmetros Decodificados em Tempo Real:** Temperaturas máximas de discos de freio e miolo de pneus (Packet 6), carga e modo de implementação de bateria ERS (Packet 7), desgaste interno dos componentes de unidade de potência ICE e MGU-K (Packet 10), e ajustes de carga aerodinâmica de asas dianteira e traseira (Packet 5).
+
+| Pos | Piloto | Equipe | Temp. Max Freios | Temp. Max Pneus (Miolo) | Bateria ERS | Combustível | Desgaste Motor (ICE / MGU-K) | Asas (D / T) |
+| :---: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **P1** | **Max Verstappen** | Red Bull Racing | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P2** | **Lando Norris** | McLaren Formula 1 Team | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P3** | **Oscar Piastri** | McLaren Formula 1 Team | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P4** | **Charles Leclerc** | Scuderia Ferrari HP | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P5** | **Carlos Sainz** | Scuderia Ferrari HP | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P6** | **Sergio Pérez** | Red Bull Racing | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P7** | **George Russell** | Mercedes-AMG Petronas | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P8** | **Fernando Alonso** | Aston Martin Aramco | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P9** | **Lance Stroll** | Aston Martin Aramco | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P10** | **Lewis Hamilton** | Mercedes-AMG Petronas | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P11** | **Yuki Tsunoda** | Visa Cash App RB | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P12** | **Guanyu Zhou** | Stake F1 Team Kick Sauber | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P13** | **Daniel Ricciardo** | Visa Cash App RB | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P14** | **Pierre Gasly** | BWT Alpine F1 Team | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P15** | **Esteban Ocon** | BWT Alpine F1 Team | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P16** | **Alexander Albon** | Williams Racing | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P17** | **Valtteri Bottas** | Stake F1 Team Kick Sauber | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P18** | **Kevin Magnussen** | MoneyGram Haas F1 Team | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P19** | **Nico Hülkenberg** | MoneyGram Haas F1 Team | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
+| **P20** | **Logan Sargeant** | Williams Racing | `—` | `—` | `—` | `—` | `0% (Novo)` | `Padrão` |
 
 ---
 
-## 4. 🚨 Incidentes, Advertências e Punições dos Comissários (FIA Stewards)
+## 4. Destaques Técnicos & Narrativos Capturados via UDP
 
-| Piloto | Equipe | Advertências (Limites de Pista) | Punição em Tempo | Impacto na Prova |
-| :--- | :--- | :---: | :---: | :--- |
-| **Max Verstappen** | Red Bull Racing | `1 aviso(s)` | `Sem penalidade de tempo` | Advertência inicial por corte de curva |
-| **Lewis Hamilton** | Mercedes-AMG Petronas | `1 aviso(s)` | `Sem penalidade de tempo` | Advertência inicial por corte de curva |
-| **Davi (DaviMSSon)** | Williams Racing | `Nenhum` | `+255s` | Advertência inicial por corte de curva |
-| **Felipe (frdsilva)** | Stake F1 Team Kick Sauber | `Nenhum` | `+255s` | Advertência inicial por corte de curva |
-| **Daniel Ricciardo** | Visa Cash App RB | `Nenhum` | `+255s` | Advertência inicial por corte de curva |
-| **Alexander Albon** | Williams Racing | `Nenhum` | `+255s` | Advertência inicial por corte de curva |
+* **Vencedor da Corrida:** `Max Verstappen` (Red Bull Racing) com tempo total de `6:46.675`.
+* **Volta Mais Rápida da Sessão:** `Max Verstappen` com `1:20.778` (Ponto extra da FIA).
+* **Maior Velocidade no Speed Trap:** `Max Verstappen` com `0.0 km/h`.
+* **Total de Voltas Rastreadas Volta-a-Volta:** `100 voltas` com telemetria de S1, S2, S3, desgaste de pneu e posições.
 
 ---
 
-## 5. Matriz de Viabilidade para os 8 Módulos Narrativos da FIA
+## 5. 🚨 Incidentes, Advertências e Punições dos Comissários (FIA Stewards)
+
+* Nenhuma advertência ou punição formal aplicada pelos comissários nesta sessão.
+
+---
+
+## 6. Matriz de Viabilidade para os 8 Módulos Narrativos da FIA
 
 | Módulo Narrativo | Dados Exigidos | Coletado pelo UDP? | Status |
 | :--- | :--- | :---: | :---: |
