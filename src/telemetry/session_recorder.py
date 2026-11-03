@@ -32,6 +32,7 @@ from src.telemetry.f1_2024_structs import (
     SessionData,
     ParticipantsPacket,
     FinalClassificationPacket,
+    FinalClassificationDriver,
     CarSetupsPacket,
     CarTelemetryPacket,
     CarStatusFullPacket,

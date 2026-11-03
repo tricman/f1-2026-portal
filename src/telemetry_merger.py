@@ -42,12 +42,17 @@ def parse_lap_time_ms(time_str: str) -> int:
     if not time_str or not time_str.strip():
         return 999_999_999
     clean = time_str.strip()
-    if ":" in clean:
-        mins_part, secs_part = clean.split(":", 1)
-        mins = int(mins_part)
-        secs = float(secs_part)
-        return int(round((mins * 60.0 + secs) * 1000))
-    return int(round(float(clean) * 1000))
+    if clean in ("—", "-", "DNF", "DSQ", "DNS") or not any(c.isdigit() for c in clean):
+        return 999_999_999
+    try:
+        if ":" in clean:
+            mins_part, secs_part = clean.split(":", 1)
+            mins = int(mins_part)
+            secs = float(secs_part)
+            return int(round((mins * 60.0 + secs) * 1000))
+        return int(round(float(clean) * 1000))
+    except Exception:
+        return 999_999_999
 
 
 def normalize_driver(raw_name: str) -> Tuple[str, str, int, str]:
@@ -73,7 +78,10 @@ def parse_pacedex_laps_csv(csv_path: Path) -> List[LapRecord]:
             t_str = row["Tempo"].strip()
             t_ms = parse_lap_time_ms(t_str)
             wear_raw = row.get("Desgaste %", "").replace("%", "").strip()
-            wear = float(wear_raw) if wear_raw and wear_raw not in ("—", "-", "") else None
+            try:
+                wear = float(wear_raw) if wear_raw else None
+            except Exception:
+                wear = None
             age = int(row["Idade do pneu"]) if row.get("Idade do pneu") and row["Idade do pneu"].strip() else None
             pits = int(row["Pits"]) if row.get("Pits") and row["Pits"].strip() else None
             records.append(
@@ -229,10 +237,10 @@ def merge_race_telemetry(
         )
 
     # Sort best laps to find the runner-up fastest lap delta
-    sorted_by_fl = sorted(results, key=lambda r: r.best_lap_ms)
-    fl_winner = sorted_by_fl[0]
-    fl_second = sorted_by_fl[1]
-    fl_delta_s = (fl_second.best_lap_ms - fl_winner.best_lap_ms) / 1000.0
+    sorted_by_fl = sorted(results, key=lambda r: r.best_lap_ms) if results else []
+    fl_winner = sorted_by_fl[0] if sorted_by_fl else None
+    fl_second = sorted_by_fl[1] if len(sorted_by_fl) > 1 else None
+    fl_delta_s = (fl_second.best_lap_ms - fl_winner.best_lap_ms) / 1000.0 if (fl_winner and fl_second) else 0.0
 
     pit_stops = tv_overlay_data.get("pit_stops", [])
     fastest_pit = min(pit_stops, key=lambda p: p["stop_duration_s"]) if pit_stops else None
@@ -241,13 +249,13 @@ def merge_race_telemetry(
         "session_type": "RACE",
         "total_laps": max((r.laps for r in results), default=0),
         "fastest_lap_summary": {
-            "driver_id": fl_winner.driver_id,
-            "driver_name": fl_winner.driver_name,
-            "team": fl_winner.team,
-            "lap_time": fl_winner.best_lap,
-            "lap_number": fl_winner.best_lap_num,
-            "runner_up_driver": fl_second.driver_name,
-            "runner_up_time": fl_second.best_lap,
+            "driver_id": fl_winner.driver_id if fl_winner else "",
+            "driver_name": fl_winner.driver_name if fl_winner else "",
+            "team": fl_winner.team if fl_winner else "",
+            "lap_time": fl_winner.best_lap if fl_winner else "—",
+            "lap_number": fl_winner.best_lap_num if fl_winner else 1,
+            "runner_up_driver": fl_second.driver_name if fl_second else "",
+            "runner_up_time": fl_second.best_lap if fl_second else "—",
             "delta_seconds": round(fl_delta_s, 3),
         },
         "fastest_pit_stop": fastest_pit,
