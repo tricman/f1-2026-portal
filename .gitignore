@@ -21,3 +21,7 @@ validate_*.py
 /takeout*
 /portal/portal_data.json
 /portal/et10_race_table_preview.png
+
+# Word lock files
+~$*
+*.tmp

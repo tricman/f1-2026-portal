@@ -234,7 +234,7 @@ def build_specification_document():
         ("Davi (DaviMSSon)", "Piloto Titular Williams #15\n'O Leão de Grove'", "Discord #geral +\nSimulador F1 24", "Agressividade nas disputas de pista, rivalidade acirrada e respostas em coletivas."),
         ("Sarah (SarahMarinsS)", "Piloto Titular Mercedes #24\n'A Rainha do Gelo'", "Discord #geral +\nSimulador F1 24", "Ritmo dominante, busca incansável por voltas mais rápidas e rigor de dados."),
         ("Direção de Prova FIA", "Órgão Regulador Esportivo\n(Jo Bauer / Comissários)", "Relatórios .md +\nPortal Mobile", "Classificação auditada, aplicação de sanções e conformidade de construtores."),
-        ("Alain Prost", "Consultor Técnico Especial\n'Le Professeur'", "Discord #repercussao-midia", "Notas de pilotagem (0 a 10) baseadas estritamente na preservação mecânica do carro."),
+        ("Comitê de Lendas\n(Prost, Mansell, Villeneuve)", "Bancada Técnica & Crítica de Paddock\n(Estilo CBS Golazo / Inside NBA)", "Discord #repercussao-midia", "Debate dinâmico entre lendas: o cérebro (Prost), o coração (Mansell) e a acidez sem filtro (Villeneuve)."),
     ]
     for idx, (s, f, c, e) in enumerate(stk_rows, start=1):
         r_curr = tbl_stk.rows[idx]
@@ -275,8 +275,16 @@ def build_specification_document():
             "M1 — Semana das Equipes (Silly Season & Bastidores)",
             "Gera a narrativa de desenvolvimento, crises de motorhome, rumores de mercado de pilotos e intrigas entre equipes de Segunda a Quinta-feira.",
             "Comando 'inicio da semana etapa XX' ou disparo programado (Cron).",
-            "Sorteio aleatório controlado de 4 temas por equipe (Segunda a Quinta); consulta ao canon_ledger.json para resgatar promessas e rivalidades anteriores.",
-            "• Publicação em Modo Híbrido: postagens automáticas agendadas ao longo da semana real OU avanço manual sob demanda via 'avancar dia' ou 'publicar semana completa'.\n• O conteúdo destaca os bastidores das equipes de Felipe (Sauber), Davi (Williams) e Sarah (Mercedes).",
+            "Catálogo oficial de temas de Silly Season (6 verticais temáticas), estado histórico do Canon Ledger (armazenado em data/state/canon_ledger.json com suporte a NoSQL local embedded) e resultados do GP anterior.",
+            "• Catálogo dos 6 Temas Semanais da Silly Season:\n"
+            "  1. Pacote Aerodinâmico & Correlação: novidades de túnel de vento, assoalhos e asas trazidas para o GP.\n"
+            "  2. Crise Contratual & Mercado: boatos de renovação, cláusulas de desempenho e pressão de pilotos reservas.\n"
+            "  3. Clima de Garagem & Conflito Interno: cobranças da chefia (Toto Wolff, James Vowles, Mattia Binotto/Alunni Bravi) e tensão entre companheiros.\n"
+            "  4. Guerra Psicológica & Paddock: farpas na mídia entre rivais diretos e reclamações de limites de pista passados.\n"
+            "  5. Teto de Gastos (Cost Cap) & Danos Financeiros: impacto financeiro de batidas e quebras mecânicas em etapas anteriores.\n"
+            "  6. Pressão Comercial & Patrocinadores: ativações de marketing locais e pressão corporativa por resultados.\n"
+            "• Publicação em Modo Híbrido: postagens automáticas agendadas ao longo da semana real OU avanço manual sob demanda via 'avancar dia' ou 'publicar semana completa'.\n"
+            "• O conteúdo destaca os bastidores das equipes de Felipe (Sauber), Davi (Williams) e Sarah (Mercedes).",
             "Documento 01_semana_equipes.md + Teasers diários no Discord #repercussao-midia."
         ),
         (
@@ -316,23 +324,35 @@ def build_specification_document():
             "Crônica de dramaturgia esportiva narrada no formato 'Drive to Survive', dividida em 4 atos cinematográficos de bastidores.",
             "Conclusão da auditoria esportiva do M5.",
             "Resultado oficial da corrida, deltas de chegada, incidentes e danos mecânicos de telemetria.",
-            "• Ato 1: Parque Fechado (reações viscerais ao sair do cockpit, abraços nas garagens).\n• Ato 2: Sala de Descompressão (Cooldown Room - conversas sem filtro entre os 3 primeiros colocados antes de subir ao pódio).\n• Ato 3: Cerimônia do Pódio (entrega de troféus e banho de champanhe).\n• Ato 4: Zona Mista (declarações de Felipe, Davi e Sarah aos repórteres).",
+            "• Ato 1: Parque Fechado (reações viscerais ao sair do cockpit, abraços nas garagens).\n"
+            "• Ato 2: Sala de Descompressão (Cooldown Room - conversas sem filtro entre os 3 primeiros colocados antes de subir ao pódio).\n"
+            "• Ato 3: Cerimônia do Pódio (entrega de troféus e banho de champanhe).\n"
+            "• Ato 4: Zona Mista (declarações de Felipe, Davi e Sarah aos repórteres, complementadas obrigatoriamente por declarações de pilotos NPCs de destaque — ex: vencedor da prova, pilotos no pódio ou rivais envolvidos em disputas acirradas e toques de pista).",
             "Documento 06_cerimonia_podio.md + Teaser ilustrado no Discord #repercussao-midia."
         ),
         (
             "M7 — Boletim Mundial de Pilotos e Construtores (FIA World Championship)",
             "Apuração estritamente matemática e atualização irreversível da tabela do Campeonato Mundial da temporada.",
-            "Validação do resultado final de M5 e registro no standings.json.",
-            "Tabela de pontuação anterior (standings.json) + Classificação final oficial auditada de M5.",
-            "• Atribuição da pontuação clássica da FIA: 25-18-15-12-10-8-6-4-2-1 para os dez primeiros colocados.\n• Ponto extra de Volta Mais Rápida (1 pt) condicionado ao piloto terminar entre os 10 primeiros ($P \\le 10$).\n• Aplicação da Invariante de Construtores: $\\sum \\text{Pilotos} \\equiv \\text{Construtor}$.\n• Incorporação de eventuais sanções disciplinares administrativas aplicadas pela Direção de Prova no Canon Ledger.",
-            "Documento 07_fia_mundial.md + standings.json atualizado + Card PNG em alta resolução."
+            "Validação do resultado final de M5 e registro na base de dados de classificação (standings.json / NoSQL local).",
+            "Tabela de pontuação anterior + Classificação final oficial auditada de M5.",
+            "• Atribuição da pontuação clássica da FIA: 25-18-15-12-10-8-6-4-2-1 para os dez primeiros colocados.\n"
+            "• Ponto extra de Volta Mais Rápida (1 pt) condicionado ao piloto terminar entre os 10 primeiros ($P \\le 10$).\n"
+            "• Aplicação da Invariante de Construtores: $\\sum \\text{Pilotos} \\equiv \\text{Construtor}$.\n"
+            "• Incorporação de eventuais sanções disciplinares administrativas aplicadas pela Direção de Prova no Canon Ledger.",
+            "Documento 07_fia_mundial.md + Tabela atualizada na base de dados + Embed nativo formatado para Discord com visualização mobile adaptativa. (Dispensa a geração de cards em imagem PNG)."
         ),
         (
-            "M8 — Repercussão de Mídia & Análise Técnica de Alain Prost",
-            "Fechamento da etapa com análise tática refinada e repercussão jornalística internacional sobre a atuação dos pilotos.",
+            "M8 — Repercussão de Mídia, Crônica de Jornal & Bancada de Lendas",
+            "Fechamento jornalístico da etapa com narrativa dramática dos fatos marcantes da corrida e debate tático conduzido por um comitê de lendas da Fórmula 1.",
             "Atualização completa da tabela mundial em M7.",
-            "Pacotes de telemetria UDP (desgaste de pneus, superaquecimento de freios, uso de ERS) e crônicas anteriores.",
-            "• Divisão da publicação no Discord em 2 Blocos:\n  - Bloco 1: Crônica Técnica & Notas de Pilotagem de Alain Prost ('Le Professeur'), com notas de 0 a 10 avaliando o gerenciamento do carro.\n  - Bloco 2: Cobertura Editorial Internacional (tablóides britânicos, imprensa italiana e mídia brasileira).\n• O veredito de Prost não é punitivo, mas uma masterclass de gerenciamento de pneus e inteligência de corrida.",
+            "Pacotes de telemetria UDP (desgaste de pneus, temperaturas de freio, uso de ERS) e crônicas anteriores.",
+            "• Publicação no Discord segmentada em 2 Blocos:\n"
+            "  - Bloco 1: Crônica Geral da Corrida (Race Chronicle): narrativa jornalística no estilo de matéria de capa de jornal esportivo de grande circulação (ex: L'Équipe, Gazzetta dello Sport, Autosport), recapitulando a largada, os momentos de virada tática, as ultrapassagens decisivas e o desfecho da prova.\n"
+            "  - Bloco 2: Bancada de Lendas da F1 (Estilo 'CBS Sports Golazo Show' / 'Inside the NBA'): debate acalorado e bem-humorado entre ex-campeões mundiais:\n"
+            "    * Alain Prost ('Le Professeur'): visão cerebral, notas de 0 a 10 baseadas em telemetria pura (desgaste de pneus, superaquecimento de freios e economia de ERS).\n"
+            "    * Nigel Mansell ('Il Leone'): visão passional, valorizando o arrojo, ultrapassagens na marra e coragem nas disputas roda a roda.\n"
+            "    * Jacques Villeneuve ('O Crítico Sem Filtro'): comentários provocativos, sem meias palavras, criticando erros crassos de estratégia e questionando pilotos e comissários.\n"
+            "• Cobertura Editorial Internacional: tablóides britânicos, imprensa italiana e mídia brasileira repercutindo os desdobramentos de bastidores.",
             "Documento 08_repercussao_midia.md + 2 Publicações segmentadas no canal #repercussao-midia."
         ),
     ]
@@ -503,6 +523,18 @@ def build_specification_document():
         "RESILIÊNCIA DE REDE & RATE LIMITING"
     )
 
+    doc.add_heading("3.5. Arquitetura de Persistência Local: Transição de JSON para NoSQL Embedded", level=2)
+    doc.add_paragraph(
+        "Atualmente, o estado do campeonato (standings.json) e o histórico de fatos esportivos (canon_ledger.json) "
+        "residem em arquivos JSON atômicos no diretório data/state/. Embora simples e portável, a evolução da solução "
+        "comporta a adoção de uma base de dados NoSQL local embarcada (como TinyDB ou SQLite em modo Document Store), "
+        "oferecendo vantagens arquiteturais significativas sem violar a restrição CON-01 (100% On-Premise e custo zero):\n"
+        "1. Transações ACID Locais: Garante que gravações de pontuação ou deliberações de comissários não sofram corrupção caso o processo seja interrompido no meio de um flush.\n"
+        "2. Consultas Indexadas por Etapa: Permite filtrar eventos, declarações de pilotos ou históricos de punições por round_number sem carregar toda a massa histórica em memória.\n"
+        "3. Snapshot e Versionamento Automático: Facilita a criação de pontos de restauração antes de cada etapa, viabilizando operações seguras de rollback.\n"
+        "A implementação técnica adota o padrão de Repositório (Repository Pattern), isolando as camadas superiores da escolha entre JSON serializado ou banco NoSQL embarcado."
+    )
+
     doc.add_page_break()
 
     # =========================================================================
@@ -553,13 +585,29 @@ def build_specification_document():
             "E atualizar o arquivo standings.json no disco sem lançar qualquer exceção."
         ),
         (
-            "Cenário 4: Geração das Avaliações Técnicas de Pilotagem por Alain Prost",
-            "Funcionalidade: Emissão de Notas de Pilotagem no Paddock (M8)\n"
+            "Cenário 4: Geração das Avaliações Técnicas da Bancada de Lendas da F1 (M8)",
+            "Funcionalidade: Debate e Emissão de Notas de Pilotagem no Paddock (M8)\n"
             "Dado que a Etapa 11 foi finalizada e os dados de telemetria fina de pneus e freios foram gravados\n"
             "Quando o orquestrador invocar o módulo de geração de M8\n"
-            "Então o Gemini deve incorporar a persona de Alain Prost ('Le Professeur') definida em personas/alain_prost_ex_driver.md\n"
-            "E atribuir notas de 0 a 10 para os três pilotos brasileiros baseando-se no desgaste mecânico\n"
-            "E o bot deve publicar a análise no canal #repercussao-midia dividida em Bloco 1 (Prost) e Bloco 2 (Imprensa)."
+            "Então o Gemini deve incorporar as três personas do Comitê de Lendas:\n"
+            "  - Alain Prost avaliando a conservação mecânica e atribuindo notas de 0 a 10 com embasamento técnico\n"
+            "  - Nigel Mansell avaliando a agressividade, arrojo nas ultrapassagens e coração na pista\n"
+            "  - Jacques Villeneuve tecendo críticas contundentes e sem filtro a erros táticos e decisões da FIA\n"
+            "E gerar a Crônica Geral da Corrida (Race Chronicle) no estilo de jornal de grande circulação\n"
+            "E o bot deve publicar a cobertura no canal #repercussao-midia dividida em Bloco 1 (Crônica) e Bloco 2 (Bancada de Lendas & Mídia)."
+        ),
+        (
+            "Cenário 5: Execução de Rollback Granular de Etapa via Bot Discord",
+            "Funcionalidade: Reversão Segura de Dados de Etapa por Falhas Operacionais\n"
+            "Dado que a Etapa 11 foi processada com inconsistência ou bandeira vermelha não tratada\n"
+            "Quando o organizador enviar o comando 'rollback etapa 11 sessao' no canal #geral\n"
+            "Então o bot deve exigir a confirmação de segurança com a mensagem 'Digite confirmar rollback para prosseguir'\n"
+            "E quando o organizador responder com 'confirmar rollback'\n"
+            "Então o sistema deve realizar um backup atômico pré-expurgo\n"
+            "E apagar os arquivos de telemetria UDP e relatórios de pista da Etapa 11 (M3 a M8)\n"
+            "E reverter a tabela standings.json para o snapshot exato da Etapa 10\n"
+            "E preservar intactos os dados de Silly Season (M1) e Coletiva (M2)\n"
+            "E notificar o canal com o status 'Rollback de sessão executado com sucesso. Etapa pronta para nova tomada de pista'."
         ),
     ]
 
@@ -608,19 +656,51 @@ def build_specification_document():
 
     doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
-    doc.add_heading("5.2. Glossário de Termos Canônicos (Domain-Driven Design)", level=2)
-    tbl_glo = doc.add_table(rows=7, cols=2)
+    doc.add_heading("5.2. Rotina de Rollback Granular de Etapa via Discord", level=2)
+    doc.add_paragraph(
+        "Para responder a imprevistos operacionais (desconexão massiva em corrida online, reinício de sessão ou corrupção de telemetria), "
+        "o bot do Discord incorpora o comando administrativo de rollback granular, parametrizado por escopo de intervenção:"
+    )
+
+    tbl_rb = doc.add_table(rows=5, cols=3)
+    tbl_rb.alignment = WD_TABLE_ALIGNMENT.CENTER
+    headers_rb = ["Comando Discord", "Escopo Excluído", "Comportamento e Impacto no Estado"]
+    for j, h in enumerate(headers_rb):
+        tbl_rb.rows[0].cells[j].text = h
+    style_table_header(tbl_rb.rows[0], [Inches(2.1), Inches(1.6), Inches(3.2)])
+
+    rb_data = [
+        ("rollback etapa XX sessao", "Sessões de Pista\n(TL, Qualy, Race)", "Exclui race_telemetry_merged.json, CSVs e relatórios M3 a M8. Reverte o standings.json para o snapshot da etapa anterior (recalculando pontos). Preserva M1 e M2 intactos."),
+        ("rollback etapa XX coletiva", "Coletiva FIA (M2)", "Exclui 02_coletiva_pre_gp.md, reseta o estado da FSM para PRESS_ACTIVE e purga declarações da etapa do Canon Ledger."),
+        ("rollback etapa XX semana", "Silly Season (M1)", "Exclui 01_semana_equipes.md, reseta o agendador de dias para o Dia 1 e reabre o sorteio dos temas de bastidores."),
+        ("rollback etapa XX tudo", "Etapa Completa\n(M1 a M8)", "Limpa integralmente o diretório data/seasons/season_01/et_XX/, reverte a pontuação oficial do campeonato e expurga todos os eventos associados do Canon Ledger."),
+    ]
+    for idx_b, (cmd_r, esc, cmp) in enumerate(rb_data, start=1):
+        r_b = tbl_rb.rows[idx_b]
+        r_b.cells[0].text = cmd_r
+        r_b.cells[0].paragraphs[0].runs[0].bold = True
+        r_b.cells[0].paragraphs[0].runs[0].font.name = "Consolas"
+        r_b.cells[0].paragraphs[0].runs[0].font.size = Pt(8.5)
+        r_b.cells[1].text = esc
+        r_b.cells[2].text = cmp
+        style_table_row(r_b, is_even=(idx_b % 2 == 0), col_widths=[Inches(2.1), Inches(1.6), Inches(3.2)])
+
+    doc.add_paragraph().paragraph_format.space_after = Pt(6)
+
+    doc.add_heading("5.3. Glossário de Termos Canônicos (Domain-Driven Design)", level=2)
+    tbl_glo = doc.add_table(rows=8, cols=2)
     tbl_glo.alignment = WD_TABLE_ALIGNMENT.CENTER
     tbl_glo.rows[0].cells[0].text = "Termo / Conceito"
     tbl_glo.rows[0].cells[1].text = "Definição no Domínio do Showrunner F1"
     style_table_header(tbl_glo.rows[0], [Inches(2.0), Inches(4.7)])
 
     glo_data = [
-        ("Canon Ledger", "Livro-razão em arquivo JSON imutável que registra todos os fatos históricos, promessas, multas e rivalidades criadas ao longo da temporada."),
+        ("Canon Ledger", "Livro-razão em arquivo estruturado (JSON ou NoSQL local) que registra todos os fatos históricos, promessas, multas e rivalidades criadas ao longo da temporada."),
         ("Trava de Turno (Turn-Lock)", "Estado bloqueante do bot do Discord em que o avanço da coletiva é condicionado ao envio de resposta pelo piloto humano designado."),
         ("Session UID", "Identificador único de 64 bits transmitido pelo simulador que distingue inequivocamente sessões de treinos, qualificação e corrida."),
         ("Invariante de Construtores", "Regra matemática estrita da FIA segundo a qual a pontuação de uma equipe deve ser rigorosamente idêntica à soma de seus dois pilotos."),
-        ("Le Professeur (Alain Prost)", "Persona de consultoria técnica que avalia a condução esportiva e preservação dos componentes mecânicos dos carros com notas de 0 a 10."),
+        ("Bancada de Lendas", "Comitê crítico de ex-campeões mundiais (Alain Prost, Nigel Mansell, Jacques Villeneuve) que debatem e avaliam a condução técnica e postura esportiva dos pilotos."),
+        ("Rollback Granular", "Capacidade de reverter seletivamente o estado de uma etapa (sessões de pista, coletiva, Silly Season ou tudo) sem comprometer o histórico canônico acumulado."),
         ("Pacing de Chamadas", "Mecanismo de espaçamento temporal entre requisições ao Google AI Studio para manter a taxa abaixo dos limites do plano gratuito."),
     ]
     for idx_g, (tm, df) in enumerate(glo_data, start=1):
@@ -633,9 +713,17 @@ def build_specification_document():
 
     # Salvamento do Documento
     DOC_PATH.parent.mkdir(parents=True, exist_ok=True)
-    doc.save(str(DOC_PATH))
-    print(f"✅ Documento corporativo gerado com sucesso em: {DOC_PATH}")
+    revised_path = DOC_PATH.parent / "ESPECIFICACAO_FUNCIONAL_SHOWRUNNER_F1_REVISADO.docx"
+    doc.save(str(revised_path))
+    print(f"✅ Documento revisado gerado com sucesso em: {revised_path}")
+    try:
+        doc.save(str(DOC_PATH))
+        print(f"✅ Documento principal atualizado com sucesso em: {DOC_PATH}")
+    except PermissionError:
+        print(f"⚠️ O arquivo {DOC_PATH.name} está aberto no Microsoft Word do usuário. Versão revisada salva em {revised_path.name}.")
+
 
 
 if __name__ == "__main__":
     build_specification_document()
+
