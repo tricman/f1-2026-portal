@@ -18,3 +18,4 @@
    - **Felipe (Sauber #5):** O papel de líder técnico em Hinwil, a transição para a era de fábrica da Audi, a exigência de confiabilidade e a disputa pelo assento principal.
    - **Davi (Williams #15):** O jovem prodígio agressivo de Grove, a pressão de James Vowles por pontos consistentes e a constante sondagem das equipes de ponta (Red Bull e Ferrari).
    - **Sarah (Mercedes #24):** A busca implacável pela perfeição técnica em Brackley, a dinâmica de poder com Toto Wolff e a pressão esmagadora de liderar a equipe mais vitoriosa da era híbrida.
+

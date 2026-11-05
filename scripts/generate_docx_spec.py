@@ -275,14 +275,24 @@ def build_specification_document():
             "M1 — Semana das Equipes (Silly Season & Bastidores)",
             "Gera a narrativa de desenvolvimento, crises de motorhome, rumores de mercado de pilotos e intrigas entre equipes de Segunda a Quinta-feira.",
             "Comando 'inicio da semana etapa XX' ou disparo programado (Cron).",
-            "Catálogo oficial de temas de Silly Season expandido para 12 verticais temáticas (validado pela Persona Paddock Insider), estado histórico do Canon Ledger (armazenado em data/state/canon_ledger.json com suporte a NoSQL local embedded) e resultados do GP anterior.",
+            "Catálogo oficial de temas de Silly Season expandido para 12 verticais temáticas (validado pela Persona Paddock Insider), estado histórico do Canon Ledger (armazenado em base NoSQL local embedded) e resultados do GP anterior.",
             "• Sorteio Balanceado de 4 entre 12 Verticais Temáticas (ver Seção 2.3 para catálogo completo):\n"
             "  1. Pacote Aerodinâmico | 2. Crise Contratual | 3. Clima de Garagem | 4. Guerra Psicológica\n"
             "  5. Teto de Gastos (Cost Cap) | 6. Pressão Comercial | 7. Confiabilidade de Motor | 8. Polêmicas Regulatórias\n"
             "  9. Desafio Biométrico/Clima | 10. Acerto de Pista | 11. Blindagem de Mídia | 12. Dilema de Desenvolvimento\n"
-            "• Publicação em Modo Híbrido: postagens automáticas agendadas ao longo da semana real OU avanço manual sob demanda via 'avancar dia' ou 'publicar semana completa'.\n"
-            "• O conteúdo destaca os bastidores das equipes de Felipe (Sauber), Davi (Williams) e Sarah (Mercedes).",
+            "• Cobertura Abrangente de TODAS as 10 Equipes do Grid: O roteiro abrange pilotos Reais (Felipe, Davi, Sarah) e pilotos NPCs de todo o grid (Red Bull, Ferrari, McLaren, Aston Martin, Alpine, Haas, VCARB).\n"
+            "• Publicação em Modo Híbrido: postagens automáticas agendadas ao longo da semana real OU avanço manual sob demanda via 'avancar dia' ou 'publicar semana completa'.",
             "Documento 01_semana_equipes.md + Teasers diários no Discord #repercussao-midia."
+        ),
+        (
+            "M1.5 — Dilema Interativo de Paddock (Interactive Storytelling)",
+            "Confronta os pilotos humanos com escolhas críticas de bastidores (técnicas, éticas ou contratuais) com consequências no Canon Ledger.",
+            "Quarta-feira da semana pré-etapa (após publicação do Dia 3 do M1) ou comando 'dilema etapa XX'.",
+            "Tema semanal sorteado no M1, perfil psicológico do piloto e histórico de rivalidades no Canon Ledger.",
+            "• Mecânica de Trava de Turno (Turn-Lock): O bot posta uma situação dramática no canal #geral marcando o piloto humano (ex: proposta secreta de equipe rival, escolha de asa experimental arriscada ou exigência de patrocinador).\n"
+            "• A máquina de estados bloqueia o avanço da semana até que o piloto tome sua decisão no chat.\n"
+            "• A escolha é gravada irreversivelmente no Canon Ledger e reverbera na Coletiva (M2) e na avaliação do Comitê de Lendas (M8).",
+            "Registro de consequência no Canon Ledger + Notificação de impacto de bastidores no Discord."
         ),
         (
             "M2 — Coletiva de Imprensa Oficial da FIA",
@@ -311,7 +321,7 @@ def build_specification_document():
         (
             "M5 — Relatório da Corrida (FIA Official Sporting Report)",
             "Documento master que audita a prova: classificação final, voltas percorridas, paradas nos boxes, compostos de pneus utilizados e incidentes com punições.",
-            "Bandeira quadriculada da corrida (Packet 8 FinalClassification recebido pelo listener UDP).",
+            "Bandeira quadriculada da corrida (Packet 8 FinalClassification recebido pelo listener UDP) OU ativação sob demanda via comando do bot Discord 'iniciar escuta f1'.",
             "Arquivo consolidado race_telemetry_merged.json sintetizado nativamente pelo listener UDP.",
             "• Verificação obrigatória do regulamento de pneus (mínimo de 2 compostos secos distintos utilizados em provas secas).\n• Consolidação de tempo total de corrida ou gap em relação ao líder.\n• Apuração de tempos de paradas nos boxes e voltas das trocas.\n• Registro formal das deliberações dos comissários (Stewards' Decisions).",
             "Documento 05_fia_corrida.md + Atualização do estado de corrida para disparo de M6 e M7."
@@ -424,6 +434,25 @@ def build_specification_document():
 
     doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
+    doc.add_heading("2.4. Diretrizes de Design & Experiência Visual do Portal F1 (Mobile-First & Editorial)", level=2)
+    doc.add_paragraph(
+        "O Portal Web do Showrunner (compilado por src/portal_builder.py e hospedado via GitHub Pages) constitui "
+        "a vitrine visual do campeonato. Para proporcionar uma experiência de leitura imersiva equivalente aos portais "
+        "oficiais da F1 e da FIA, a especificação estabelece os seguintes padrões de design e componentes:\n"
+        "1. Identidade Visual 'Paddock Dark Mode': Paleta corporativa dominada por Deep Slate (#0B131E), FIA Navy (#1B365D), "
+        "acentos em F1 Racing Red (#E10600) e tipografia limpa sem serifa (Inter/Titillium Web), garantindo alto contraste e leitura confortável em telas OLED.\n"
+        "2. Seletor de Temporadas e Etapas: Cabeçalho global com menu dropdown para alternância dinâmica entre temporadas (Temporada 2026, 2027...) "
+        "e um carrossel horizontal de etapas que indica visualmente o status (Concluída, Em Andamento ou Próxima).\n"
+        "3. Hub Editorial por Abas (M1 a M8): Cada Grande Prêmio apresenta uma visão em abas que agrupa a jornada completa da semana: "
+        "'Silly Season (M1)', 'Coletiva (M2)', 'Treino Livre (M3)', 'Grid (M4)', 'Corrida (M5)', 'Bastidores (M6)', 'Classificação (M7)' e 'Bancada de Lendas (M8)'.\n"
+        "4. Tabela de Classificação Responsiva: Em telas grandes exibe a tabela completa de 20 pilotos com deltas de posição (+1, -2, =), "
+        "badges de vitórias e pódios; em smartphones, converte-se automaticamente em cards verticais compactos destacando os 3 primeiros e os pilotos brasileiros.\n"
+        "5. Painel da Bancada de Lendas: Módulo visual em cards com foto/estilo de Alain Prost, Nigel Mansell e Jacques Villeneuve, "
+        "apresentando as notas de 0 a 10 e citações destacadas de cada lenda esportiva.\n"
+        "6. Infográfico de Estratégia de Pneus: Barra horizontal colorida representando as voltas de cada stint (Macio: Vermelho, Médio: Amarelo, Duro: Branco, Inter: Verde, Chuva: Azul) "
+        "e ícones com o tempo exato das paradas de box."
+    )
+
     doc.add_page_break()
 
     # =========================================================================
@@ -531,7 +560,7 @@ def build_specification_document():
         "armazenando o estado da conversação em data/state/discord_session_state.json."
     )
 
-    tbl_fsm = doc.add_table(rows=6, cols=3)
+    tbl_fsm = doc.add_table(rows=7, cols=3)
     tbl_fsm.alignment = WD_TABLE_ALIGNMENT.CENTER
     headers_fsm = ["Estado FSM", "Gatilho de Transição", "Ação Operacional Executada pelo Bot"]
     for j, h in enumerate(headers_fsm):
@@ -541,9 +570,10 @@ def build_specification_document():
     fsm_data = [
         ("IDLE", "Mensagem 'inicio da semana etapa XX'", "Valida número da etapa, cria diretório et_XX se inexistente e transita para SEMANA_ACTIVE."),
         ("SEMANA_ACTIVE", "Avanço de dia (Cron ou comando 'avancar dia')", "Gera o episódio diário via Gemini, publica teaser em #repercussao-midia e incrementa o dia."),
+        ("DILEMA_ACTIVE", "Quarta-feira pós-Dia 3 ou comando 'dilema etapa XX'", "Posta o dilema de paddock no #geral marcando o piloto real e entra em TURN_LOCKED."),
         ("PRESS_ACTIVE", "Comando 'coletiva etapa XX' ou fim do Dia 4", "Dispara convocação da coletiva, publica perguntas e transita para TURN_LOCKED."),
-        ("TURN_LOCKED", "Resposta do piloto humano convocado", "Captura declaração, salva no canon_ledger.json, publica próxima pergunta ou encerra coletiva."),
-        ("RACE_RECORDING", "Bandeira quadriculada (Packet 8 UDP)", "Executa flush() dos buffers de telemetria, atualiza standings.json e dispara M5 a M8."),
+        ("TURN_LOCKED", "Resposta do piloto humano convocado", "Captura declaração/escolha, salva no Canon Ledger NoSQL, publica próxima pergunta ou encerra turno."),
+        ("RACE_RECORDING", "Bandeira quadriculada OU comando 'iniciar escuta f1'", "Ativa escuta UDP 20777 em background; na bandeirada executa flush(), atualiza standings e dispara M5 a M8."),
     ]
     for idx_f, (es, gt, ao) in enumerate(fsm_data, start=1):
         r_f = tbl_fsm.rows[idx_f]
@@ -562,16 +592,41 @@ def build_specification_document():
         "RESILIÊNCIA DE REDE & RATE LIMITING"
     )
 
-    doc.add_heading("3.5. Arquitetura de Persistência Local: Transição de JSON para NoSQL Embedded", level=2)
+    doc.add_heading("3.5. Arquitetura NoSQL Local Unificada para Todos os Dados Gerados", level=2)
     doc.add_paragraph(
-        "Atualmente, o estado do campeonato (standings.json) e o histórico de fatos esportivos (canon_ledger.json) "
-        "residem em arquivos JSON atômicos no diretório data/state/. Embora simples e portável, a evolução da solução "
-        "comporta a adoção de uma base de dados NoSQL local embarcada (como TinyDB ou SQLite em modo Document Store), "
-        "oferecendo vantagens arquiteturais significativas sem violar a restrição CON-01 (100% On-Premise e custo zero):\n"
-        "1. Transações ACID Locais: Garante que gravações de pontuação ou deliberações de comissários não sofram corrupção caso o processo seja interrompido no meio de um flush.\n"
-        "2. Consultas Indexadas por Etapa: Permite filtrar eventos, declarações de pilotos ou históricos de punições por round_number sem carregar toda a massa histórica em memória.\n"
-        "3. Snapshot e Versionamento Automático: Facilita a criação de pontos de restauração antes de cada etapa, viabilizando operações seguras de rollback.\n"
-        "A implementação técnica adota o padrão de Repositório (Repository Pattern), isolando as camadas superiores da escolha entre JSON serializado ou banco NoSQL embarcado."
+        "Em conformidade com as diretrizes aprovadas de arquitetura, todos os dados persistentes gerados pelo Showrunner "
+        "(tabela do campeonato, livro-razão canônico, telemetria de voltas, atas de coletiva e relatórios dos comissários) "
+        "são organizados prioritariamente em uma base NoSQL local embutida (como TinyDB ou SQLite em modo Document Store):\n"
+        "1. Coleções Principais: 'seasons', 'standings', 'canon_events', 'race_telemetry', 'press_conferences' e 'driver_ratings'.\n"
+        "2. Transações ACID e Integridade Local: Atualizações de pontuação do campeonato e deliberações de comissários ocorrem "
+        "sob transação atômica, prevenindo corrupção em caso de encerramento abrupto do processo.\n"
+        "3. Zero Dependência de Servidores Externos: O banco NoSQL opera diretamente em arquivo local (ex: data/state/f1_simulator.db / tinydb.json), "
+        "preservando 100% da premissa de execução On-Premise e custo zero (CON-01 e CON-02)."
+    )
+
+    doc.add_heading("3.6. Arquitetura Multi-Temporada & Storytelling de Transferências", level=2)
+    doc.add_paragraph(
+        "A solução implementa governança nativa para suporte a múltiplas temporadas consecutivas (Temporada 2026, 2027, etc.):\n"
+        "1. Particionamento por Temporada: Todos os registros possuem a chave canônica 'season_id'. Ao término de uma temporada, "
+        "o comando administrativo 'iniciar nova temporada' consolida o Hall da Fama no banco NoSQL, zera as pontuações e gera "
+        "o calendário da nova edição sem afetar a integridade histórica dos anos anteriores.\n"
+        "2. Configuração Parametrizada de Pilotos e Equipes: No início de cada temporada, um arquivo declarativo "
+        "(ex: season_setup.json ou coleção 'season_grid') define a distribuição de pilotos Reais (Felipe, Davi, Sarah) e NPCs entre as 10 escuderias.\n"
+        "3. Detecção Automática de Mudança de Equipe & Storytelling: O motor compara o grid da nova etapa/temporada com a etapa anterior. "
+        "Se houver alteração de assento de qualquer piloto (Real ou NPC), o módulo aciona automaticamente uma narrativa especial de "
+        "'Dança das Cadeiras / Anúncio de Transferência' no M1, gerando comunicados oficiais de imprensa, reações dos chefes de equipe rivais "
+        "e expectativas de adaptação ao novo cockpit."
+    )
+
+    doc.add_heading("3.7. Gerenciamento do Listener UDP via ChatOps Discord", level=2)
+    doc.add_paragraph(
+        "Para dispensar a necessidade de inicializar scripts manualmente via terminal antes de cada corrida, o bot do Discord "
+        "passa a gerenciar o ciclo de vida do listener UDP como um subprocesso em background:\n"
+        "1. Comando 'iniciar escuta f1' (ou 'escutar corrida'): O bot inicia o listener na porta 20777, grava o PID do processo em "
+        "data/state/listener.pid e responde no canal com uma confirmação formal: '📡 Listener UDP F1 24 ativo na porta 20777! Aguardando o simulador...'.\n"
+        "2. Comando 'status telemetria': Retorna o status de conexão, número de pacotes recebidos e pilotos detectados no grid em tempo real.\n"
+        "3. Finalização Automática: Ao receber o Packet 8 (FinalClassification) e concluir o flush dos relatórios pós-corrida, o listener "
+        "notifica o Discord e encerra o socket de forma graciosa."
     )
 
     doc.add_page_break()
@@ -647,6 +702,39 @@ def build_specification_document():
             "E reverter a tabela standings.json para o snapshot exato da Etapa 10\n"
             "E preservar intactos os dados de Silly Season (M1) e Coletiva (M2)\n"
             "E notificar o canal com o status 'Rollback de sessão executado com sucesso. Etapa pronta para nova tomada de pista'."
+        ),
+        (
+            "Cenário 6: Dilema Interativo de Paddock no M1.5 com Trava de Turno",
+            "Funcionalidade: Decisão Estratégica do Piloto com Consequência Canônica (M1.5)\n"
+            "Dado que o M1 da Etapa 11 avançou para o Dia 3 e o tema 'Crise Contratual & Mercado' foi sorteado\n"
+            "Quando a rotina de M1.5 for disparada\n"
+            "Então o bot deve postar no canal #geral um dilema de bastidores marcando o piloto @Felipe\n"
+            "E apresentar a situação: 'A Audi fez uma oferta sigilosa para liderar o projeto de fábrica em 2027, mas exige lealdade imediata'\n"
+            "E o bot deve travar o avanço semanal com status 'TURN_LOCKED'\n"
+            "E quando Felipe responder no chat com sua decisão\n"
+            "Então o sistema deve registrar a escolha e as repercussões no Canon Ledger NoSQL\n"
+            "E destravar a máquina de estados para liberar a Coletiva de Imprensa (M2)."
+        ),
+        (
+            "Cenário 7: Inicialização do Listener UDP via ChatOps no Discord",
+            "Funcionalidade: Ativação Remota da Escuta de Telemetria F1 24\n"
+            "Dado que os pilotos estão se reunindo no lobby multiplayer do simulador\n"
+            "Quando o operador enviar o comando 'iniciar escuta f1' no canal #geral\n"
+            "Então o bot deve inicializar o processo udp_relay na porta 20777 em background\n"
+            "E registrar o PID do processo em data/state/listener.pid\n"
+            "E postar no canal a mensagem '📡 Listener UDP F1 24 ativado com sucesso na porta 20777! Aguardando telemetria do simulador...'\n"
+            "E transitar o estado da FSM para 'RACE_RECORDING'."
+        ),
+        (
+            "Cenário 8: Transição de Temporada e Storytelling de Mudança de Equipe",
+            "Funcionalidade: Governança Multi-Temporada e Dança das Cadeiras\n"
+            "Dado que a Temporada 2026 foi concluída e o comando 'iniciar nova temporada 2027' foi executado\n"
+            "E que no arquivo de configuração do novo grid Davi foi transferido da Williams para a Ferrari\n"
+            "Quando a rotina de inicialização de temporada processar o grid_registry\n"
+            "Então o sistema deve detectar o delta de equipe para o piloto Davi\n"
+            "E acionar o módulo de storytelling de transferências da Silly Season\n"
+            "E gerar um comunicado oficial de imprensa narrando a chegada do 'Leão de Grove' a Maranello\n"
+            "E inicializar a tabela de classificação de 2027 zerada na coleção 'standings_2027' do NoSQL local."
         ),
     ]
 
