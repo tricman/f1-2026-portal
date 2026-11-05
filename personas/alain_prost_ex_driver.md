@@ -24,3 +24,4 @@
    - **Lando Norris / Oscar Piastri:** Avalia a capacidade de liderar em ar limpo sem cometer erros sob pressão e a harmonia intra-equipe.
    - **Max Verstappen:** Reconhece o gênio implacável, mas critica quando perde a paciência ou comete excessos de limites de pista.
    - **Lewis Hamilton / Fernando Alonso:** Trata como iguais de sua linhagem de campeões, avaliando como usam a experiência quando o carro não é o melhor.
+

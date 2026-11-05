@@ -20,6 +20,32 @@ from src.canon_ledger import CanonLedgerManager, sample_weekly_themes
 from src.logger import log_text
 from src.portal_builder import ROUND_METADATA
 
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
+
+def load_dotenv_if_present() -> None:
+    env_path = ROOT_DIR / ".env"
+    if not env_path.exists():
+        return
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        k, v = line.split("=", 1)
+        k = k.strip()
+        v = v.strip()
+        if v.startswith('"'):
+            end_q = v.find('"', 1)
+            v = v[1:end_q] if end_q != -1 else v.strip('"')
+        elif v.startswith("'"):
+            end_q = v.find("'", 1)
+            v = v[1:end_q] if end_q != -1 else v.strip("'")
+        else:
+            v = v.split("#")[0].strip()
+        if k not in os.environ:
+            os.environ[k] = v
+
+
 GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
 FALLBACK_FLASH_MODELS = [
     "gemini-flash-lite-latest",
@@ -42,6 +68,7 @@ class GeminiFreeTierClient:
         pro_model: str = "gemini-3.1-pro-preview",
         pacing_seconds: float = 32.0,
     ) -> None:
+        load_dotenv_if_present()
         self.api_key = (api_key or os.environ.get("GEMINI_API_KEY", "")).strip()
         self.flash_model = flash_model
         self.pro_model = pro_model

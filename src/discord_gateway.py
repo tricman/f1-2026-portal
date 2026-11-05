@@ -10,6 +10,32 @@ from typing import List, Dict, Any, Optional, Tuple
 from src.table_renderer import transform_markdown_tables_for_discord
 from src.portal_builder import ROUND_METADATA
 
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
+
+def load_dotenv_if_present() -> None:
+    env_path = ROOT_DIR / ".env"
+    if not env_path.exists():
+        return
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        k, v = line.split("=", 1)
+        k = k.strip()
+        v = v.strip()
+        if v.startswith('"'):
+            end_q = v.find('"', 1)
+            v = v[1:end_q] if end_q != -1 else v.strip('"')
+        elif v.startswith("'"):
+            end_q = v.find("'", 1)
+            v = v[1:end_q] if end_q != -1 else v.strip("'")
+        else:
+            v = v.split("#")[0].strip()
+        if k not in os.environ:
+            os.environ[k] = v
+
+
 DISCORD_GUILD_ID = "1457392707604578460"
 DISCORD_VOICE_INGEST_CHANNEL_ID = "1457392708355096580"
 DISCORD_MEDIA_PUBLISH_CHANNEL_ID = "1536416375969685524"
@@ -153,6 +179,7 @@ class DiscordGatewayClient:
         ingest_channel_id: str = DISCORD_VOICE_INGEST_CHANNEL_ID,
         publish_channel_id: str = DISCORD_MEDIA_PUBLISH_CHANNEL_ID,
     ):
+        load_dotenv_if_present()
         self.bot_token = bot_token or os.environ.get("DISCORD_BOT_TOKEN")
         self.webhook_url = webhook_url or os.environ.get("DISCORD_WEBHOOK_URL")
         self.guild_id = guild_id
