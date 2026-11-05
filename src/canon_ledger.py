@@ -4,12 +4,18 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 
 SILLY_SEASON_THEMES = [
-    "Glamour & Celebridades: Festas VIP (iates, galas de luxo, estreias), parcerias com grifes e flagras com astros pop/cinema.",
-    "Silly Season & Crise Contratual: Reuniões sigilosas em motorhomes fechados, empresários negociando multas rescisórias e sondagens rivais.",
-    "Treta & Vestiário: Encontros tensos ou alianças improváveis em restaurantes, discussões vazadas por garçons ou comissários de bordo.",
-    "Marketing & Mico Corporativo: Ações promocionais constrangedoras de patrocinadores, vídeos de TikTok recusados ou gravados a contragosto.",
-    "Entrevista Surpresa / Flagra de Tabloid: Microfone ambiente indiscreto captando desabafo técnico, fotos de paparazzi ou vazamento de mensagens.",
-    "Preparação & Simulador: Comparações ácidas de telemetria na fábrica, turnos triplos no simulador e reflexo das disputas online na garagem.",
+    "T01 — Pacote Aerodinâmico & Peças Novas: Peças novas de túnel de vento (assoalhos, asas, sidepods) e o drama da correlação entre simulação em fábrica e dados reais de pista.",
+    "T02 — Crise Contratual & Mercado de Pilotos: Boatos de transferências para a temporada seguinte, cláusulas de desempenho, pré-contratos e pressão de jovens da academia ou pilotos reservas.",
+    "T03 — Clima de Garagem & Conflito Interno: Divergência entre companheiros de equipe, cobranças contundentes dos chefes (Toto Wolff, James Vowles, Mattia Binotto) e prioridade de peças novas.",
+    "T04 — Guerra Psicológica & Provocações: Farpas trocadas em coletivas passadas, declarações sobre estilo de pilotagem agressivo e jogos mentais para desestabilizar adversários diretos.",
+    "T05 — Teto de Gastos (Cost Cap) & Danos Financeiros: O peso orçamentário de acidentes e quebras nas etapas anteriores, impondo o dilema de reparar peças ou congelar o desenvolvimento do carro.",
+    "T06 — Pressão Comercial & Patrocinadores: Exigências de patrocinadores master, pinturas especiais (special liveries), ativações de RP exaustivas roubando horas de sono dos pilotos.",
+    "T07 — Confiabilidade de Motor & Punições de Grid: Desgaste de componentes da unidade de potência (ICE, Turbo, MGU-K) atingindo o limite regulamentar e o dilema de trocar motor e largar no fundo do grid.",
+    "T08 — Polêmicas Regulatórias & Protestos na FIA: Esclarecimentos técnicos exigidos à FIA sobre flexibilidade de asas (flexi-wings), truques de refrigeração e suspeitas mútuas entre equipes.",
+    "T09 — Desafio Biométrico & Clima Extremo: Previsão de calor sufocante, altitude rarefeita, desidratação severa ou chuva torrencial exigindo preparação cardiovascular no limite.",
+    "T10 — Acerto de Pista & Tradição do GP: O compromisso clássico entre velocidade de reta e downforce para o traçado específico, histórico dos pilotos na pista e armadilhas de zebras.",
+    "T11 — Blindagem de Mídia & Estratégia de Spin: Gerenciamento de crises pessoais, controle de danos contra manchetes caça-cliques de tablóides e vazamento estratégico de informações.",
+    "T12 — Dilema de Foco (Ano Atual vs. Temporada Seguinte): A decisão da cúpula da equipe de encerrar o desenvolvimento do carro atual para investir tudo no projeto do ano que vem, frustrando os pilotos titulares.",
 ]
 
 

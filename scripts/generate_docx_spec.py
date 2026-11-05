@@ -275,14 +275,11 @@ def build_specification_document():
             "M1 — Semana das Equipes (Silly Season & Bastidores)",
             "Gera a narrativa de desenvolvimento, crises de motorhome, rumores de mercado de pilotos e intrigas entre equipes de Segunda a Quinta-feira.",
             "Comando 'inicio da semana etapa XX' ou disparo programado (Cron).",
-            "Catálogo oficial de temas de Silly Season (6 verticais temáticas), estado histórico do Canon Ledger (armazenado em data/state/canon_ledger.json com suporte a NoSQL local embedded) e resultados do GP anterior.",
-            "• Catálogo dos 6 Temas Semanais da Silly Season:\n"
-            "  1. Pacote Aerodinâmico & Correlação: novidades de túnel de vento, assoalhos e asas trazidas para o GP.\n"
-            "  2. Crise Contratual & Mercado: boatos de renovação, cláusulas de desempenho e pressão de pilotos reservas.\n"
-            "  3. Clima de Garagem & Conflito Interno: cobranças da chefia (Toto Wolff, James Vowles, Mattia Binotto/Alunni Bravi) e tensão entre companheiros.\n"
-            "  4. Guerra Psicológica & Paddock: farpas na mídia entre rivais diretos e reclamações de limites de pista passados.\n"
-            "  5. Teto de Gastos (Cost Cap) & Danos Financeiros: impacto financeiro de batidas e quebras mecânicas em etapas anteriores.\n"
-            "  6. Pressão Comercial & Patrocinadores: ativações de marketing locais e pressão corporativa por resultados.\n"
+            "Catálogo oficial de temas de Silly Season expandido para 12 verticais temáticas (validado pela Persona Paddock Insider), estado histórico do Canon Ledger (armazenado em data/state/canon_ledger.json com suporte a NoSQL local embedded) e resultados do GP anterior.",
+            "• Sorteio Balanceado de 4 entre 12 Verticais Temáticas (ver Seção 2.3 para catálogo completo):\n"
+            "  1. Pacote Aerodinâmico | 2. Crise Contratual | 3. Clima de Garagem | 4. Guerra Psicológica\n"
+            "  5. Teto de Gastos (Cost Cap) | 6. Pressão Comercial | 7. Confiabilidade de Motor | 8. Polêmicas Regulatórias\n"
+            "  9. Desafio Biométrico/Clima | 10. Acerto de Pista | 11. Blindagem de Mídia | 12. Dilema de Desenvolvimento\n"
             "• Publicação em Modo Híbrido: postagens automáticas agendadas ao longo da semana real OU avanço manual sob demanda via 'avancar dia' ou 'publicar semana completa'.\n"
             "• O conteúdo destaca os bastidores das equipes de Felipe (Sauber), Davi (Williams) e Sarah (Mercedes).",
             "Documento 01_semana_equipes.md + Teasers diários no Discord #repercussao-midia."
@@ -384,6 +381,48 @@ def build_specification_document():
         "livremente pelo modelo de linguagem. O LLM atua sob contratos de dados rígidos gerados pelo núcleo em Python.",
         "PRINCÍPIO DE CONFORMIDADE DETERMINÍSTICA"
     )
+
+    doc.add_heading("2.3. Catálogo Canônico de Verticais Temáticas da Silly Season (12 Verticais de Paddock)", level=2)
+    doc.add_paragraph(
+        "Desenvolvido sob a consultoria da persona especialista em paddock e jornalismo técnico de F1, "
+        "o catálogo de narrativas do Módulo M1 expande a cobertura da Silly Season para 12 verticais temáticas exclusivas. "
+        "A cada etapa, o algoritmo de amostragem sorteia 4 destas verticais para distribuir entre segunda e quinta-feira, "
+        "cruzando com os dados do Canon Ledger para resgatar pendências anteriores:"
+    )
+
+    tbl_thm = doc.add_table(rows=13, cols=3)
+    tbl_thm.alignment = WD_TABLE_ALIGNMENT.CENTER
+    headers_thm = ["ID & Vertical Temática", "Dimensão / Enfoque", "Descrição Operacional & Impacto no RPG"]
+    for j, h in enumerate(headers_thm):
+        tbl_thm.rows[0].cells[j].text = h
+    style_table_header(tbl_thm.rows[0], [Inches(2.1), Inches(1.5), Inches(3.1)])
+
+    thm_data = [
+        ("T01: Pacote Aerodinâmico & Correlação", "Técnica / Engenharia", "Peças novas de túnel de vento (assoalhos, asas, sidepods) e o drama da correlação entre simulação em fábrica e dados reais de pista."),
+        ("T02: Crise Contratual & Mercado", "Política / Negócios", "Boatos de transferências para a temporada seguinte, cláusulas de desempenho, pré-contratos e pressão de jovens da academia ou pilotos reservas."),
+        ("T03: Clima de Garagem & Conflito Interno", "Relações Humanas", "Divergência entre companheiros de equipe, cobranças contundentes dos chefes (Toto Wolff, James Vowles, Mattia Binotto) e prioridade de peças novas."),
+        ("T04: Guerra Psicológica & Provocações", "Mídia / Paddock", "Farpas trocadas em coletivas passadas, declarações sobre estilo de pilotagem agressivo e jogos mentais para desestabilizar adversários diretos."),
+        ("T05: Teto de Gastos (Cost Cap) & Danos", "Financeira / Regulamentar", "O peso orçamentário de acidentes e quebras nas etapas anteriores, impondo o dilema de reparar peças ou congelar o desenvolvimento do carro."),
+        ("T06: Pressão Comercial & Patrocinadores", "Corporativa / Marketing", "Exigências de patrocinadores master, pinturas especiais (special liveries), ativações de RP exaustivas roubando horas de sono dos pilotos."),
+        ("T07: Confiabilidade de Motor & Punições", "Mecânica / Penalidades", "Desgaste de componentes da unidade de potência (ICE, Turbo, MGU-K) atingindo o limite regulamentar e o dilema de trocar motor e largar no fundo do grid."),
+        ("T08: Polêmicas Regulatórias & Protestos", "Compliance / FIA", "Esclarecimentos técnicos exigidos à FIA sobre flexibilidade de asas (flexi-wings), truques de refrigeração e suspeitas mútuas entre equipes."),
+        ("T09: Desafio Biométrico & Clima Extremo", "Fisiologia / Ambiente", "Previsão de calor sufocante, altitude rarefeita, desidratação severa ou chuva torrencial exigindo preparação cardiovascular no limite."),
+        ("T10: Acerto de Pista & Tradição do GP", "História / Pilotagem", "O compromisso clássico entre velocidade de reta e downforce para o traçado específico, histórico dos pilotos na pista e armadilhas de zebras."),
+        ("T11: Blindagem de Mídia & Estratégia de Spin", "Assessoria de Imprensa", "Gerenciamento de crises pessoais, controle de danos contra manchetes caça-cliques de tablóides e vazamento estratégico de informações."),
+        ("T12: Dilema de Foco: Ano Atual vs. Seguinte", "Estratégia de Longo Prazo", "A decisão da cúpula da equipe de encerrar o desenvolvimento do carro atual para investir tudo no projeto do ano que vem, frustrando os pilotos titulares."),
+    ]
+    for idx_t, (tid, dim, dsc) in enumerate(thm_data, start=1):
+        r_t = tbl_thm.rows[idx_t]
+        r_t.cells[0].text = tid
+        r_t.cells[0].paragraphs[0].runs[0].bold = True
+        r_t.cells[0].paragraphs[0].runs[0].font.size = Pt(8.5)
+        r_t.cells[1].text = dim
+        r_t.cells[1].paragraphs[0].runs[0].font.size = Pt(8.5)
+        r_t.cells[2].text = dsc
+        r_t.cells[2].paragraphs[0].runs[0].font.size = Pt(8.5)
+        style_table_row(r_t, is_even=(idx_t % 2 == 0), col_widths=[Inches(2.1), Inches(1.5), Inches(3.1)])
+
+    doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
     doc.add_page_break()
 
