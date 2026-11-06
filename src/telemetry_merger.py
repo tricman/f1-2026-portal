@@ -3,6 +3,8 @@ import re
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 from src.models import LapRecord, PitStopEvent, StewardIncident, DriverRaceResult
+from src.logger import trace
+from src.tracer import trace_span
 
 DRIVER_ID_MAP = {
     "sarahmarinss": ("sarah", "Sarah (SarahMarinsS)", 24, "Mercedes-AMG Petronas"),
@@ -105,12 +107,24 @@ def parse_pacedex_laps_csv(csv_path: Path) -> List[LapRecord]:
     return records
 
 
+@trace_span("parse_free_practice_summary")
 def parse_free_practice_summary(summary_csv: Path, laps_csv: Path) -> Dict[str, Any]:
     laps = parse_pacedex_laps_csv(laps_csv)
     by_driver: Dict[str, List[LapRecord]] = {}
     for rec in laps:
         d_id, _, _, _ = normalize_driver(rec.driver)
         by_driver.setdefault(d_id, []).append(rec)
+
+    trace(
+        f"Lendo telemetria TL: {len(laps)} voltas carregadas de {len(by_driver)} pilotos",
+        event="TELEMETRY_FP_PARSE",
+        details={
+            "summary_csv": str(summary_csv),
+            "laps_csv": str(laps_csv),
+            "total_laps": len(laps),
+            "drivers_count": len(by_driver),
+        },
+    )
 
     classification = []
     leader_ms: Optional[int] = None
@@ -158,6 +172,7 @@ def parse_free_practice_summary(summary_csv: Path, laps_csv: Path) -> Dict[str, 
     }
 
 
+@trace_span("merge_race_telemetry")
 def merge_race_telemetry(
     summary_csv: Path,
     laps_csv: Path,
@@ -167,6 +182,15 @@ def merge_race_telemetry(
     Merge PaceDex Race Summary + PaceDex Lap-by-Lap CSV + TV Screen Overlay Data
     (Grid, Total Time / Gaps, Pit Stop Durations, Stewards Incidents).
     """
+    trace(
+        f"Iniciando fusao PaceDex + TV Overlay para {summary_csv.name}",
+        event="TELEMETRY_MERGE_START",
+        details={
+            "summary_csv": str(summary_csv),
+            "laps_csv": str(laps_csv),
+            "has_tv_overlay": bool(tv_overlay_data),
+        },
+    )
     laps = parse_pacedex_laps_csv(laps_csv)
     by_driver: Dict[str, List[LapRecord]] = {}
     for rec in laps:

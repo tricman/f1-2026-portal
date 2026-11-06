@@ -12,6 +12,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from src.repositories.base_repository import IDataRepository
+from src.logger import trace
+from src.tracer import trace_span
 
 
 class SqliteDocumentRepository(IDataRepository):
@@ -117,17 +119,41 @@ class SqliteDocumentRepository(IDataRepository):
     # --------------------------------------------------------------------------
     # Generic Document CRUD
     # --------------------------------------------------------------------------
+    @trace_span("sqlite_save_document")
     def save_document(self, collection: str, doc_id: str, data: Dict[str, Any]) -> None:
+        t0 = time.perf_counter()
         with self._get_connection() as conn:
             self._upsert_doc(conn, collection, doc_id, data)
             conn.commit()
+        duration_ms = round((time.perf_counter() - t0) * 1000, 2)
+        trace(
+            f"SQLite UPSERT doc [{collection}/{doc_id}] em {duration_ms}ms",
+            event="SQLITE_SAVE_DOC",
+            collection=collection,
+            doc_id=doc_id,
+            duration_ms=duration_ms,
+        )
 
+    @trace_span("sqlite_get_document")
     def get_document(self, collection: str, doc_id: str) -> Optional[Dict[str, Any]]:
-        return self._get_doc(collection, doc_id)
+        t0 = time.perf_counter()
+        doc = self._get_doc(collection, doc_id)
+        duration_ms = round((time.perf_counter() - t0) * 1000, 2)
+        trace(
+            f"SQLite SELECT doc [{collection}/{doc_id}]: {'HIT' if doc else 'MISS'} em {duration_ms}ms",
+            event="SQLITE_GET_DOC",
+            collection=collection,
+            doc_id=doc_id,
+            duration_ms=duration_ms,
+            hit=bool(doc),
+        )
+        return doc
 
+    @trace_span("sqlite_find_documents")
     def find_documents(
         self, collection: str, filter_dict: Optional[Dict[str, Any]] = None
     ) -> List[Dict[str, Any]]:
+        t0 = time.perf_counter()
         with self._get_connection() as conn:
             cur = conn.execute(
                 "SELECT doc_id, data FROM collections WHERE collection_name = ?",
@@ -144,16 +170,36 @@ class SqliteDocumentRepository(IDataRepository):
                 doc_with_meta = dict(doc)
                 doc_with_meta["doc_id"] = doc_id
                 results.append(doc_with_meta)
+            duration_ms = round((time.perf_counter() - t0) * 1000, 2)
+            trace(
+                f"SQLite FIND in [{collection}]: {len(results)} docs encontrados em {duration_ms}ms",
+                event="SQLITE_FIND_DOCS",
+                collection=collection,
+                duration_ms=duration_ms,
+                count=len(results),
+            )
             return results
 
+    @trace_span("sqlite_delete_document")
     def delete_document(self, collection: str, doc_id: str) -> bool:
+        t0 = time.perf_counter()
         with self._get_connection() as conn:
             cur = conn.execute(
                 "DELETE FROM collections WHERE collection_name = ? AND doc_id = ?",
                 (collection, doc_id),
             )
             conn.commit()
-            return cur.rowcount > 0
+            duration_ms = round((time.perf_counter() - t0) * 1000, 2)
+            deleted = cur.rowcount > 0
+            trace(
+                f"SQLite DELETE [{collection}/{doc_id}]: {'DELETED' if deleted else 'NOT_FOUND'} em {duration_ms}ms",
+                event="SQLITE_DELETE_DOC",
+                collection=collection,
+                doc_id=doc_id,
+                duration_ms=duration_ms,
+                deleted=deleted,
+            )
+            return deleted
 
     # --------------------------------------------------------------------------
     # 1. Canon Ledger

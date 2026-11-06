@@ -3,7 +3,11 @@ import json
 from pathlib import Path
 from typing import Dict, Any, List
 
+from src.logger import trace
+from src.tracer import trace_span
 
+
+@trace_span("update_championship_standings")
 def update_championship_standings(
     previous_standings: Dict[str, Any],
     race_merged: Dict[str, Any],
@@ -101,5 +105,17 @@ def update_championship_standings(
 
     state["last_completed_round"] = round_number
     state["last_completed_gp"] = gp_name
+
+    top3 = [{"pos": d["pos"], "id": d["id"], "pts": d["points"], "delta": d["pos_delta"]} for d in state["drivers_standings"][:3]]
+    trace(
+        f"Tabela FIA atualizada para Etapa {round_number} ({gp_name})",
+        event="FIA_STANDINGS_COMPUTED",
+        round_num=round_number,
+        details={
+            "gp_name": gp_name,
+            "top_3_drivers": top3,
+            "leader_constructor": state["constructors_standings"][0]["team_id"],
+        },
+    )
     return state
 

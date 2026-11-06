@@ -17,9 +17,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from src.canon_ledger import CanonLedgerManager, sample_weekly_themes
-from src.logger import log_text
+from src.logger import log_text, trace
 from src.portal_builder import ROUND_METADATA
 from src.season_manager import get_season_dir, get_current_season_id
+from src.tracer import trace_span
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
@@ -76,6 +77,7 @@ class GeminiFreeTierClient:
         self.pacing_seconds = pacing_seconds
         self._last_pro_call_ts: float = 0.0
 
+    @trace_span("gemini_generate_content")
     def _call_generate_content(
         self,
         model: str,
@@ -118,6 +120,20 @@ class GeminiFreeTierClient:
             active_model = models_to_try[min(attempt, len(models_to_try) - 1)]
             active_url = f"{GEMINI_API_BASE}/{active_model}:generateContent?key={self.api_key}"
             log_text(f"🤖 [GEMINI REQUEST] Modelo: {active_model} | Payload: {chars_in:,} bytes (~{chars_in // 4:,} tokens) | Tentativa {attempt + 1}/{total_attempts}")
+            trace(
+                f"Disparando chamada Gemini ({active_model})",
+                event="LLM_DISPATCH",
+                model=active_model,
+                details={
+                    "payload_bytes": chars_in,
+                    "estimated_tokens": chars_in // 4,
+                    "temperature": temperature,
+                    "attempt": attempt + 1,
+                    "max_attempts": total_attempts,
+                    "system_instruction_len": len(system_instruction) if system_instruction else 0,
+                    "prompt_preview": str(parts)[:400],
+                },
+            )
             req = urllib.request.Request(active_url, data=body_bytes, headers=headers, method="POST")
             try:
                 with urllib.request.urlopen(req, timeout=45) as resp:
@@ -130,10 +146,30 @@ class GeminiFreeTierClient:
                     content_parts = candidates[0].get("content", {}).get("parts", [])
                     result_text = "".join(p.get("text", "") for p in content_parts)
                     elapsed = time.time() - t_start
+                    duration_ms = round(elapsed * 1000, 2)
                     log_text(f"✨ [GEMINI RESPONSE] 200 OK ({active_model}) em {elapsed:.2f}s | Gerados: {len(result_text):,} chars")
+                    trace(
+                        f"Resposta recebida Gemini ({active_model}) em {elapsed:.2f}s",
+                        event="LLM_RESPONSE",
+                        model=active_model,
+                        duration_ms=duration_ms,
+                        details={
+                            "output_chars": len(result_text),
+                            "estimated_output_tokens": len(result_text) // 4,
+                            "candidates_count": len(candidates),
+                            "output_preview": result_text[:400],
+                        },
+                    )
                     return result_text
             except urllib.error.HTTPError as exc:
                 err_body = exc.read().decode("utf-8", errors="replace")
+                trace(
+                    f"Erro HTTP {exc.code} ao chamar Gemini ({active_model})",
+                    event="LLM_HTTP_ERROR",
+                    model=active_model,
+                    details={"http_code": exc.code, "error_body": err_body[:500]},
+                    exc=exc,
+                )
                 if exc.code in (429, 500, 502, 503, 504) and attempt < total_attempts - 1:
                     next_model = models_to_try[min(attempt + 1, len(models_to_try) - 1)]
                     wait_time = 4.0 * (attempt + 1) if exc.code != 429 else 12.0 * (attempt + 1)
@@ -145,6 +181,12 @@ class GeminiFreeTierClient:
                     continue
                 raise RuntimeError(f"Gemini API HTTP {exc.code} ({active_model}): {err_body}") from exc
             except (urllib.error.URLError, TimeoutError, OSError) as exc:
+                trace(
+                    f"Timeout/Rede ao chamar Gemini ({active_model}): {exc}",
+                    event="LLM_NETWORK_ERROR",
+                    model=active_model,
+                    exc=exc,
+                )
                 if attempt < total_attempts - 1:
                     next_model = models_to_try[min(attempt + 1, len(models_to_try) - 1)]
                     log_text(
@@ -309,6 +351,7 @@ def assemble_storytelling_context(root_dir: Path, round_num: int, round_folder: 
     return "\n\n".join(sections)
 
 
+@trace_span("finalize_round_transition")
 def finalize_round_transition(
     root_dir: Path,
     round_num: int,
@@ -372,6 +415,7 @@ def finalize_round_transition(
     }
 
 
+@trace_span("generate_post_race_modules")
 def generate_post_race_modules(
     root_dir: Path,
     round_num: int,
@@ -586,6 +630,7 @@ def generate_pre_race_m1(
     return target_file
 
 
+@trace_span("generate_m1_daily_episode")
 def generate_m1_daily_episode(
     root_dir: Path,
     round_num: int,
@@ -796,6 +841,7 @@ DRIVER_SETUP_MAP: Dict[str, Tuple[str, str, str, str, str]] = {
 }
 
 
+@trace_span("generate_paddock_dilemma")
 def generate_paddock_dilemma(
     root_dir: Path,
     round_num: int,
@@ -888,6 +934,7 @@ def generate_paddock_dilemma(
     return state_data
 
 
+@trace_span("resolve_paddock_dilemma")
 def resolve_paddock_dilemma(
     root_dir: Path,
     round_num: int,

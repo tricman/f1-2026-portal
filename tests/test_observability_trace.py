@@ -206,6 +206,117 @@ class TestObservabilityTraceEngine(unittest.TestCase):
         self.assertGreaterEqual(purge_res["deleted_files_count"], 1)
         self.assertFalse(f3.exists())
 
+    def test_sqlite_layer_instrumentation(self):
+        set_log_level("TRACE")
+        from src.repositories.sqlite_document_repository import SqliteDocumentRepository
+        db = SqliteDocumentRepository(root_dir=self.temp_logs_dir, db_path=self.temp_logs_dir / "test.db")
+
+        db.save_document("test_col", "doc_1", {"name": "Audit Test"})
+        doc = db.get_document("test_col", "doc_1")
+        self.assertIsNotNone(doc)
+        docs = db.find_documents("test_col", {"name": "Audit Test"})
+        self.assertEqual(len(docs), 1)
+        deleted = db.delete_document("test_col", "doc_1")
+        self.assertTrue(deleted)
+
+        trace_file = self.temp_logs_dir / "trace.log"
+        lines = [json.loads(l) for l in trace_file.read_text(encoding="utf-8").strip().split("\n")]
+        events = [l.get("event") for l in lines]
+        self.assertIn("SQLITE_SAVE_DOC", events)
+        self.assertIn("SQLITE_GET_DOC", events)
+        self.assertIn("SQLITE_FIND_DOCS", events)
+        self.assertIn("SQLITE_DELETE_DOC", events)
+
+    @patch("urllib.request.urlopen")
+    def test_gemini_layer_instrumentation(self, mock_urlopen):
+        set_log_level("TRACE")
+        from src.ai_showrunner import GeminiFreeTierClient
+
+        # Setup mock response
+        mock_resp = mock_urlopen.return_value.__enter__.return_value
+        mock_resp.read.return_value = json.dumps({
+            "candidates": [{
+                "content": {"parts": [{"text": "Texto gerado em teste de observabilidade"}]}
+            }]
+        }).encode("utf-8")
+
+        client = GeminiFreeTierClient(api_key="fake_test_key_gemini")
+        res = client._call_generate_content(
+            model="gemini-flash-test",
+            parts=[{"text": "Escreva um resumo de TL"}],
+        )
+        self.assertIn("Texto gerado em teste", res)
+
+        trace_file = self.temp_logs_dir / "trace.log"
+        lines = [json.loads(l) for l in trace_file.read_text(encoding="utf-8").strip().split("\n")]
+        events = [l.get("event") for l in lines]
+        self.assertIn("LLM_DISPATCH", events)
+        self.assertIn("LLM_RESPONSE", events)
+
+        span_names = [l.get("span_name") for l in lines]
+        self.assertIn("gemini_generate_content", span_names)
+
+    @patch("urllib.request.urlopen")
+    def test_discord_layer_instrumentation(self, mock_urlopen):
+        set_log_level("TRACE")
+        from src.discord_gateway import DiscordGatewayClient
+
+        mock_resp = mock_urlopen.return_value.__enter__.return_value
+        mock_resp.status = 200
+        mock_resp.read.return_value = json.dumps({"id": "msg_9999", "content": "Ok"}).encode("utf-8")
+
+        gw = DiscordGatewayClient()
+        gw.bot_token = "fake_token_discord"
+        res = gw._request_with_backoff("https://discord.com/api/v10/channels/123/messages", method="POST", payload={"content": "Oi"})
+        self.assertEqual(res.get("id"), "msg_9999")
+
+        trace_file = self.temp_logs_dir / "trace.log"
+        lines = [json.loads(l) for l in trace_file.read_text(encoding="utf-8").strip().split("\n")]
+        events = [l.get("event") for l in lines]
+        self.assertIn("DISCORD_HTTP_REQUEST", events)
+        self.assertIn("DISCORD_HTTP_RESPONSE", events)
+
+    def test_fia_calculator_layer_instrumentation(self):
+        set_log_level("TRACE")
+        from src.fia_calculator import update_championship_standings
+
+        sample_prev = {
+            "last_completed_round": 0,
+            "last_completed_gp": "Inicio",
+            "drivers_standings": [
+                {
+                    "pos": 1, "id": "sarah", "name": "Sarah", "points": 0, "wins": 0,
+                    "podiums": 0, "poles": 0, "fastest_laps": 0, "points_by_round": [],
+                    "team_id": "mercedes"
+                },
+                {
+                    "pos": 2, "id": "hamilton", "name": "Hamilton", "points": 0, "wins": 0,
+                    "podiums": 0, "poles": 0, "fastest_laps": 0, "points_by_round": [],
+                    "team_id": "mercedes"
+                }
+            ],
+            "constructors_standings": [
+                {
+                    "pos": 1, "team_id": "mercedes", "name": "Mercedes", "gross_points": 0,
+                    "net_points": 0, "drivers": ["sarah", "hamilton"], "team_wins": 0
+                }
+            ]
+        }
+        sample_race = {
+            "classification": [
+                {"driver_id": "sarah", "pos": 1, "grid": 1, "status": "Finalizada", "points": 25, "is_fastest_lap": False},
+                {"driver_id": "hamilton", "pos": 2, "grid": 2, "status": "Finalizada", "points": 18, "is_fastest_lap": False}
+            ]
+        }
+
+        res = update_championship_standings(sample_prev, sample_race, round_number=1, gp_name="GP do Bahrein")
+        self.assertEqual(res["last_completed_round"], 1)
+
+        trace_file = self.temp_logs_dir / "trace.log"
+        lines = [json.loads(l) for l in trace_file.read_text(encoding="utf-8").strip().split("\n")]
+        events = [l.get("event") for l in lines]
+        self.assertIn("FIA_STANDINGS_COMPUTED", events)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -9,6 +9,8 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 from src.table_renderer import transform_markdown_tables_for_discord
 from src.portal_builder import ROUND_METADATA
+from src.logger import trace
+from src.tracer import trace_span
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
@@ -246,6 +248,7 @@ class DiscordGatewayClient:
         self.ingest_channel_id = ingest_channel_id
         self.publish_channel_id = publish_channel_id
 
+    @trace_span("discord_rest_request")
     def _request_with_backoff(
         self,
         url: str,
@@ -261,14 +264,41 @@ class DiscordGatewayClient:
             headers["Authorization"] = f"Bot {self.bot_token}"
 
         data_bytes = json.dumps(payload).encode("utf-8") if payload is not None else None
+        trace(
+            f"Discord REST Request [{method}] {url.split('?')[0]}",
+            event="DISCORD_HTTP_REQUEST",
+            details={
+                "method": method,
+                "url": url.split("?")[0],
+                "payload_bytes": len(data_bytes) if data_bytes else 0,
+            },
+        )
 
         for attempt in range(max_retries):
+            t_start = time.perf_counter()
             req = urllib.request.Request(url, data=data_bytes, headers=headers, method=method)
             try:
                 with urllib.request.urlopen(req, timeout=15) as resp:
                     raw = resp.read().decode("utf-8")
+                    duration_ms = round((time.perf_counter() - t_start) * 1000, 2)
+                    trace(
+                        f"Discord REST Response [{method}] {resp.status} em {duration_ms}ms",
+                        event="DISCORD_HTTP_RESPONSE",
+                        details={
+                            "status": resp.status,
+                            "duration_ms": duration_ms,
+                            "response_bytes": len(raw) if raw else 0,
+                        },
+                    )
                     return json.loads(raw) if raw else {}
             except urllib.error.HTTPError as e:
+                duration_ms = round((time.perf_counter() - t_start) * 1000, 2)
+                trace(
+                    f"Discord REST HTTP Error [{method}] {e.code} em {duration_ms}ms (tentativa {attempt + 1}/{max_retries})",
+                    event="DISCORD_HTTP_ERROR",
+                    details={"status": e.code, "duration_ms": duration_ms},
+                    exc=e,
+                )
                 if e.code == 429:  # Rate limited
                     retry_after = float(e.headers.get("Retry-After", 2 ** (attempt + 1)))
                     time.sleep(retry_after)
@@ -276,11 +306,18 @@ class DiscordGatewayClient:
                 if attempt == max_retries - 1:
                     raise
                 time.sleep(2 ** attempt)
-            except urllib.error.URLError:
+            except urllib.error.URLError as e:
+                duration_ms = round((time.perf_counter() - t_start) * 1000, 2)
+                trace(
+                    f"Discord REST URL Error [{method}] {e} em {duration_ms}ms",
+                    event="DISCORD_NETWORK_ERROR",
+                    exc=e,
+                )
                 if attempt == max_retries - 1:
                     raise
                 time.sleep(2 ** attempt)
 
+    @trace_span("discord_post_channel_message")
     def post_channel_message(self, channel_id: str, content: str) -> Dict[str, Any]:
         """Post a message directly to a Discord channel using the Bot Token, splitting safely if > 1900 chars."""
         if not self.bot_token:
@@ -977,6 +1014,7 @@ class DiscordGatewayClient:
                     raise
                 time.sleep(2 ** attempt)
 
+    @trace_span("discord_publish_markdown_report")
     def publish_markdown_report(
         self,
         markdown_text: str,
@@ -1035,6 +1073,7 @@ class DiscordGatewayClient:
 
         return message_ids
 
+    @trace_span("discord_publish_editorial_teaser")
     def publish_editorial_teaser(
         self,
         markdown_text: str,
