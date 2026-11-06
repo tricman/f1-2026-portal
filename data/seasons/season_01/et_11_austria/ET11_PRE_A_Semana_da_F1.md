@@ -91,6 +91,8 @@
 
 ---
 
+---
+
 ## 📅 DIA 2/4: TERÇA-FEIRA
 
 ### 🕵️‍♂️ A F1 Que Você Não Vê — Dossiê Especial de Terça-Feira
@@ -176,3 +178,101 @@
 * **O Fato de Bastidor:** A lanterna solitária do campeonato de construtores (zero pontos para Yuki Tsunoda e Liam Lawson) transformou a VCARB na antessala da degola. Reuniões de emergência com Helmut Marko foram conduzidas em salas cinzentas e sem janelas em Milton Keynes. Tsunoda e Lawson foram submetidos a sabatinas implacáveis sobre o desempenho medíocre do chassi e a falta de ritmo de corrida. Fontes garantem que o clima é de velório antecipado: quem não pontuar na Áustria pode dar adeus ao sonho de vestir o macacão principal da Red Bull em 2027.
 * **O comentário ácido do Insider:**
 > *"A VCARB é onde os sonhos de jovens pilotos vão para morrer lentamente sob a supervisão do Dr. Marko. Zero pontos na tabela, nenhum pódio na alma, e os caras passam a terça-feira ouvindo sermão em alemão sobre como a culpa é da aerodinâmica da AlphaTauri... ops, Visa Cash App o que quer que seja."* — **Il Cavallino Spia**
+
+---
+
+## 📅 DIA 3/4: QUARTA-FEIRA
+
+**A F1 Que Você Não Vê**  
+*Consórcio Internacional de Jornalismo Investigativo — Dossiê de Quarta-Feira (Módulo 1, Dia 3/4)*  
+*Foco: Preparação para o GP da Áustria (Spielberg) | Fábricas, Simuladores e Crises Contratuais*
+
+---
+
+### 1. Mercedes-AMG Petronas (Brackley / Stuttgart)
+* **Local / Cidade:** Brackley, Reino Unido (Quartel-general da equipe).
+* **O Fato de Bastidor:** Um microfone ambiente de alta sensibilidade, esquecido por um técnico de áudio da FOM durante um debriefing interno no simulador, capturou um desabafo gélido da líder do campeonato, Sarah (Mercedes #24). Irritada com o comportamento traseiro do W17 nas zebras virtuais de Spielberg, a "Ice Queen" disparou contra os engenheiros de simulação: *"Se o carro quicar mais duas vezes assim, eu vou correr de patinete e ainda coloco o Lewis na frente por compaixão"*. Lewis Hamilton (#44), sentado no canto da sala testando o balanceamento de freio, limitou-se a rir de canto de boca, enquanto Jules Moreau já blindava a imprensa com um sorriso forçado.
+* **O comentário ácido do Insider:**
+> *"A menina tem 16 anos, lidera o mundial com cinco vitórias e já trata os engenheiros britânicos como se fossem estagiários de autoescola. Abracei o microfone e quase chorei de rir. Brackley está em silêncio absoluto rezando para que ela não mude de ideia e compre a equipe inteira até o final do ano."*  
+> — **The Silver Bullet / Lady Paddock**
+
+---
+
+### 2. Stake F1 Team Kick Sauber / Audi (Hinwil / Zurique)
+* **Local / Cidade:** Hinwil, Suíça (Fábrica da Sauber).
+* **O Fato de Bastidor:** A *Silly Season* ferveu nos escritórios executivos de Hinwil. Marcus Thorne ("O Tubarão de Silverstone"), agente de Felipe (#5), foi visto saindo de uma sala de reuniões estanque no terceiro andar com uma expressão de quem acabou de herdar uma mina de ouro. Fontes internas confirmam que as negociações preliminares para a transição definitiva da Audi em 2027 esbarraram em cifras astronômicas e exigências de veto técnico por parte do vice-líder do campeonato. Enquanto isso, Nico Hülkenberg (#27) assistia a tudo do café, fingindo não se importar com o fato de seu contrato estar pendurado por um fio de alpaca suíça.
+* **O comentário ácido do Insider:**
+> *"Marcus Thorne não negocia contratos; ele redige termos de rendição para diretores acuados. A Audi queria flexibilidade; o 'Professor' quer garantias de que o túnel de vento não vai ser terceirizado para a patagônia. O clima está tão cortante que o café da máquina saiu congelado."*  
+> — **The Paddock Mole / Lady Paddock**
+
+---
+
+### 3. Red Bull Racing (Milton Keynes)
+* **Local / Cidade:** Milton Keynes, Reino Unido.
+* **O Fato de Bastidor:** Turnos triplos e atmosfera de velório no departamento de telemetria da Red Bull. Após a penalização em Mônaco e a queda para o 3º lugar nos Construtores, Max Verstappen (#1) passou oito horas ininterruptas no simulador calibrando o RB22 para Spielberg, disparando xingamentos em holandês a cada décimo perdido para os tempos da Mercedes. Do outro lado da divisória, Sergio Pérez (#11) tentava justificar seu ritmo com gráficos de degradação de pneus que os engenheiros olhavam com a mesma expressão de quem vê um cometa vindo em direção à Terra.
+* **O comentário ácido do Insider:**
+> *"Verstappen está tão pilhado que se o simulador travar mais uma vez ele é capaz de dar um 'drop kick' no monitor principal. E o Checo? Bom, o Checo está descobrindo que o 'plano de melhoria de performance' dele consiste em rezar para que os comissários inventem outra punição para a concorrência."*  
+> — **The Paddock Mole**
+
+---
+
+### 4. McLaren F1 Team (Woking)
+* **Local / Cidade:** Woking, Reino Unido.
+* **O Fato de Bastidor:** Um jantar supostamente privado entre Lando Norris (#4) e Oscar Piastri (#81) em um restaurante italiano badalado perto de Woking virou assunto de boticário após um garçom vascar fragmentos da conversa para a imprensa local. O motivo da discórdia? Quem teria prioridade de desenvolvimento nas atualizações aerodinâmicas para a Áustria. Piastri, com sua frieza habitual, teria ameaçado pedir o cardápio de sobremesas antes mesmo de Lando terminar de explicar os dados de downforce de Barcelona.
+* **O comentário ácido do Insider:**
+> *"A amizade colorida da McLaren está azedando mais que leite deixado no sol de junho. O Oscar é um australiano gélido que sorri enquanto enterra suas esperanças de título na valeta, e o Lando está com aquela cara de quem perdeu o brinquedo favorito no parquinho."*  
+> — **The Paddock Mole**
+
+---
+
+### 5. Aston Martin Aramco (Silverstone)
+* **Local / Cidade:** Silverstone, Reino Unido.
+* **O Fato de Bastidor:** Fernando Alonso (#14) convocou uma reunião de emergência no motorhome da equipe com os projetistas chefes para analisar os dados do GP da Espanha. O espanhol, atual 3º no Mundial, não escondeu a frustração com a lentidão nas curvas de alta de Barcelona e exigiu que o carro de Stroll (#18) sirva exclusivamente como laboratório de testes aerodinâmicos na Áustria. Lance Stroll, por sua vez, foi visto de fones de ouvido jogando videogame no fundo do motorhome, completamente indiferente à geopolítica de Adrian Newey.
+* **O comentário ácido do Insider:**
+> *"Alonso está pilotando como se tivesse 22 anos e um pacto com o além. Ele olha para o carro do companheiro de equipe como um cientista louco olha para umaoba de laboratório descartável. Se depender do asturiano, a Aston Martin vai correr com três asas dianteiras na Áustria."*  
+> — **El Chisme de Montmeló**
+
+---
+
+### 6. Scuderia Ferrari HP (Maranello)
+* **Local / Cidade:** Maranello, Itália.
+* **O Fato de Bastidor:** O departamento de marketing de Maranello cometeu o que está sendo chamado internamente de "o crime de les-patria". Charles Leclerc (#16) e Carlos Sainz (#55) foram obrigados a gravar um vídeo de TikTok de 60 segundos vestindo toucas de chef e tentando fazer pizza acrobática com a logomarca do patrocinador. Leclerc quase cortou o dedo com a espátula de metal e Sainz abandonou a gravação na metade, recusando-se a sorrir enquanto segurava um rolo de massa. 
+* **O comentário ácido do Insider:**
+> *"Se Enzo Ferrari visse os pilotos dele dançando coreografia de rede social com avental de pizzaiolo, ele levantava da sepultura só para puxar o pé do chefe de marketing. A cara do Leclerc era de um homem refém em zona de conflito."*  
+> — **Il Cavallino Spia**
+
+---
+
+### 7. Williams Racing (Grove)
+* **Local / Cidade:** Grove, Reino Unido.
+* **O Fato de Bastidor:** Chloe Vance ("A Máquina de Hype") aportou em Grove com uma equipe de produção americana de quatro câmeras para registrar a preparação de Davi (#15) rumo à Áustria. O "Leão de Grove", embalado pelo segundo pódio consecutivo no Canadá e com o carro impulsionado pela *Brazilian Storm*, passou a tarde alternando entre o simulador e reuniões de alinhamento de imagem global. Alex Albon (#23), zerado no campeonato, observava de braços cruzados a algazarra midiática no QG histórico da equipe.
+* **O comentário ácido do Insider:**
+> *"Grove virou Hollywood. Tem luz de LED para todo lado, garotos de 20 anos falando em 'engajamento de marca' e o Davi assinando bonés como se fosse estrela de rock. Albon parece um fantasma solitário vagando pelos corredores do museu da equipe."*  
+> — **The Paddock Mole / Lady Paddock**
+
+---
+
+### 8. BWT Alpine F1 Team (Enstone)
+* **Local / Cidade:** Enstone, Reino Unido.
+* **O Fato de Bastidor:** Em meio a mais uma temporada melancólica (apenas 6 pontos no bolso), a Alpine tentou desviar o foco da crise técnica com uma ação promocional constrangedora em uma fábrica de filtros de água. Pierre Gasly (#10) e Jack Doohan (#7) tiveram que posar sorridentes ao lado de purificadores gigantes enquanto explicavam a importância da sustentabilidade hídrica. Gasly foi flagrado sussurrando para o assessor de imprensa: *"Se eu pontuar na Áustria, vocês me deixam tirar férias na Patagônia sem celular?"*.
+* **O comentário ácido do Insider:**
+> *"A Alpine está tão perdida no campeonato que virou garota-propaganda de eletrodoméstico ecológico. Os caras penam para passar do Q1, mas o setor de comunicação acha que vai salvar o ano com foto de galão de água."*  
+> — **El Chisme de Montmeló**
+
+---
+
+### 9. MoneyGram Haas F1 Team (Kannapolis / Banbury)
+* **Local / Cidade:** Banbury, Reino Unido.
+* **O Fato de Bastidor:** Um clima de tensão palpável tomou conta da oficina da Haas após vazarem rumores de que Oliver Bearman (#87) e Esteban Ocon (#31) quase saíram no tapa verbal durante uma sessão de debriefing pós-Espanha. O motivo? Divergências sobre quem deveria receber a única asa dianteira com especificação atualizada para Spielberg. O dono da equipe não estava presente, mas o engenheiro de pista teve que intervir antes que os papéis de telemetria começassem a voar.
+* **O comentário ácido do Insider:**
+> *"Colocar Bearman e Ocon na mesma garagem é o equivalente a misturar pólvora com fósforo em uma sala fechada. O Ocon acha que é o dono do pedaço e o Bearman quer provar que a juventude vai atropelar a marra. Vai dar faísca na Áustria."*  
+> — **The Paddock Mole**
+
+---
+
+### 10. Visa Cash App RB (Faenza)
+* **Local / Cidade:** Faenza, Itália.
+* **O Fato de Bastidor:** A lanterna isolada do campeonato (0 pontos) gerou um clima de fossa coletiva em Faenza. Yuki Tsunoda (#22) e Liam Lawson (#30) foram vistos almoçando em um restaurante local em silêncio quase tumular, interrompido apenas por suspiros profundos e olhares perdidos na travessa de macarrão. Fontes de Maranello/Faenza indicam que a pressão da matriz da Red Bull para cima dos jovens pilotos atingiu níveis insuportáveis.
+* **O comentário ácido do Insider:**
+> *"A VCARB está tão zerada que até o garçon do restaurante teve pena e recusou a gorjeta. O Yuki está com aquela expressão de quem desistiu da humanidade e o Lawson parece um recruta em campo minado. Spielberg vai ser mais um teste de sobrevivência."*  
+> — **Il Cavallino Spia**

@@ -17,7 +17,7 @@
     "1566507000056123514_pacedex_catalunya-espanha_2026-10-17_laps_TL.csv"
   ],
   "debrief_messages": [],
-  "semana_day": 2,
+  "semana_day": 3,
   "processed_msg_ids": [
     "1558572125911126036",
     "1558572289178734622",
@@ -70,10 +70,14 @@
     "1567319693596033067",
     "1567320334917701725",
     "1568398714781958267",
-    "1568406329536548996"
+    "1568406039789830368",
+    "1568406329536548996",
+    "1568407129260556311",
+    "1568409045008912526",
+    "1568409374026899507"
   ],
   "last_poll_new_files": [],
-  "last_poll_stage_event": "SEMANA_TICK_11_2",
+  "last_poll_stage_event": "SEMANA_TICK_11_3",
   "session_files": [
     "rn_image_picker_lib_temp_0f35fe54-e237-4a97-b212-18f514740ef3.jpg",
     "rn_image_picker_lib_temp_22fc1ff9-807b-4122-98a1-052b58961a5c.jpg",
