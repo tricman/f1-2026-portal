@@ -317,6 +317,36 @@ class TestObservabilityTraceEngine(unittest.TestCase):
         events = [l.get("event") for l in lines]
         self.assertIn("FIA_STANDINGS_COMPUTED", events)
 
+    def test_chatops_trace_commands_detection(self):
+        from src.discord_gateway import detect_stage_command
+
+        # Test enable trace triggers
+        self.assertEqual(detect_stage_command("ativar trace"), ("ENABLE_TRACE", None))
+        self.assertEqual(detect_stage_command("ligar modo trace"), ("ENABLE_TRACE", None))
+        self.assertEqual(detect_stage_command("trace on"), ("ENABLE_TRACE", None))
+
+        # Test disable trace triggers
+        self.assertEqual(detect_stage_command("desativar trace"), ("DISABLE_TRACE", None))
+        self.assertEqual(detect_stage_command("desligar modo trace"), ("DISABLE_TRACE", None))
+        self.assertEqual(detect_stage_command("trace off"), ("DISABLE_TRACE", None))
+
+        # Test purge logs triggers
+        self.assertEqual(detect_stage_command("limpar logs"), ("PURGE_LOGS", None))
+        self.assertEqual(detect_stage_command("purge log"), ("PURGE_LOGS", None))
+        self.assertEqual(detect_stage_command("expurgar logs"), ("PURGE_LOGS", None))
+
+    def test_cli_trace_flag_and_purge_action(self):
+        import subprocess
+        # Test CLI help contains --trace and purge-logs
+        proc = subprocess.run(
+            ["python", "-m", "src.orchestrator_cli", "--help"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(proc.returncode, 0)
+        self.assertIn("--trace", proc.stdout)
+        self.assertIn("purge-logs", proc.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

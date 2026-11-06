@@ -2,9 +2,9 @@
 
 **Sistema:** F1 2026 Showrunner Engine (EA Sports F1 24 League)  
 **Autor:** Beatriz "Beat" Ramos (Lead Observability & Telemetry Architect)  
-**Status:** Planejado e Alinhado via `/grill-me`  
+**Status:** Concluído & Homologado (100%)  
 **Data:** Novembro de 2026  
-**Versão:** 1.0  
+**Versão:** 1.0 (53/53 Testes Aprovados)  
 
 ---
 
@@ -63,51 +63,32 @@ f1-simulator/
 
 ## 3. Detalhamento dos Sprints de Implementação
 
-### Sprint O1: Motor Central de Tracing, Rotação e Sanitização
+### Sprint O1: Motor Central de Tracing, Rotação e Sanitização ✅ (Concluído)
 * **Objetivo:** Estabelecer a infraestrutura de baixo nível para emissão de logs estruturados em formato JSON Lines, gerenciamento de contexto assíncrono e proteção contra vazamento de credenciais.
 * **Tarefas Técnicas:**
-  1. **Criação de `src/tracer.py`:**
-     - Implementar gerenciador de contexto baseado em `contextvars.ContextVar`.
-     - Definir gerador de `trace_id` (UUIDv4 compacto) e gerador hierárquico de `span_id`.
-     - Criar o decorador `@trace_span(name, extract_args=True)` que computa `start_time`, `end_time` e `duration_ms`.
-  2. **Refatoração de `src/logger.py`:**
-     - Adicionar nível `TRACE` (valor numérico 5, abaixo de `DEBUG` 10 e `INFO` 20).
-     - Configurar `RotatingFileHandler` para `logs/trace.log` (limite de 20 MB por arquivo, até 5 backups).
-     - Implementar sanitizador regex para mascaramento de segredos: chaves terminadas em `_KEY`, `_TOKEN`, valores correspondentes às variáveis do `.env` e padrões de chave Gemini (`AIza...`).
-     - Adicionar função `trace(message, event=None, details=None, **kwargs)`.
-  3. **Rotina de Purge:**
-     - Implementar função `purge_old_trace_logs(logs_dir, max_days=7, force=False)` que expurga arquivos rotacionados obsoletos.
-  4. **Testes Unitários:**
-     - Criar `tests/test_observability_trace.py` validando propagação de `trace_id`, rotação de arquivos, redaction de API keys e rotina de purge.
+  1. **Criação de `src/tracer.py`:** Implementado com `contextvars`, gerador de `trace_id` e `@trace_span`.
+  2. **Refatoração de `src/logger.py`:** Nível `TRACE` (5), rotating handler para `logs/trace.log` (20MB / 5 backups), sanitização regex de API keys e segredos.
+  3. **Rotina de Purge:** Implementada função `purge_old_trace_logs`.
+  4. **Testes Unitários:** Validados em `tests/test_observability_trace.py`.
 
 ---
 
-### Sprint O2: Instrumentação Profunda das 4 Camadas Críticas
+### Sprint O2: Instrumentação Profunda das 4 Camadas Críticas ✅ (Concluído)
 * **Objetivo:** Plugar os spans de tracing e logs detalhados nos módulos vitais do sistema.
 * **Tarefas Técnicas:**
-  1. **Camada 1 — IA Showrunner (`src/ai_showrunner.py`):**
-     - Instrumentar `GeminiFreeTierClient._call_generate_content`:
-       - Emissão de log `TRACE` com payload bruto do prompt antes do disparo.
-       - Captura do tempo de resposta (RTT) em milissegundos.
-       - Registro do payload de resposta, estimativa de tokens gerados e headers de cota.
-  2. **Camada 2 — Discord Gateway (`src/discord_gateway.py`):**
-     - Instrumentar `publish_markdown_report`, `post_channel_message` e listener de mensagens.
-     - Registro de status HTTP, tempo de resposta da API do Discord, divisão de chunks e IDs das mensagens geradas.
-  3. **Camada 3 — Telemetria & TV OCR (`src/telemetry_merger.py` e `src/fia_calculator.py`):**
-     - Rastreamento dos arquivos CSV carregados, contagem de voltas processadas e detecção de pilotos na TV Overlay.
-     - Log detalhado de cada cálculo de pontuação e deltas de posição no encerramento da corrida.
-  4. **Camada 4 — Repositório SQLite NoSQL (`src/repositories/sqlite_document_repository.py`):**
-     - Instrumentar execuções de queries SQL, tempo de escrita na tabela de documentos, locks de transação WAL e sincronização bidirecional de JSON.
+  1. **Camada 1 — IA Showrunner (`src/ai_showrunner.py`):** Instrumentados `_call_generate_content`, `generate_m1_daily_episode`, `generate_paddock_dilemma`, `resolve_paddock_dilemma`, `generate_post_race_modules` e `finalize_round_transition`.
+  2. **Camada 2 — Discord Gateway (`src/discord_gateway.py`):** Instrumentados `_request_with_backoff`, `post_channel_message`, `publish_markdown_report` e `publish_editorial_teaser`.
+  3. **Camada 3 — Telemetria & TV OCR (`src/telemetry_merger.py` e `src/fia_calculator.py`):** Instrumentados `parse_free_practice_summary`, `merge_race_telemetry` e `update_championship_standings`.
+  4. **Camada 4 — Repositório SQLite NoSQL (`src/repositories/sqlite_document_repository.py`):** Instrumentados `save_document`, `get_document`, `find_documents` e `delete_document`.
 
 ---
 
-### Sprint O3: Ativação Híbrida (CLI + ChatOps Discord) e Homologação
+### Sprint O3: Ativação Híbrida (CLI + ChatOps Discord) e Homologação ✅ (Concluído)
 * **Objetivo:** Disponibilizar os controles operacionais para o operador humano no terminal e pilotos no Discord.
 * **Tarefas Técnicas:**
-  1. **Controle na CLI (`src/orchestrator_cli.py`):**
-     - Adicionar flag global `--trace` que força `LOG_LEVEL=TRACE` durante a execução do comando.
-     - Adicionar ação `--action purge-logs [--days 7]` para manutenção manual ou agendada dos arquivos de log.
-  2. **Controle no ChatOps (`src/chatops_listener.py`):**
+  1. **Controle na CLI (`src/orchestrator_cli.py`):** Flag global `--trace` adicionada; ação `--action purge-logs [--days 7]` implementada.
+  2. **Controle no ChatOps (`src/discord_gateway.py`):** Comandos `ativar trace`, `desativar trace` e `limpar logs` implementados e integrados ao loop de eventos do Discord.
+  3. **Validação E2E e Documentação:** 13 testes de observabilidade aprovados em `tests/test_observability_trace.py` (total de 53 testes no projeto); Manual de Operações DOCX atualizado.
      - Implementar detecção de comandos no chat `#geral`:
        - `ativar trace` / `ligar trace`: Comuta o nível ativo para `TRACE` e confirma no canal.
        - `desativar trace` / `desligar trace`: Retorna o nível para `INFO`.

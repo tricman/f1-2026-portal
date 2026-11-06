@@ -135,6 +135,16 @@ def detect_stage_command(text: str) -> Optional[Tuple[Any, ...]]:
         s_num = int(re.sub(r"\D", "", s_raw) or "2")
         return ("START_NEW_SEASON", s_num, s_id)
 
+    # 4.6 Observability & TRACE Mode ChatOps
+    if re.search(r"\b(?:ativar|ligar|start|enable)\s+(?:modo\s+)?trace\b|\btrace\s+on\b", clean):
+        return ("ENABLE_TRACE", None)
+
+    if re.search(r"\b(?:desativar|desligar|stop|disable)\s+(?:modo\s+)?trace\b|\btrace\s+off\b", clean):
+        return ("DISABLE_TRACE", None)
+
+    if re.search(r"\b(?:limpar|expurgar|purge)\s+logs?\b", clean):
+        return ("PURGE_LOGS", None)
+
     # 5. Weekly Silly Season Schedule
     semana_start = re.search(
         r"\b(?:inicio|início|iniciar|start)\s+(?:da\s+|de\s+)?semana(?:\s+(?:da\s+|de\s+)?etapa)?(?:\s+#?(\d+))?",
@@ -467,6 +477,40 @@ class DiscordGatewayClient:
                     ok, reply_txt = stop_udp_listener(root_dir)
                     if should_reply:
                         self.post_channel_message(self.ingest_channel_id, reply_txt)
+                    continue
+
+                if cmd_type == "ENABLE_TRACE":
+                    from src.logger import set_log_level
+                    set_log_level("TRACE")
+                    if should_reply:
+                        self.post_channel_message(
+                            self.ingest_channel_id,
+                            "🔍 **[MODO TRACE ATIVADO]**\n"
+                            "A auditoria de alta resolução está habilitada. Payloads brutos, métricas de span e requisições de rede estão sendo gravados em `logs/trace.log`."
+                        )
+                    continue
+
+                if cmd_type == "DISABLE_TRACE":
+                    from src.logger import set_log_level
+                    set_log_level("INFO")
+                    if should_reply:
+                        self.post_channel_message(
+                            self.ingest_channel_id,
+                            "ℹ️ **[MODO TRACE DESATIVADO]**\n"
+                            "O nível operacional de log retornou para `INFO`."
+                        )
+                    continue
+
+                if cmd_type == "PURGE_LOGS":
+                    from src.logger import purge_old_trace_logs
+                    res = purge_old_trace_logs()
+                    if should_reply:
+                        self.post_channel_message(
+                            self.ingest_channel_id,
+                            f"🧹 **[PURGE DE LOGS EXECUTADO]**\n"
+                            f"• **Arquivos excluídos:** `{res['deleted_files_count']}`\n"
+                            f"• **Espaço em disco liberado:** `{res['freed_mb']} MB` (`{res['freed_bytes']:,} bytes`)"
+                        )
                     continue
 
                 if cmd_type == "STAGE_ROLLBACK":

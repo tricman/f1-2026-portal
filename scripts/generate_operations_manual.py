@@ -234,17 +234,18 @@ def build_manual_docx():
     r_div.bold = True
 
     # Metadados em Tabela Limpa
-    meta_table = doc.add_table(rows=5, cols=2)
+    meta_table = doc.add_table(rows=6, cols=2)
     meta_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     meta_table.columns[0].width = Inches(2.2)
     meta_table.columns[1].width = Inches(4.3)
     
     metadata_rows = [
-        ("Sistema:", "EA F1 24 Autonomous Showrunner Engine (Sprints 1 a 4)"),
-        ("Versão do Manual:", "2.0 (Homologado para Etapa 11 e Multi-Temporada)"),
+        ("Sistema:", "EA F1 24 Autonomous Showrunner Engine (Sprints 1 a 4 + Observabilidade TRACE)"),
+        ("Versão do Manual:", "2.1 (Homologado para Etapa 11, Multi-Temporada & Observabilidade TRACE)"),
         ("Ambiente de Execução:", "On-Premise Windows x64 (Python 3.12+ Standard Library)"),
         ("Arquitetura de Dados:", "SQLite WAL Local NoSQL (showrunner.db) + Canon Ledger JSON"),
-        ("Data de Homologação:", "Novembro de 2026 · Cobertura de Testes: 100% (40/40)"),
+        ("Observabilidade & SRE:", "Logs TRACE rotacionados (20MB) + Context Tracing (trace_id / span_id)"),
+        ("Data de Homologação:", "Novembro de 2026 · Cobertura de Testes: 100% (51/51)"),
     ]
     for idx, (label, val) in enumerate(metadata_rows):
         c0 = meta_table.cell(idx, 0)
@@ -393,7 +394,7 @@ def build_manual_docx():
     p.paragraph_format.space_after = Pt(8)
 
     doc.add_heading("2.1 Tabela Sintética de Ações da CLI", level=2)
-    cli_tbl = doc.add_table(rows=11, cols=3)
+    cli_tbl = doc.add_table(rows=12, cols=3)
     cli_tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
     cli_tbl.columns[0].width = Inches(2.0)
     cli_tbl.columns[1].width = Inches(2.1)
@@ -418,11 +419,12 @@ def build_manual_docx():
         ("status-listener", "--", "Exibe a integridade, PID e status de monitoramento do processo de escuta."),
         ("generate-m1", "--round 11 --round-folder et_11_austria [--season season_01]", "Gera os 4 episódios diários da pré-semana (M1) cobrindo as 10 equipes do grid."),
         ("generate-dilemma", "--round 11 --round-folder et_11_austria --persona felipe", "Gera o Dilema de Paddock M1.5 com trava de turno e opções estratégicas A/B."),
-        ("autonomous-session", "--round 11 --round-folder et_11_austria", "Executa a pipeline autônoma pós-corrida: fusão PaceDex + TV, M3..M8 e deploy portal."),
+        ("autonomous-session", "--round 11 --round-folder et_11_austria [--trace]", "Executa a pipeline autônoma pós-corrida: fusão PaceDex + TV, M3..M8 e deploy portal."),
         ("rollback", "--round 11 --scope sessao [--scope coletiva|semana|tudo]", "Executa o rollback granular e seguro de uma etapa, expurgando arquivos e revertendo tabela."),
         ("build-portal", "[--season season_01]", "Recompila o Portal Editorial Paddock Dark Mode e atualiza os índices de busca."),
         ("deploy-portal", "[--season season_01]", "Recompila o Portal e efetua o commit e push automatizado no branch do GitHub Pages."),
         ("start-season", "--new-season season_02 [--grid-file grid.json]", "Inicializa formalmente uma nova temporada com análise de Dança das Cadeiras e tabela zerada."),
+        ("purge-logs", "[--days 7]", "Expurga backups de logs rotacionados antigos (logs/trace.log.*) liberando espaço em disco."),
     ]
     for row_idx, row in enumerate(cli_actions, start=1):
         for col_idx, text in enumerate(row):
@@ -520,9 +522,22 @@ def build_manual_docx():
         "# 1. Executar a suite completa com todos os 40 testes de regressao\n"
         "python -m unittest discover tests -v\n\n"
         "# 2. Executar teste de homologacao E2E da Etapa 11 (Austria)\n"
-        "python -m unittest tests/test_e2e_showrunner.py -v"
+        "python -m unittest tests/test_e2e_showrunner.py -v\n\n"
+        "# 3. Executar testes especificos de Observabilidade e Tracing (Sprint O1 e O2)\n"
+        "python -m unittest tests/test_observability_trace.py -v"
     )
     add_code_block(doc, cmd_sample_7)
+
+    p = doc.add_paragraph("H) Auditoria Profunda, Modo TRACE e Rotina de Purge:")
+    p.paragraph_format.space_after = Pt(4)
+    p.runs[0].bold = True
+    cmd_sample_8 = (
+        "# 1. Executar qualquer pipeline com flag --trace (grava payloads brutos em logs/trace.log)\n"
+        "python -m src.orchestrator_cli --action autonomous-session --round-folder et_11_austria --round 11 --trace\n\n"
+        "# 2. Executar rotina de purge para expurgar logs rotacionados com mais de 7 dias\n"
+        "python -m src.orchestrator_cli --action purge-logs --days 7"
+    )
+    add_code_block(doc, cmd_sample_8)
 
     # ---------------------------------------------------------------------------
     # SEÇÃO 3: GUIA COMPLETO DO CHATBOT DISCORD (CHATOPS)
@@ -742,13 +757,13 @@ def build_manual_docx():
     p_sp = doc.add_paragraph()
     p_sp.paragraph_format.space_before = Pt(6)
 
-    doc.add_heading("3.5 Rollback Granular e Gestão de Temporada no Discord", level=2)
+    doc.add_heading("3.5 Rollback Granular, Gestão de Temporada e Modo TRACE no Discord", level=2)
     p = doc.add_paragraph(
-        "Permite executar correções cirúrgicas ou inaugurar novas fases do campeonato diretamente pelo Discord:"
+        "Permite executar correções cirúrgicas, comutar o nível de auditoria de logs ou inaugurar novas fases do campeonato diretamente pelo Discord:"
     )
     p.paragraph_format.space_after = Pt(6)
 
-    extra_tbl = doc.add_table(rows=6, cols=3)
+    extra_tbl = doc.add_table(rows=9, cols=3)
     extra_tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
     extra_tbl.columns[0].width = Inches(2.2)
     extra_tbl.columns[1].width = Inches(2.0)
@@ -773,6 +788,9 @@ def build_manual_docx():
         ("rollback etapa XX semana", "reverter etapa XX semana", "Reseta os arquivos de pré-semana M1 e o dilema M1.5."),
         ("iniciar telemetria udp", "start udp, conectar telemetria", "Ativa o listener local para captura de telemetria UDP ao vivo na porta 20777."),
         ("nova temporada season_02", "iniciar nova temporada season_02", "Inaugura a nova temporada, processa transferências de pilotos e sela evento no Canon Ledger."),
+        ("ativar trace", "ligar trace, trace on, modo trace", "Ativa a auditoria profunda em tempo real: grava payloads brutos e métricas de span em logs/trace.log."),
+        ("desativar trace", "desligar trace, trace off", "Retorna o nível de log operacional para INFO, suspendendo dumps pesados."),
+        ("limpar logs", "expurgar logs, purge logs", "Executa a rotina de purge imediato dos arquivos rotacionados de trace liberando espaço em disco."),
     ]
     for row_idx, row in enumerate(extra_cmds, start=1):
         for col_idx, text in enumerate(row):
@@ -861,10 +879,17 @@ def build_manual_docx():
         r_s.font.size = Pt(9.5)
         r_s.font.color.rgb = COLOR_TEXT_DARK
 
-    # Salva o documento
-    doc.save(str(OUTPUT_FILE))
-    print(f"Manual de Operações gerado com sucesso em: {OUTPUT_FILE}")
-    print(f"Tamanho do arquivo: {OUTPUT_FILE.stat().st_size:,} bytes")
+    # Salva o documento (tratando lock de arquivo caso esteja aberto no Word)
+    target_out = OUTPUT_FILE
+    try:
+        doc.save(str(target_out))
+    except PermissionError:
+        target_out = DOCS_DIR / "MANUAL_DE_OPERACOES_SHOWRUNNER_F1_v2.docx"
+        doc.save(str(target_out))
+        print(f"[Aviso] O arquivo original está aberto no Word. Versão atualizada salva em: {target_out}")
+
+    print(f"Manual de Operações gerado com sucesso em: {target_out}")
+    print(f"Tamanho do arquivo: {target_out.stat().st_size:,} bytes")
 
 
 if __name__ == "__main__":

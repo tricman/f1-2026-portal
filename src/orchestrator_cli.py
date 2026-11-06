@@ -695,10 +695,13 @@ def main() -> None:
             "status-listener",
             "start-season",
             "list-seasons",
+            "purge-logs",
         ],
         default="process-et10",
         help="Action to execute",
     )
+    parser.add_argument("--trace", action="store_true", help="Enable high-fidelity TRACE logging to logs/trace.log")
+    parser.add_argument("--days", type=int, default=7, help="Max days to retain trace logs when executing purge-logs")
     parser.add_argument("--file", type=str, help="Markdown file to publish to Discord")
     parser.add_argument("--round-folder", type=str, default="et_10_espanha", help="Season round folder name")
     parser.add_argument("--round", type=int, default=11, help="Championship round number (e.g. 11 for Áustria)")
@@ -722,6 +725,10 @@ def main() -> None:
         help="Exit immediately on first poll if no active 'inicio da etapa' session is found; otherwise stay alive for up to --max-hours",
     )
     args = parser.parse_args()
+
+    if args.trace:
+        from src.logger import set_log_level
+        set_log_level("TRACE")
 
     if args.action == "process-et10":
         process_round_10_telemetry()
@@ -815,6 +822,10 @@ def main() -> None:
     elif args.action == "status-listener":
         ok, msg = get_udp_listener_status(ROOT_DIR)
         print(msg)
+    elif args.action == "purge-logs":
+        from src.logger import purge_old_trace_logs
+        res = purge_old_trace_logs(max_days=args.days)
+        print(f"Log purge concluído: {res['deleted_files_count']} arquivos removidos, {res['freed_mb']} MB liberados.")
     elif args.action == "sync-ingest":
         client = DiscordGatewayClient()
         state_file = ROOT_DIR / "data" / "state" / "discord_session_state.json"
