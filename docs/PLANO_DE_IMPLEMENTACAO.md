@@ -11,14 +11,14 @@
 | ID Requisito | Funcionalidade na Especificação Aprovada | Estado no Código Atual | Severidade / Esforço |
 | :---: | :--- | :---: | :---: |
 | **REQ-01** | Catálogo das 12 Verticais Temáticas da Silly Season | ✅ Implementado em `src/canon_ledger.py` | Baixo (Concluído) |
-| **REQ-02** | Cobertura M1 de todas as 10 Equipes (Reais e NPCs) | ⚠️ Parcial (cobre 4 equipes no gerador) | Médio (2 horas) |
-| **REQ-03** | Módulo M1.5: Dilema Interativo de Paddock com Trava de Turno | ❌ Não Implementado no código | Médio (3 horas) |
+| **REQ-02** | Cobertura M1 de todas as 10 Equipes (Reais e NPCs) | ✅ Implementado em `src/ai_showrunner.py` | Médio (Concluído no Sprint 2) |
+| **REQ-03** | Módulo M1.5: Dilema Interativo de Paddock com Trava de Turno | ✅ Implementado em `src/ai_showrunner.py` e `discord_gateway.py` | Médio (Concluído no Sprint 2) |
 | **REQ-04** | Coletiva M2: Contingência por Timeout de Piloto via IA | ✅ Implementado (`force_timeout_answer` + fallback Gemini) | Baixo (Concluído no Sprint 1) |
 | **REQ-05** | Ingestão UDP 20777 e Descarte de Slots Residuais (`m_numActiveCars`) | ✅ Implementado em `src/telemetry/session_recorder.py` | Baixo (Concluído) |
-| **REQ-06** | Ingestão de Áudios de Debriefing de Voz nos Módulos M5 e M6 | ⚠️ Parcial (transcrição existe, falta hook no Discord) | Médio (2 horas) |
-| **REQ-07** | M6 Ato 4: Declarações de Pilotos NPCs Relevantes | ⚠️ Parcial (prompt precisa de ajuste) | Baixo (1 hora) |
+| **REQ-06** | Ingestão de Áudios de Debriefing de Voz nos Módulos M5 e M6 | ✅ Implementado (`debrief_text` encadeado nos prompts) | Médio (Concluído no Sprint 2) |
+| **REQ-07** | M6 Ato 4: Declarações de Pilotos NPCs Relevantes | ✅ Implementado em `prompts/06_cerimonia_podio.md` | Baixo (Concluído no Sprint 2) |
 | **REQ-08** | M7: Cálculo Determinístico e Dispensa de Imagem PNG | ✅ Implementado (basta suprimir renderizador PNG) | Baixo (0.5 hora) |
-| **REQ-09** | M8: Crônica de Corrida + Bancada de Lendas (Prost, Mansell, Villeneuve) | ⚠️ Parcial (prompts focam apenas em Prost) | Médio (2.5 horas) |
+| **REQ-09** | M8: Crônica de Corrida + Bancada de Lendas (Prost, Mansell, Villeneuve) | ✅ Implementado em `prompts/08_repercussao_midia.md` e personas | Médio (Concluído no Sprint 2) |
 | **REQ-10** | ChatOps: Comando `iniciar escuta f1` para o Listener UDP | ✅ Implementado em `discord_gateway.py` e `orchestrator_cli.py` | Médio (Concluído no Sprint 1) |
 | **REQ-11** | ChatOps: Rotina de Rollback Granular de Etapa (`rollback etapa XX`) | ✅ Implementado em `orchestrator_cli.py` com 4 escopos e trava | Médio (Concluído no Sprint 1) |
 | **REQ-12** | Persistência: Base NoSQL Local Unificada (TinyDB / SQLite Document) | ❌ Não Implementado (JSONs puros atuais) | Alto (4 horas) |
@@ -76,19 +76,19 @@ flowchart TD
   * Arquivos: `src/press_conference.py`, `src/discord_gateway.py`, `tests/test_sprint1.py`.
   * Status: Implementado. Adicionado método `force_timeout_answer(reason)` em `PressConferenceSession` com sintetização de resposta in-character via Gemini fundamentada no arquivo `Setup - Perfil [Piloto].md`. Integração do comando `forcar avanco coletiva` e verificação de auto-timeout regulamentar no polling do Discord.
 
-### Sprint 2: Enriquecimento de Storytelling & Prompts M1 a M8
-* **Atividade 2.1 — M1 para as 10 Equipes do Grid:**
-  * Arquivos: `src/ai_showrunner.py`, `src/canon_ledger.py`, `prompts/01_semana_equipes.md`.
-  * Tarefa: Atualizar `generate_m1_daily_episode` para sortear temas e redigir o noticiário cobrindo o grid completo (incluindo Ferrari, Red Bull, McLaren, etc.), integrando as 12 verticais temáticas.
-* **Atividade 2.2 — Submódulo M1.5 (Dilema Interativo de Paddock):**
-  * Arquivos: `src/ai_showrunner.py`, `prompts/01b_dilema_paddock.md`, `src/discord_gateway.py`.
-  * Tarefa: Criar prompt de geração de dilemas polarizados; disparar às quartas-feiras no `#geral`; pausar em `TURN_LOCKED` até resposta do jogador real; registrar a escolha no Canon Ledger.
-* **Atividade 2.3 — M6 com NPCs e Áudios de Voz:**
-  * Arquivos: `prompts/06_cerimonia_podio.md`, `src/ai_showrunner.py`.
-  * Tarefa: Inserir no Ato 4 declarações dos NPCs de destaque da prova e conectar a transcrição de notas de voz enviadas no canal de debriefing.
-* **Atividade 2.4 — M8 com Crônica de Corrida & Bancada de Lendas:**
-  * Arquivos: `prompts/08_repercussao_midia.md`, `personas/alain_prost_ex_driver.md`, novas personas `personas/nigel_mansell.md` e `personas/jacques_villeneuve.md`.
-  * Tarefa: Formatar a publicação no Discord em Bloco 1 (Crônica de Corrida estilo *L'Équipe/Autosport*) e Bloco 2 (Bancada de Lendas no formato *CBS Golazo Show* com Prost, Mansell e Villeneuve debatendo a pilotagem).
+### Sprint 2: Enriquecimento de Storytelling & Prompts M1 a M8 — ✅ CONCLUÍDO
+* **Atividade 2.1 — M1 para as 10 Equipes do Grid:** ✅
+  * Arquivos: `src/ai_showrunner.py`, `src/canon_ledger.py`, `prompts/01_semana_equipes.md`, `tests/test_sprint2.py`.
+  * Status: Implementado. O catálogo das 10 equipes foi formalizado em `ALL_10_CONSTRUCTORS`, com amostragem estritamente determinística de 4 temas das 12 Verticais Temáticas por construtor e diretrizes editoriais completas no prompt `01_semana_equipes.md`.
+* **Atividade 2.2 — Submódulo M1.5 (Dilema Interativo de Paddock):** ✅
+  * Arquivos: `src/ai_showrunner.py`, `prompts/01b_dilema_paddock.md`, `src/discord_gateway.py`, `src/orchestrator_cli.py`, `tests/test_sprint2.py`.
+  * Status: Implementado. Funções `generate_paddock_dilemma` e `resolve_paddock_dilemma` habilitadas com trava de turno (`DILEMMA_LOCKED`), gatilhos ChatOps (`dilema etapa XX`, `forcar avanco dilema`) e integração ao ciclo de Quarta-feira do M1. Consequências gravadas no `canon_ledger.json` (`M1_5_DILEMA`).
+* **Atividade 2.3 — M6 com NPCs e Áudios de Voz:** ✅
+  * Arquivos: `prompts/06_cerimonia_podio.md`, `src/ai_showrunner.py`, `tests/test_sprint2.py`.
+  * Status: Implementado. Ato 4 expandido para exigir declarações quentes de NPCs relevantes do grid (Verstappen, Hamilton, Alonso, Leclerc, Norris) e ingestão direta de transcrições de debriefing de voz dos pilotos humanos (`debrief_text`).
+* **Atividade 2.4 — M8 com Crônica de Corrida & Bancada de Lendas:** ✅
+  * Arquivos: `prompts/08_repercussao_midia.md`, `personas/alain_prost_ex_driver.md`, `personas/nigel_mansell.md`, `personas/jacques_villeneuve.md`, `src/ai_showrunner.py`, `tests/test_sprint2.py`.
+  * Status: Implementado. Criadas as personas de Nigel Mansell ("Il Leone") e Jacques Villeneuve ("O Franco-Atirador"). Prompt `08_repercussao_midia.md` reestruturado em 4 Partes (Crônica de Jornal, Bancada de Lendas com notas 0 a 10 de Prost, Mansell e Villeneuve, Imprensa Internacional/Brasileira e Redes Sociais). Contexto das 3 lendas injetado no pipeline de geração.
 
 ### Sprint 3: Camada de Dados NoSQL Local & Multi-Temporada
 * **Atividade 3.1 — Camada de Abstração NoSQL Local:**

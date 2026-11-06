@@ -661,6 +661,7 @@ def main() -> None:
             "watch-discord",
             "autonomous-session",
             "generate-m1",
+            "generate-dilemma",
             "rollback",
             "start-listener",
             "stop-listener",
@@ -746,6 +747,12 @@ def main() -> None:
             persona_name="F1 Paddock Insider | Blog 'A F1 Que Você Não Vê'",
         )
         print(f"M1 Teaser publicado no Discord: {msg_id} -> {deep_link}")
+    elif args.action == "generate-dilemma":
+        from src.ai_showrunner import generate_paddock_dilemma
+        r_num = getattr(args, "round", 11)
+        r_folder = getattr(args, "round_folder", f"et_{r_num:02d}")
+        res = generate_paddock_dilemma(ROOT_DIR, r_num, r_folder)
+        print(f"Dilema M1.5 gerado com sucesso para {res.get('driver_name')} ({res.get('target_driver')})")
     elif args.action == "publish-round":
         publish_round_to_discord(args.round_folder, teaser_mode=True, base_portal_url=args.portal_url or "")
     elif args.action == "rollback":

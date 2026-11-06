@@ -392,6 +392,8 @@ def generate_post_race_modules(
     race_json = (tel_dir / "race_telemetry_merged.json").read_text(encoding="utf-8")[:14000] if (tel_dir / "race_telemetry_merged.json").exists() else "{}"
     tv_json_path = tel_dir / f"tv_overlay_et{round_num:02d}.json"
     tv_json = tv_json_path.read_text(encoding="utf-8")[:12000] if tv_json_path.exists() else "{}"
+    debrief_file = round_dir / "debriefing" / "debriefing_notes.md"
+    debrief_text = debrief_file.read_text(encoding="utf-8").strip() if debrief_file.exists() else ""
 
     module_specs = [
         (
@@ -407,12 +409,12 @@ def generate_post_race_modules(
         (
             f"Etapa {round_num:02d} - Relatório Oficial FIA - Resultado Final - {gp_title}.md",
             "05_fia_corrida.md",
-            f"Gere o Relatório Oficial FIA do Resultado Final da Corrida (M5) da Etapa {round_num} ({gp_title}) em Markdown GFM completo com tabela oficial dos 20 pilotos, pit stops, pneus, decisões dos comissários e crônica pós-corrida incluindo os relatos de debriefing.\nDADOS CORRIDA PACEDEX + FIA:\n{race_json}",
+            f"Gere o Relatório Oficial FIA do Resultado Final da Corrida (M5) da Etapa {round_num} ({gp_title}) em Markdown GFM completo com tabela oficial dos 20 pilotos, pit stops, pneus, decisões dos comissários e crônica pós-corrida incluindo os relatos de debriefing.\nDADOS CORRIDA PACEDEX + FIA:\n{race_json}\nRELATOS DE DEBRIEFING:\n{debrief_text}",
         ),
         (
             f"Etapa {round_num:02d} - Pós - Cerimônia do Pódio e Bastidores - {gp_title}.md",
             "06_cerimonia_podio.md",
-            f"Gere o módulo Pós-Corrida: Cerimônia do Pódio, Sala de Resfriamento (Cooldown Room) e Bastidores dos Motorhomes (M6) da Etapa {round_num} ({gp_title}) em 4 Atos.\nDADOS CORRIDA:\n{race_json}",
+            f"Gere o módulo Pós-Corrida: Cerimônia do Pódio, Sala de Resfriamento (Cooldown Room), Bastidores dos Motorhomes, Declarações de Pilotos NPCs Relevantes e Ingestão dos Áudios de Debriefing (M6) da Etapa {round_num} ({gp_title}) em 4 Atos estruturados.\nDADOS CORRIDA:\n{race_json}\nRELATOS DE DEBRIEFING DE ÁUDIO:\n{debrief_text}",
         ),
         (
             f"Etapa {round_num:02d} - Pós - Relatório FIA - Atualização Classificação Pilotos e Construtores.md",
@@ -422,7 +424,12 @@ def generate_post_race_modules(
         (
             f"Etapa {round_num:02d} - Pós - Repercussão Imprensa e Internet - {gp_title}.md",
             "08_repercussao_midia.md",
-            f"Gere o módulo de Repercussão na Imprensa Internacional, Brasileira, Podcasts e Redes Sociais (M8) pós-Etapa {round_num} ({gp_title}) repercutindo o resultado e os bastidores da corrida.",
+            f"Gere o módulo M8 da Etapa {round_num} ({gp_title}) em 4 Partes estruturadas:\n"
+            f"1. A Crônica Geral do Grande Prêmio (Race Chronicle);\n"
+            f"2. A Bancada de Lendas da Fórmula 1 (Notas de 0 a 10 e análises técnicas detalhadas de Alain Prost, Nigel Mansell e Jacques Villeneuve);\n"
+            f"3. Repercussão na Imprensa Internacional e Brasileira;\n"
+            f"4. Podcasts, YouTube e Redes Sociais.\n"
+            f"DADOS DE TELEMETRIA E INCIDENTES:\n{race_json}\nDEBRIEFINGS DE ÁUDIO:\n{debrief_text}",
         ),
     ]
 
@@ -438,9 +445,25 @@ def generate_post_race_modules(
         prompt_template_path = root_dir / "prompts" / prompt_file
         prompt_template = prompt_template_path.read_text(encoding="utf-8") if prompt_template_path.exists() else ""
 
+        extra_persona_context = ""
+        if "08_repercussao_midia" in prompt_file:
+            prost_path = root_dir / "personas" / "alain_prost_ex_driver.md"
+            mansell_path = root_dir / "personas" / "nigel_mansell.md"
+            villeneuve_path = root_dir / "personas" / "jacques_villeneuve.md"
+            prost_txt = prost_path.read_text(encoding="utf-8") if prost_path.exists() else ""
+            mansell_txt = mansell_path.read_text(encoding="utf-8") if mansell_path.exists() else ""
+            villeneuve_txt = villeneuve_path.read_text(encoding="utf-8") if villeneuve_path.exists() else ""
+            extra_persona_context = (
+                f"\n\n=== PERSONAS DA BANCADA DE LENDAS DA FÓRMULA 1 ===\n"
+                f"--- ALAIN PROST (O Professor) ---\n{prost_txt}\n\n"
+                f"--- NIGEL MANSELL (Il Leone) ---\n{mansell_txt}\n\n"
+                f"--- JACQUES VILLENEUVE (O Franco-Atirador) ---\n{villeneuve_txt}\n"
+            )
+
         full_prompt = (
             f"{base_context}\n\n"
             + ("\n\n".join(chained_outputs[-2:]) if chained_outputs else "")
+            + extra_persona_context
             + f"\n\n=== DIRETRIZ DO MÓDULO ({prompt_file}) ===\n{prompt_template}\n\n"
             + f"=== TAREFA DE GERAÇÃO ===\n{task_instructions}"
         )
@@ -478,6 +501,20 @@ def generate_post_race_modules(
     return generated
 
 
+ALL_10_CONSTRUCTORS = [
+    ("Mercedes-AMG Petronas", "mercedes", "Sarah (#24) & Hamilton (#44)", "The Silver Bullet / Lady Paddock"),
+    ("Stake F1 Team Kick Sauber (Audi)", "sauber", "Felipe (#5) & Hülkenberg (#27)", "The Paddock Mole / Lady Paddock"),
+    ("Red Bull Racing", "red_bull", "Verstappen (#1) & Pérez (#11)", "The Paddock Mole"),
+    ("McLaren F1 Team", "mclaren", "Norris (#4) & Piastri (#81)", "The Paddock Mole"),
+    ("Aston Martin Aramco", "aston_martin", "Alonso (#14) & Stroll (#18)", "El Chisme de Montmeló"),
+    ("Scuderia Ferrari", "ferrari", "Leclerc (#16) & Sainz (#55)", "Il Cavallino Spia"),
+    ("Williams Racing", "williams", "Davi (#15) & Albon (#23)", "The Paddock Mole / Lady Paddock"),
+    ("Alpine F1 Team", "alpine", "Gasly (#10) & Doohan (#7)", "El Chisme de Montmeló"),
+    ("MoneyGram Haas F1 Team", "haas", "Bearman (#87) & Ocon (#31)", "The Paddock Mole"),
+    ("Visa Cash App RB", "vcarb", "Tsunoda (#22) & Lawson (#30)", "Il Cavallino Spia"),
+]
+
+
 def generate_pre_race_m1(
     root_dir: Path,
     round_num: int,
@@ -487,7 +524,8 @@ def generate_pre_race_m1(
 ) -> Path:
     """
     Generate or load M1 (A F1 Que Você Não Vê — Quadro: A Semana da F1) for Round N,
-    grounded on Round N-1 standings, canon ledger events and deterministically sampled RNG weekly themes.
+    grounded on Round N-1 standings, canon ledger events and deterministically sampled RNG weekly themes
+    covering all 10 constructors of the 2026 grid.
     """
     from src.canon_ledger import sample_weekly_themes
 
@@ -503,24 +541,21 @@ def generate_pre_race_m1(
     prompt_template = prompt_file.read_text(encoding="utf-8") if prompt_file.exists() else ""
     base_context = assemble_storytelling_context(root_dir, round_num, round_folder)[:18000]
 
-    # Sample RNG themes for major teams
-    rb_themes = sample_weekly_themes(round_num, "red_bull")
-    merc_themes = sample_weekly_themes(round_num, "mercedes")
-    sauber_themes = sample_weekly_themes(round_num, "sauber")
-    williams_themes = sample_weekly_themes(round_num, "williams")
+    # Sample RNG themes for all 10 constructors
+    sampled_bullets = []
+    for team_name, team_id, drivers, insider in ALL_10_CONSTRUCTORS:
+        themes = sample_weekly_themes(round_num, team_id)
+        sampled_bullets.append(
+            f"- **{team_name}** ({drivers}) | Insider: *{insider}* | "
+            f"Seg: {themes['monday']} | Ter: {themes['tuesday']} | Qua: {themes['wednesday']} | Qui: {themes['thursday']}"
+        )
 
-    rng_context = (
-        f"\n\n=== TEMAS RNG SORTEADOS PARA A SEMANA (ETAPA {round_num}) ===\n"
-        f"- Red Bull Racing: Seg={rb_themes['monday']}, Ter={rb_themes['tuesday']}, Qua={rb_themes['wednesday']}, Qui={rb_themes['thursday']}\n"
-        f"- Mercedes: Seg={merc_themes['monday']}, Ter={merc_themes['tuesday']}, Qua={merc_themes['wednesday']}, Qui={merc_themes['thursday']}\n"
-        f"- Sauber: Seg={sauber_themes['monday']}, Ter={sauber_themes['tuesday']}, Qua={sauber_themes['wednesday']}, Qui={sauber_themes['thursday']}\n"
-        f"- Williams: Seg={williams_themes['monday']}, Ter={williams_themes['tuesday']}, Qua={williams_themes['wednesday']}, Qui={williams_themes['thursday']}\n"
-    )
+    rng_context = f"\n\n=== TEMAS RNG SORTEADOS PARA TODAS AS 10 EQUIPES (ETAPA {round_num}) ===\n" + "\n".join(sampled_bullets)
 
     full_prompt = (
         f"{base_context}\n{rng_context}\n\n=== DIRETRIZ DE GERAÇÃO DO MÓDULO 1 ===\n{prompt_template}\n\n"
         f"Gere o Módulo 1 completo cobrindo as 10 equipes da temporada 2026 de Segunda a Quinta-feira, "
-        f"amarrando a tabela real da última etapa e a reputação dos pilotos."
+        f"amarrando a tabela real da última etapa, a reputação dos pilotos e os temas sorteados acima."
     )
 
     print(f"[M1 Showrunner] Gerando Módulo 1 (A Semana da F1) para {round_folder}...")
@@ -530,7 +565,7 @@ def generate_pre_race_m1(
             parts=[{"text": full_prompt}],
             system_instruction=(
                 "Você é o coletivo de jornalistas insiders 'A F1 Que Você Não Vê'. "
-                "Escreva crônicas mordazes, dinâmicas e ricas sobre os bastidores da F1 de Segunda a Quinta."
+                "Escreva crônicas mordazes, dinâmicas e ricas sobre os bastidores da F1 de Segunda a Quinta, cobrindo todas as 10 equipes."
             ),
             temperature=0.5,
             max_retries=2,
@@ -545,20 +580,6 @@ def generate_pre_race_m1(
     except Exception as exc:
         print(f"[Canon Event Warning] Falha ao sintetizar evento M1: {exc}")
     return target_file
-
-
-ALL_10_CONSTRUCTORS = [
-    ("Mercedes-AMG Petronas", "mercedes", "Sarah (#24) & Hamilton (#44)", "The Silver Bullet / Lady Paddock"),
-    ("Stake F1 Team Kick Sauber (Audi)", "sauber", "Felipe (#5) & Hülkenberg (#27)", "The Paddock Mole / Lady Paddock"),
-    ("Red Bull Racing", "red_bull", "Verstappen (#1) & Pérez (#11)", "The Paddock Mole"),
-    ("McLaren F1 Team", "mclaren", "Norris (#4) & Piastri (#81)", "The Paddock Mole"),
-    ("Aston Martin Aramco", "aston_martin", "Alonso (#14) & Stroll (#18)", "El Chisme de Montmeló"),
-    ("Scuderia Ferrari", "ferrari", "Leclerc (#16) & Sainz (#55)", "Il Cavallino Spia"),
-    ("Williams Racing", "williams", "Davi (#15) & Albon (#23)", "The Paddock Mole / Lady Paddock"),
-    ("Alpine F1 Team", "alpine", "Gasly (#10) & Doohan (#7)", "El Chisme de Montmeló"),
-    ("MoneyGram Haas F1 Team", "haas", "Bearman (#87) & Ocon (#31)", "The Paddock Mole"),
-    ("Visa Cash App RB", "vcarb", "Tsunoda (#22) & Lawson (#30)", "Il Cavallino Spia"),
-]
 
 
 def generate_m1_daily_episode(
@@ -756,6 +777,205 @@ def extract_and_record_m1_canon_event(
         "summary": summary,
         "entities": entities,
         "status": "OPEN",
+    }
+
+
+# ==============================================================================
+# SUBMÓDULO M1.5: DILEMA INTERATIVO DE PADDOCK (INTERACTIVE STORYTELLING)
+# ==============================================================================
+
+DRIVER_SETUP_MAP: Dict[str, Tuple[str, str, str, str, str]] = {
+    "felipe": ("Felipe", "frdsilva83", "Carro #5 · Stake F1 Team Kick Sauber (Audi)", "sauber", "Stake F1 Team Kick Sauber (Audi)"),
+    "davi": ("Davi", "DaviMSSon", "Carro #15 · Williams Racing", "williams", "Williams Racing"),
+    "sarah": ("Sarah", "SarahMarinsS", "Carro #24 · Mercedes-AMG Petronas", "mercedes", "Mercedes-AMG Petronas"),
+}
+
+
+def generate_paddock_dilemma(
+    root_dir: Path,
+    round_num: int,
+    round_folder: str,
+    target_driver: Optional[str] = None,
+    ai_client: Optional[GeminiFreeTierClient] = None,
+) -> Dict[str, Any]:
+    """
+    Generates a high-stakes, polarized paddock dilemma (M1.5) for a human driver,
+    grounded on Wednesday's theme and psychological profile, pausing in TURN_LOCKED.
+    """
+    from src.canon_ledger import sample_weekly_themes
+
+    client = ai_client or GeminiFreeTierClient()
+    round_dir = root_dir / "data" / "seasons" / "season_01" / round_folder
+    round_dir.mkdir(parents=True, exist_ok=True)
+    state_file = root_dir / "data" / "state" / f"dilemma_et{round_num:02d}.json"
+
+    # Select target driver deterministically if not specified: rotate Felipe, Davi, Sarah
+    available_drivers = ["felipe", "davi", "sarah"]
+    driver_id = target_driver.lower() if target_driver and target_driver.lower() in DRIVER_SETUP_MAP else available_drivers[(round_num - 1) % len(available_drivers)]
+    driver_name, discord_tag, car_desc, team_id, team_name = DRIVER_SETUP_MAP[driver_id]
+
+    meta = ROUND_METADATA.get(round_folder, {"name": f"GP da Etapa {round_num}"})
+    gp_name = meta.get("name", f"Etapa {round_num}")
+
+    # Sample theme for Wednesday
+    themes = sample_weekly_themes(round_num, team_id)
+    wed_theme = themes.get("wednesday", "Crise Contratual & Mercado de Pilotos")
+
+    # Load context & prompt template
+    prompt_file = root_dir / "prompts" / "01b_dilema_paddock.md"
+    prompt_template = prompt_file.read_text(encoding="utf-8") if prompt_file.exists() else ""
+    base_context = assemble_storytelling_context(root_dir, round_num, round_folder)[:12000]
+
+    # Driver profile context
+    profile_path = root_dir / "data" / "setup" / f"Setup - Perfil {driver_name}.md"
+    profile_text = profile_path.read_text(encoding="utf-8")[:1500] if profile_path.exists() else ""
+
+    prompt = (
+        f"{base_context}\n\n"
+        f"=== PERFIL DO PILOTO ===\n{profile_text}\n\n"
+        f"=== DIRETRIZ DO DILEMA ===\n{prompt_template}\n\n"
+        f"Gere agora o dilema de paddock polarizado para {driver_name} ({team_name}), "
+        f"centrado no tema obrigatório: '{wed_theme}', para a Etapa {round_num} ({gp_name})."
+    )
+
+    try:
+        dilemma_md = client._call_generate_content(
+            model=client.flash_model,
+            parts=[{"text": prompt}],
+            system_instruction=(
+                "Você é o Game Master de RPG esportivo e Diretor Narrativo da F1 2026. "
+                "Crie escolhas dramáticas polarizadas com alto custo e ganho real."
+            ),
+            temperature=0.5,
+        ).strip()
+    except Exception as exc:
+        dilemma_md = (
+            f"# ⚡ DILEMA DE PADDOCK — {gp_name.upper()} (MÓDULO #1.5)\n"
+            f"### 🛑 DECISÃO ESTRATÉGICA CONVOCADA: @{discord_tag} ({driver_name} · {team_name})\n\n"
+            f"**Cenário de Bastidor:**\n"
+            f"Nos bastidores desta quarta-feira, a cúpula técnica apresentou uma proposta crítica em torno de {wed_theme}.\n\n"
+            f"### ⚖️ SUAS OPÇÕES DE DECISÃO:\n"
+            f"* **[OPÇÃO A] — Rota Agressiva:** Assumir o pacote experimental com risco de confiabilidade.\n"
+            f"* **[OPÇÃO B] — Rota Conservadora:** Manter a especificação padrão e focar em pontos seguros.\n\n"
+            f"🛑 **[TRAVA DE TURNO ATIVA | Aguardando resposta de @{discord_tag}]**\n"
+            f"> 💬 *Piloto, digite 'Opção A' ou 'Opção B' no chat do canal de voz para registrar a decisão no Canon Oficial!*"
+        )
+
+    # Save Markdown file
+    target_md = round_dir / f"Etapa {round_num:02d} - Relatório de Bastidores - M1.5 Dilema de Paddock - {gp_name} 2026.md"
+    target_md.write_text(dilemma_md + "\n", encoding="utf-8")
+
+    state_data = {
+        "round_num": round_num,
+        "round_folder": round_folder,
+        "target_driver": driver_id,
+        "driver_name": driver_name,
+        "discord_tag": discord_tag,
+        "status": "AWAITING_DILEMMA_CHOICE",
+        "dilemma_text": dilemma_md,
+        "timestamp": time.time(),
+        "completed": False,
+        "chosen_option": None,
+        "resolution_text": None,
+    }
+    state_file.write_text(json.dumps(state_data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return state_data
+
+
+def resolve_paddock_dilemma(
+    root_dir: Path,
+    round_num: int,
+    round_folder: str,
+    raw_choice: str,
+    ai_client: Optional[GeminiFreeTierClient] = None,
+) -> Dict[str, Any]:
+    """
+    Receives player's choice from Discord, incorporates into Canon Ledger and generates
+    context-aware paddock consequence, unlocking the weekly state machine.
+    """
+    from src.canon_ledger import CanonLedgerManager
+
+    client = ai_client or GeminiFreeTierClient()
+    state_file = root_dir / "data" / "state" / f"dilemma_et{round_num:02d}.json"
+    if not state_file.exists():
+        raise FileNotFoundError(f"Dilema da Etapa {round_num} não encontrado em {state_file}")
+
+    st = json.loads(state_file.read_text(encoding="utf-8"))
+    driver_id = st.get("target_driver", "felipe")
+    driver_name = st.get("driver_name", "Felipe")
+    discord_tag = st.get("discord_tag", "piloto")
+    clean_choice = raw_choice.strip()
+
+    prompt = (
+        f"DILEMA DE PADDOCK APRESENTADO (Etapa {round_num}):\n"
+        f"{st.get('dilemma_text', '')[:3000]}\n\n"
+        f"ESCOLHA FEITA PELO PILOTO {driver_name.upper()} (@{discord_tag}):\n"
+        f"\"{clean_choice}\"\n\n"
+        f"TAREFA:\n"
+        f"1. Como Game Master e narrador de F1, gere em 2 parágrafos curtos a reação imediata nos bastidores da equipe e o impacto político/técnico da escolha feita pelo piloto.\n"
+        f"2. Escreva em tom realista, tenso e cinematográfico.\n"
+        f"3. Finalize com um resumo executivo de 1 linha da consequência para o Canon Ledger."
+    )
+
+    try:
+        consequence_text = client._call_generate_content(
+            model=client.flash_model,
+            parts=[{"text": prompt}],
+            system_instruction="Você é o Game Master esportivo de F1 2026.",
+            temperature=0.45,
+        ).strip()
+    except Exception as exc:
+        consequence_text = (
+            f"A decisão de {driver_name} foi comunicada à chefia de equipe, gerando debates intensos entre os engenheiros. "
+            f"A escolha sela o direcionamento estratégico para o restante do Grande Prêmio."
+        )
+
+    # Register in Canon Ledger
+    ledger_path = root_dir / "data" / "state" / "canon_ledger.json"
+    mgr = CanonLedgerManager(ledger_path)
+    mgr.append_event(
+        event_id=f"ET{round_num:02d}-M1.5-DILEMMA",
+        round_num=round_num,
+        module="M1_5_DILEMA",
+        summary=f"No Dilema de Paddock da Etapa {round_num}, {driver_name} decidiu: '{clean_choice[:140]}'. Consequência: {consequence_text[:200]}",
+        entities=[driver_id, "fia", "equipe", round_folder],
+        status="OPEN",
+    )
+
+    st["status"] = "COMPLETED"
+    st["completed"] = True
+    st["chosen_option"] = clean_choice
+    st["resolution_text"] = consequence_text
+    st["resolved_timestamp"] = time.time()
+    state_file.write_text(json.dumps(st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    # Append consequence to target markdown
+    round_dir = root_dir / "data" / "seasons" / "season_01" / round_folder
+    meta = ROUND_METADATA.get(round_folder, {"name": f"GP da Etapa {round_num}"})
+    gp_name = meta.get("name", f"Etapa {round_num}")
+    target_md = round_dir / f"Etapa {round_num:02d} - Relatório de Bastidores - M1.5 Dilema de Paddock - {gp_name} 2026.md"
+    if target_md.exists():
+        append_res = (
+            f"\n\n---\n\n"
+            f"### ✅ DECISÃO REGISTRADA NO CANON OFICIAL\n"
+            f"**Escolha do Piloto @{discord_tag} ({driver_name}):**\n> *\"{clean_choice}\"*\n\n"
+            f"**Repercussão Imediata nos Bastidores:**\n{consequence_text}\n"
+        )
+        target_md.write_text(target_md.read_text(encoding="utf-8") + append_res, encoding="utf-8")
+
+    ack_message = (
+        f"✅ **DECISÃO DE {driver_name.upper()} REGISTRADA NO CANON LEDGER DA F1 2026!**\n"
+        f"> *\"{clean_choice}\"*\n\n"
+        f"📋 **Repercussão nos Bastidores:**\n{consequence_text}\n\n"
+        f"🔓 **Trava de Turno Liberada!** A semana da F1 avança rumo à Coletiva de Imprensa Oficial da FIA (M2)!"
+    )
+    return {
+        "status": "COMPLETED",
+        "driver_id": driver_id,
+        "driver_name": driver_name,
+        "choice": clean_choice,
+        "consequence": consequence_text,
+        "ack_message": ack_message,
     }
 
 

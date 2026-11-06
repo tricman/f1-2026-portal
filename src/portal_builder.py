@@ -36,6 +36,8 @@ def classify_module_badge(filename: str) -> Tuple[int, str, str, str]:
     Return (sort_order, short_tag, badge_label, color_class) for a given Markdown file.
     """
     low = filename.lower()
+    if "dilema" in low:
+        return (1, "M1.5 • DILEMA", "Dilema Interativo de Paddock", "badge-amber")
     if "semana" in low or "bastidores pré" in low or "bastidores da semana" in low:
         return (1, "M1 • PRÉ-SEMANA", "Blog: A F1 Que Você Não Vê", "badge-amber")
     if "coletiva" in low:

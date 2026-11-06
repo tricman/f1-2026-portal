@@ -110,7 +110,19 @@ def detect_stage_command(text: str) -> Optional[Tuple[Any, ...]]:
     if re.search(r"\b(?:forcar|forçar|avancar|avançar)\s+(?:avanco\s+|avanço\s+)?coletiva\b|\btimeout\s+coletiva\b", clean):
         return ("FORCE_PRESS_CONF_ADVANCE", None)
 
-    # 4. Weekly Silly Season Schedule
+    # 4. M1.5 Paddock Dilemma ChatOps
+    dilemma_match = re.search(
+        r"\b(?:dilema|dilemma)\s+(?:da\s+|de\s+)?etapa\s+(\d+)\b",
+        clean,
+    )
+    if dilemma_match:
+        r_num = int(dilemma_match.group(1))
+        return ("START_DILEMMA", r_num)
+
+    if re.search(r"\b(?:forcar|forçar|avancar|avançar)\s+(?:avanco\s+|avanço\s+)?dilema\b|\btimeout\s+dilema\b", clean):
+        return ("FORCE_DILEMMA_ADVANCE", None)
+
+    # 5. Weekly Silly Season Schedule
     semana_start = re.search(
         r"\b(?:inicio|início|iniciar|start)\s+(?:da\s+|de\s+)?semana(?:\s+(?:da\s+|de\s+)?etapa)?(?:\s+#?(\d+))?",
         clean,
@@ -524,6 +536,51 @@ class DiscordGatewayClient:
                             )
                     continue
 
+                if cmd_type == "START_DILEMMA":
+                    r_num = cmd_round or state.get("active_round_num") or 11
+                    r_folder = ROUND_NUMBER_TO_FOLDER.get(r_num, f"et_{r_num:02d}")
+                    from src.ai_showrunner import generate_paddock_dilemma
+                    d_data = generate_paddock_dilemma(root_dir, r_num, r_folder)
+                    state["status"] = "DILEMMA_LOCKED"
+                    state["active_round_num"] = r_num
+                    state["active_round_folder"] = r_folder
+                    if should_reply:
+                        self.post_channel_message(self.ingest_channel_id, d_data.get("dilemma_text", ""))
+                    continue
+
+                if cmd_type == "FORCE_DILEMMA_ADVANCE":
+                    active_r_num = int(state.get("active_round_num") or 11)
+                    active_folder = state.get("active_round_folder") or ROUND_NUMBER_TO_FOLDER.get(active_r_num, f"et_{active_r_num:02d}")
+                    dilemma_file = root_dir / "data" / "state" / f"dilemma_et{active_r_num:02d}.json"
+                    if dilemma_file.exists():
+                        try:
+                            d_info = json.loads(dilemma_file.read_text(encoding="utf-8"))
+                            if d_info.get("status") == "AWAITING_DILEMMA_CHOICE":
+                                from src.ai_showrunner import resolve_paddock_dilemma
+                                res = resolve_paddock_dilemma(
+                                    root_dir, active_r_num, active_folder,
+                                    raw_choice="Opção A (Decisão executada pela assessoria e chefia técnica)"
+                                )
+                                state["status"] = "SEMANA_ACTIVE"
+                                if should_reply:
+                                    self.post_channel_message(self.ingest_channel_id, res.get("ack_message", ""))
+                            else:
+                                if should_reply:
+                                    self.post_channel_message(
+                                        self.ingest_channel_id,
+                                        f"ℹ️ Nenhum dilema pendente aguardando resposta para a Etapa {active_r_num}."
+                                    )
+                        except Exception as exc:
+                            if should_reply:
+                                self.post_channel_message(self.ingest_channel_id, f"⚠️ Erro ao forçar avanço do dilema: {exc}")
+                    else:
+                        if should_reply:
+                            self.post_channel_message(
+                                self.ingest_channel_id,
+                                f"ℹ️ Nenhum dilema ativo encontrado para a Etapa {active_r_num}."
+                            )
+                    continue
+
                 if cmd_type == "START_SEMANA":
                     r_num = cmd_round or state.get("active_round_num") or 10
                     r_folder = ROUND_NUMBER_TO_FOLDER.get(r_num, f"et_{r_num:02d}")
@@ -633,6 +690,24 @@ class DiscordGatewayClient:
                             f"⚙️ Iniciando fusão de telemetria PaceDex, cálculo oficial da FIA, geração dos relatórios e publicação no Portal Mobile + `#repercussao-midia`!",
                         )
                     continue
+
+            # Interactive Paddock Dilemma Answer Detection (Trava de Turno M1.5)
+            active_r_num = int(state.get("active_round_num") or 11)
+            active_folder = state.get("active_round_folder") or ROUND_NUMBER_TO_FOLDER.get(active_r_num, f"et_{active_r_num:02d}")
+            dilemma_file = root_dir / "data" / "state" / f"dilemma_et{active_r_num:02d}.json"
+            if content and not cmd and msg_id not in processed_msg_ids and dilemma_file.exists():
+                try:
+                    d_info = json.loads(dilemma_file.read_text(encoding="utf-8"))
+                    if d_info.get("status") == "AWAITING_DILEMMA_CHOICE":
+                        processed_msg_ids.add(msg_id)
+                        from src.ai_showrunner import resolve_paddock_dilemma
+                        res = resolve_paddock_dilemma(root_dir, active_r_num, active_folder, content)
+                        state["status"] = "SEMANA_ACTIVE"
+                        if should_reply:
+                            self.post_channel_message(self.ingest_channel_id, res.get("ack_message", ""))
+                        continue
+                except Exception as exc:
+                    print(f"[Dilemma Answer Warning] {exc}")
 
             # Interactive Press Conference Answer Detection (Trava de Turno)
             active_r_num = int(state.get("active_round_num") or 11)
