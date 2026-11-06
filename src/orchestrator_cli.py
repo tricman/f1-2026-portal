@@ -242,6 +242,376 @@ def publish_round_to_discord(round_folder: str, teaser_mode: bool = True, base_p
         )
 
 
+ROUND_NUMBER_TO_FOLDER: Dict[int, str] = {
+    meta["num"]: folder for folder, meta in ROUND_METADATA.items()
+}
+
+
+def is_pid_running(pid: int) -> bool:
+    if pid <= 0:
+        return False
+    try:
+        if os.name == "nt":
+            res = subprocess.run(
+                ["tasklist", "/FI", f"PID eq {pid}", "/FO", "CSV", "/NH"],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            return str(pid) in res.stdout
+        else:
+            os.kill(pid, 0)
+            return True
+    except Exception:
+        return False
+
+
+def start_udp_listener(root_dir: Optional[Path] = None, round_num: Optional[int] = None) -> Tuple[bool, str]:
+    import sys
+    root = root_dir or ROOT_DIR
+    lock_file = root / "data" / "state" / "listener.pid"
+    if lock_file.exists():
+        try:
+            pid = int(lock_file.read_text(encoding="utf-8").strip())
+            if is_pid_running(pid):
+                return False, (
+                    f"⚠️ **O LISTENER UDP JÁ ESTÁ ATIVO!**\n"
+                    f"• **PID:** `{pid}` (Porta 20777)\n"
+                    f"• Digite `status telemetria` para monitorar ou `parar escuta f1` para encerrar."
+                )
+            else:
+                lock_file.unlink(missing_ok=True)
+        except Exception:
+            lock_file.unlink(missing_ok=True)
+
+    cmd = [sys.executable, "-m", "src.udp_relay"]
+    if round_num is not None:
+        cmd.extend(["--round", str(round_num)])
+
+    creationflags = 0
+    if os.name == "nt":
+        creationflags = subprocess.CREATE_NEW_PROCESS_GROUP | getattr(subprocess, "DETACHED_PROCESS", 0x00000008)
+
+    try:
+        proc = subprocess.Popen(
+            cmd,
+            cwd=str(root),
+            creationflags=creationflags,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        time.sleep(0.8)
+        if proc.poll() is None:
+            lock_file.parent.mkdir(parents=True, exist_ok=True)
+            lock_file.write_text(str(proc.pid), encoding="utf-8")
+            target_round = round_num or 11
+            target_folder = ROUND_NUMBER_TO_FOLDER.get(target_round, f"et_{target_round:02d}")
+            return True, (
+                f"🟢 **LISTENER UDP DE TELEMETRIA F1 24 INICIADO COM SUCESSO!**\n"
+                f"• **Porta UDP:** `20777` (Pronto para receber dados em tempo real do jogo EA F1 24)\n"
+                f"• **Processo (PID):** `{proc.pid}`\n"
+                f"• **Destino:** `data/seasons/season_01/{target_folder}/telemetry/`\n"
+                f"• Digite `status telemetria` para monitorar ou `parar escuta f1` para encerrar."
+            )
+        else:
+            return False, "❌ Falha ao inicializar o Listener UDP. O processo encerrou prematuramente."
+    except Exception as exc:
+        return False, f"❌ Erro ao disparar processo do Listener UDP: {exc}"
+
+
+def get_udp_listener_status(root_dir: Optional[Path] = None) -> Tuple[bool, str]:
+    root = root_dir or ROOT_DIR
+    lock_file = root / "data" / "state" / "listener.pid"
+    if lock_file.exists():
+        try:
+            pid = int(lock_file.read_text(encoding="utf-8").strip())
+            if is_pid_running(pid):
+                return True, (
+                    f"🟢 **STATUS DA TELEMETRIA UDP (F1 24):**\n"
+                    f"• **Estado:** ATIVO / ESCUTANDO\n"
+                    f"• **PID:** `{pid}`\n"
+                    f"• **Porta UDP:** `20777`\n"
+                    f"• Digite `parar escuta f1` para encerrar o serviço."
+                )
+            else:
+                lock_file.unlink(missing_ok=True)
+        except Exception:
+            lock_file.unlink(missing_ok=True)
+    return False, (
+        f"⚪ **STATUS DA TELEMETRIA UDP:**\n"
+        f"• **Estado:** 🔴 INATIVO\n"
+        f"• O Listener UDP não está em execução no momento.\n"
+        f"• Digite `iniciar escuta f1` para iniciar a escuta na porta 20777."
+    )
+
+
+def stop_udp_listener(root_dir: Optional[Path] = None) -> Tuple[bool, str]:
+    root = root_dir or ROOT_DIR
+    lock_file = root / "data" / "state" / "listener.pid"
+    if not lock_file.exists():
+        return False, "ℹ️ Nenhum Listener UDP de Telemetria está ativo no momento."
+    try:
+        pid = int(lock_file.read_text(encoding="utf-8").strip())
+        if is_pid_running(pid):
+            if os.name == "nt":
+                subprocess.run(["taskkill", "/F", "/T", "/PID", str(pid)], capture_output=True, check=False)
+            else:
+                import signal
+                os.kill(pid, signal.SIGKILL)
+            time.sleep(0.5)
+        lock_file.unlink(missing_ok=True)
+        return True, (
+            f"🛑 **LISTENER UDP DE TELEMETRIA ENCERRADO!**\n"
+            f"• Processo PID `{pid}` finalizado com sucesso.\n"
+            f"• Porta 20777 liberada."
+        )
+    except Exception as exc:
+        lock_file.unlink(missing_ok=True)
+        return True, f"🛑 Listener encerrado: {exc}"
+
+
+def execute_stage_rollback(round_num: int, scope: str = "sessao") -> Dict[str, Any]:
+    """
+    Executes a granular rollback for a given round.
+    
+    Scopes:
+      - 'sessao': Reverts post-race session (M3 to M8, telemetry, photos, debriefs, standings).
+      - 'coletiva': Reverts M2 Coletiva de Imprensa and its Canon Ledger events.
+      - 'semana': Resets M1 Semana das Equipes and M1.5 Dilema.
+      - 'tudo': Complete round reset (resets everything for the round).
+      
+    Safety:
+      - Rounds 1 to 10 are canonical history and cannot be rolled back.
+    """
+    if round_num < 11:
+        raise ValueError(
+            f"Proteção de integridade ativada: As Etapas 01 a 10 são canônicas e imutáveis. "
+            f"O rollback só é permitido para a Etapa 11 em diante (solicitado: Etapa {round_num})."
+        )
+
+    scope_norm = scope.lower().strip().replace("sessão", "sessao")
+    valid_scopes = {"sessao", "coletiva", "semana", "tudo"}
+    if scope_norm not in valid_scopes:
+        raise ValueError(f"Escopo de rollback inválido: '{scope}'. Opções válidas: {sorted(list(valid_scopes))}")
+
+    round_folder = ROUND_NUMBER_TO_FOLDER.get(round_num, f"et_{round_num:02d}")
+    round_dir = ROOT_DIR / "data" / "seasons" / "season_01" / round_folder
+
+    deleted_files: List[str] = []
+    purged_events = 0
+    reverted_standings = False
+
+    # 1. ROLLBACK DE SESSÃO (M3 A M8, TELEMETRIA, FOTOS, DEBRIEFING, STANDINGS)
+    if scope_norm in ("sessao", "tudo"):
+        if round_dir.exists():
+            # Delete telemetry files
+            tel_dir = round_dir / "telemetry"
+            if tel_dir.exists():
+                for p in list(tel_dir.iterdir()):
+                    if p.is_file():
+                        p.unlink()
+                        deleted_files.append(str(p.relative_to(ROOT_DIR)))
+
+            # Delete photos
+            photos_dir = round_dir / "photos"
+            if photos_dir.exists():
+                for p in list(photos_dir.iterdir()):
+                    if p.is_file():
+                        p.unlink()
+                        deleted_files.append(str(p.relative_to(ROOT_DIR)))
+
+            # Delete debriefing
+            deb_dir = round_dir / "debriefing"
+            if deb_dir.exists():
+                for p in list(deb_dir.iterdir()):
+                    if p.is_file():
+                        p.unlink()
+                        deleted_files.append(str(p.relative_to(ROOT_DIR)))
+
+            # Delete M3 to M8 markdown files
+            for md_file in list(round_dir.glob("*.md")):
+                order_num, _, _, _ = classify_module_badge(md_file.name)
+                if order_num >= 3:
+                    md_file.unlink()
+                    deleted_files.append(str(md_file.relative_to(ROOT_DIR)))
+
+        # Standings rollback
+        standings_et_snap = ROOT_DIR / "data" / "state" / f"standings_et{round_num:02d}.json"
+        if standings_et_snap.exists():
+            standings_et_snap.unlink()
+            deleted_files.append(str(standings_et_snap.relative_to(ROOT_DIR)))
+
+        prev_standings_file = ROOT_DIR / "data" / "state" / f"standings_et{round_num - 1:02d}.json"
+        standings_file = ROOT_DIR / "data" / "state" / "standings.json"
+        if prev_standings_file.exists():
+            shutil.copy2(prev_standings_file, standings_file)
+            reverted_standings = True
+        elif standings_file.exists():
+            try:
+                curr_st = json.loads(standings_file.read_text(encoding="utf-8"))
+                if curr_st.get("last_completed_round", 0) >= round_num:
+                    curr_st["last_completed_round"] = round_num - 1
+                    for d in curr_st.get("drivers", []):
+                        pts_by_r = d.get("points_by_round", [])
+                        if len(pts_by_r) >= round_num:
+                            d["points_by_round"] = pts_by_r[:round_num - 1]
+                            d["points"] = sum(d["points_by_round"])
+                    driver_pts_map = {d["id"]: d["points"] for d in curr_st.get("drivers", [])}
+                    for c in curr_st.get("constructors", []):
+                        c["points"] = sum(driver_pts_map.get(did, 0) for did in c.get("drivers", []))
+                    curr_st["drivers"] = sorted(curr_st["drivers"], key=lambda x: x["points"], reverse=True)
+                    curr_st["constructors"] = sorted(curr_st["constructors"], key=lambda x: x["points"], reverse=True)
+                    standings_file.write_text(json.dumps(curr_st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+                    reverted_standings = True
+            except Exception:
+                pass
+
+        # Purge Canon Ledger events for M3 to M8
+        ledger_file = ROOT_DIR / "data" / "state" / "canon_ledger.json"
+        if ledger_file.exists():
+            try:
+                ledger_data = json.loads(ledger_file.read_text(encoding="utf-8"))
+                events = ledger_data.get("events", [])
+                kept_events = []
+                for ev in events:
+                    if ev.get("round") == round_num:
+                        mod = str(ev.get("module", "")).upper()
+                        if any(x in mod for x in ["M3", "M4", "M5", "M6", "M7", "M8", "TELEMETRIA", "CORRIDA", "QUALIFYING"]):
+                            purged_events += 1
+                            continue
+                    kept_events.append(ev)
+                ledger_data["events"] = kept_events
+                ledger_file.write_text(json.dumps(ledger_data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            except Exception:
+                pass
+
+        # Reset discord session state if active
+        state_file = ROOT_DIR / "data" / "state" / "discord_session_state.json"
+        if state_file.exists():
+            try:
+                st = json.loads(state_file.read_text(encoding="utf-8"))
+                if int(st.get("active_round_num", 0)) == round_num:
+                    st["status"] = "IDLE"
+                    st["session_files"] = []
+                    st["debrief_messages"] = []
+                    state_file.write_text(json.dumps(st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            except Exception:
+                pass
+
+    # 2. ROLLBACK DE COLETIVA (M2)
+    if scope_norm in ("coletiva", "tudo"):
+        if round_dir.exists():
+            for md_file in list(round_dir.glob("*.md")):
+                order_num, _, _, _ = classify_module_badge(md_file.name)
+                if order_num == 2 or "coletiva" in md_file.name.lower():
+                    md_file.unlink()
+                    deleted_files.append(str(md_file.relative_to(ROOT_DIR)))
+
+        press_file = ROOT_DIR / "data" / "state" / f"press_conf_et{round_num:02d}.json"
+        if press_file.exists():
+            press_file.unlink()
+            deleted_files.append(str(press_file.relative_to(ROOT_DIR)))
+
+        ledger_file = ROOT_DIR / "data" / "state" / "canon_ledger.json"
+        if ledger_file.exists():
+            try:
+                ledger_data = json.loads(ledger_file.read_text(encoding="utf-8"))
+                events = ledger_data.get("events", [])
+                kept_events = []
+                for ev in events:
+                    if ev.get("round") == round_num and "M2" in str(ev.get("module", "")).upper():
+                        purged_events += 1
+                        continue
+                    kept_events.append(ev)
+                ledger_data["events"] = kept_events
+                ledger_file.write_text(json.dumps(ledger_data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            except Exception:
+                pass
+
+    # 3. ROLLBACK DE SEMANA (M1 E M1.5)
+    if scope_norm in ("semana", "tudo"):
+        if round_dir.exists():
+            for md_file in list(round_dir.glob("*.md")):
+                order_num, _, _, _ = classify_module_badge(md_file.name)
+                if order_num == 1 or "semana" in md_file.name.lower() or "dilema" in md_file.name.lower():
+                    md_file.unlink()
+                    deleted_files.append(str(md_file.relative_to(ROOT_DIR)))
+
+        ledger_file = ROOT_DIR / "data" / "state" / "canon_ledger.json"
+        if ledger_file.exists():
+            try:
+                ledger_data = json.loads(ledger_file.read_text(encoding="utf-8"))
+                events = ledger_data.get("events", [])
+                kept_events = []
+                for ev in events:
+                    if ev.get("round") == round_num and any(x in str(ev.get("module", "")).upper() for x in ["M1", "DILEMA"]):
+                        purged_events += 1
+                        continue
+                    kept_events.append(ev)
+                ledger_data["events"] = kept_events
+                ledger_file.write_text(json.dumps(ledger_data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            except Exception:
+                pass
+
+        state_file = ROOT_DIR / "data" / "state" / "discord_session_state.json"
+        if state_file.exists():
+            try:
+                st = json.loads(state_file.read_text(encoding="utf-8"))
+                if int(st.get("active_round_num", 0)) == round_num:
+                    st["semana_day"] = 1
+                    state_file.write_text(json.dumps(st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            except Exception:
+                pass
+
+    # 4. ROLLBACK TUDO (CLEANUP RESIDUAL)
+    if scope_norm == "tudo":
+        if round_dir.exists():
+            for sub in ["telemetry", "photos", "debriefing"]:
+                (round_dir / sub).mkdir(parents=True, exist_ok=True)
+            for f in list(round_dir.iterdir()):
+                if f.is_file():
+                    f.unlink()
+                    deleted_files.append(str(f.relative_to(ROOT_DIR)))
+
+        ledger_file = ROOT_DIR / "data" / "state" / "canon_ledger.json"
+        if ledger_file.exists():
+            try:
+                ledger_data = json.loads(ledger_file.read_text(encoding="utf-8"))
+                events = ledger_data.get("events", [])
+                kept_events = [ev for ev in events if ev.get("round") != round_num]
+                purged_events += (len(events) - len(kept_events))
+                ledger_data["events"] = kept_events
+                ledger_file.write_text(json.dumps(ledger_data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            except Exception:
+                pass
+
+        state_file = ROOT_DIR / "data" / "state" / "discord_session_state.json"
+        if state_file.exists():
+            try:
+                st = json.loads(state_file.read_text(encoding="utf-8"))
+                st["status"] = "IDLE"
+                st["session_files"] = []
+                st["debrief_messages"] = []
+                st["semana_day"] = 1
+                state_file.write_text(json.dumps(st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            except Exception:
+                pass
+
+    # Always recompile the editorial portal to reflect the purged state
+    build_editorial_portal(ROOT_DIR)
+
+    return {
+        "success": True,
+        "round_num": round_num,
+        "round_folder": round_folder,
+        "scope": scope_norm,
+        "deleted_files_count": len(deleted_files),
+        "deleted_files": deleted_files,
+        "purged_canon_events": purged_events,
+        "reverted_standings": reverted_standings,
+    }
+
+
 def acquire_listener_lock(lock_file: Path) -> None:
     """Ensure strictly ONE listener instance runs on the machine at any time."""
     import atexit
@@ -291,12 +661,24 @@ def main() -> None:
             "watch-discord",
             "autonomous-session",
             "generate-m1",
+            "rollback",
+            "start-listener",
+            "stop-listener",
+            "status-listener",
         ],
         default="process-et10",
         help="Action to execute",
     )
     parser.add_argument("--file", type=str, help="Markdown file to publish to Discord")
     parser.add_argument("--round-folder", type=str, default="et_10_espanha", help="Season round folder name")
+    parser.add_argument("--round", type=int, default=11, help="Championship round number (e.g. 11 for Áustria)")
+    parser.add_argument(
+        "--scope",
+        type=str,
+        default="sessao",
+        choices=["sessao", "coletiva", "semana", "tudo"],
+        help="Rollback scope (sessao, coletiva, semana, tudo)",
+    )
     parser.add_argument("--persona", type=str, default=None)
     parser.add_argument("--portal-url", type=str, default=None, help="Base public URL of the Editorial Portal")
     parser.add_argument("--interval", type=int, default=15, help="Polling interval in seconds for watch-discord")
@@ -366,6 +748,18 @@ def main() -> None:
         print(f"M1 Teaser publicado no Discord: {msg_id} -> {deep_link}")
     elif args.action == "publish-round":
         publish_round_to_discord(args.round_folder, teaser_mode=True, base_portal_url=args.portal_url or "")
+    elif args.action == "rollback":
+        res = execute_stage_rollback(round_num=args.round, scope=args.scope)
+        print(f"Rollback executado com sucesso:\n{json.dumps(res, indent=2, ensure_ascii=False)}")
+    elif args.action == "start-listener":
+        ok, msg = start_udp_listener(ROOT_DIR, round_num=args.round)
+        print(msg)
+    elif args.action == "stop-listener":
+        ok, msg = stop_udp_listener(ROOT_DIR)
+        print(msg)
+    elif args.action == "status-listener":
+        ok, msg = get_udp_listener_status(ROOT_DIR)
+        print(msg)
     elif args.action == "sync-ingest":
         client = DiscordGatewayClient()
         state_file = ROOT_DIR / "data" / "state" / "discord_session_state.json"

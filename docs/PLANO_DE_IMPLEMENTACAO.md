@@ -13,14 +13,14 @@
 | **REQ-01** | Catálogo das 12 Verticais Temáticas da Silly Season | ✅ Implementado em `src/canon_ledger.py` | Baixo (Concluído) |
 | **REQ-02** | Cobertura M1 de todas as 10 Equipes (Reais e NPCs) | ⚠️ Parcial (cobre 4 equipes no gerador) | Médio (2 horas) |
 | **REQ-03** | Módulo M1.5: Dilema Interativo de Paddock com Trava de Turno | ❌ Não Implementado no código | Médio (3 horas) |
-| **REQ-04** | Coletiva M2: Contingência por Timeout de Piloto via IA | ⚠️ Parcial (trava existe, falta auto-fallback) | Baixo (1.5 horas) |
+| **REQ-04** | Coletiva M2: Contingência por Timeout de Piloto via IA | ✅ Implementado (`force_timeout_answer` + fallback Gemini) | Baixo (Concluído no Sprint 1) |
 | **REQ-05** | Ingestão UDP 20777 e Descarte de Slots Residuais (`m_numActiveCars`) | ✅ Implementado em `src/telemetry/session_recorder.py` | Baixo (Concluído) |
 | **REQ-06** | Ingestão de Áudios de Debriefing de Voz nos Módulos M5 e M6 | ⚠️ Parcial (transcrição existe, falta hook no Discord) | Médio (2 horas) |
 | **REQ-07** | M6 Ato 4: Declarações de Pilotos NPCs Relevantes | ⚠️ Parcial (prompt precisa de ajuste) | Baixo (1 hora) |
 | **REQ-08** | M7: Cálculo Determinístico e Dispensa de Imagem PNG | ✅ Implementado (basta suprimir renderizador PNG) | Baixo (0.5 hora) |
 | **REQ-09** | M8: Crônica de Corrida + Bancada de Lendas (Prost, Mansell, Villeneuve) | ⚠️ Parcial (prompts focam apenas em Prost) | Médio (2.5 horas) |
-| **REQ-10** | ChatOps: Comando `iniciar escuta f1` para o Listener UDP | ❌ Não Implementado no `discord_gateway.py` | Médio (2 horas) |
-| **REQ-11** | ChatOps: Rotina de Rollback Granular de Etapa (`rollback etapa XX`) | ❌ Não Implementado no orquestrador | Médio (3 horas) |
+| **REQ-10** | ChatOps: Comando `iniciar escuta f1` para o Listener UDP | ✅ Implementado em `discord_gateway.py` e `orchestrator_cli.py` | Médio (Concluído no Sprint 1) |
+| **REQ-11** | ChatOps: Rotina de Rollback Granular de Etapa (`rollback etapa XX`) | ✅ Implementado em `orchestrator_cli.py` com 4 escopos e trava | Médio (Concluído no Sprint 1) |
 | **REQ-12** | Persistência: Base NoSQL Local Unificada (TinyDB / SQLite Document) | ❌ Não Implementado (JSONs puros atuais) | Alto (4 horas) |
 | **REQ-13** | Arquitetura Multi-Temporada (Particionamento por `season_id`) | ⚠️ Parcial (pastas `season_01` fixas em código) | Médio (2.5 horas) |
 | **REQ-14** | Portal Web: Design Paddock Dark Mode & Navegação por Abas | ⚠️ Parcial (layout funcional, falta tema dark F1) | Médio (3 horas) |
@@ -65,16 +65,16 @@ flowchart TD
 
 ## 3. Detalhamento dos Pacotes de Trabalho (Work Packages)
 
-### Sprint 1: ChatOps & Automação Operacional (Habilitação da Etapa 11)
-* **Atividade 1.1 — Comando `iniciar escuta f1`:**
-  * Arquivos: `src/discord_gateway.py`, `src/orchestrator_cli.py`.
-  * Tarefa: Detectar comando `iniciar escuta f1` / `escutar corrida` no `#geral`. Inicializar `python -m src.orchestrator_cli --action test-telemetry` ou `udp_relay` em subprocesso background não-bloqueante; registrar PID em `data/state/listener.pid`; emitir confirmação no Discord.
-* **Atividade 1.2 — Rotina de Rollback Granular de Etapa:**
-  * Arquivos: `src/orchestrator_cli.py`, `src/discord_gateway.py`.
-  * Tarefa: Implementar método `execute_stage_rollback(round_num, scope)` com escopos: `sessao` (apaga telemetria/M3-M8 e reverte `standings.json`), `coletiva` (apaga M2), `semana` (reseta M1) e `tudo` (apaga diretório e purga Canon Ledger). Adicionar trava de confirmação (`confirmar rollback`).
-* **Atividade 1.3 — Contingência por Timeout de Coletiva (M2):**
-  * Arquivos: `src/discord_gateway.py`.
-  * Tarefa: Checar tempo decorrido no estado `TURN_LOCKED`; caso exceda o tempo limite (ou receba `forcar avanco coletiva`), disparar síntese da fala pela persona do piloto ausente via Gemini.
+### Sprint 1: ChatOps & Automação Operacional (Habilitação da Etapa 11) — ✅ CONCLUÍDO
+* **Atividade 1.1 — Comando `iniciar escuta f1`:** ✅
+  * Arquivos: `src/discord_gateway.py`, `src/orchestrator_cli.py`, `tests/test_sprint1.py`.
+  * Status: Implementado. Comandos `iniciar escuta f1`, `status telemetria` e `parar escuta f1` habilitados no ChatOps e via CLI (`--action start-listener`, `--action status-listener`, `--action stop-listener`). Rastreamento via `data/state/listener.pid` e processo `python -m src.udp_relay` em background não-bloqueante na porta 20777.
+* **Atividade 1.2 — Rotina de Rollback Granular de Etapa:** ✅
+  * Arquivos: `src/orchestrator_cli.py`, `src/discord_gateway.py`, `tests/test_sprint1.py`.
+  * Status: Implementado. Método `execute_stage_rollback(round_num, scope)` implementado com suporte aos escopos `sessao`, `coletiva`, `semana`, `tudo`. Proteção de integridade estrita para as Etapas 01 a 10 (imutáveis). No ChatOps, comando `rollback etapa XX [escopo]` exige confirmação explícita via `confirmar rollback` (com expiração em 60s) ou `cancelar rollback`.
+* **Atividade 1.3 — Contingência por Timeout de Coletiva (M2):** ✅
+  * Arquivos: `src/press_conference.py`, `src/discord_gateway.py`, `tests/test_sprint1.py`.
+  * Status: Implementado. Adicionado método `force_timeout_answer(reason)` em `PressConferenceSession` com sintetização de resposta in-character via Gemini fundamentada no arquivo `Setup - Perfil [Piloto].md`. Integração do comando `forcar avanco coletiva` e verificação de auto-timeout regulamentar no polling do Discord.
 
 ### Sprint 2: Enriquecimento de Storytelling & Prompts M1 a M8
 * **Atividade 2.1 — M1 para as 10 Equipes do Grid:**
@@ -115,3 +115,4 @@ flowchart TD
 - [x] Matriz de dependências de rede e pacotes de telemetria UDP 20777 validados e testados (`test_udp_relay.py` com exit code 0).
 - [x] Chaves de API do Discord e Google AI Studio configuradas em `.env`.
 - [x] Diretório `data/seasons/season_01/et_11_austria/` limpo e pronto para receber o novo ciclo.
+

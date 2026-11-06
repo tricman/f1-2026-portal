@@ -258,7 +258,7 @@ class PressConferenceSession:
                 ledger_path = self.root_dir / "data" / "state" / "canon_ledger.json"
                 mgr = CanonLedgerManager(ledger_path)
                 
-                resp_match = re.search(r"💬\s*\*\*?[^:]+\*\*?:\s*["']?([^"'\n]+(?:["']?[^\n]+)?)", gen_text)
+                resp_match = re.search(r'💬\s*\*\*?[^:]+\*\*?:\s*["\']?([^"\'\n]+(?:["\']?[^\n]+)?)', gen_text)
                 clean_npc_ans = resp_match.group(1).strip() if resp_match else "Declaração aos repórteres da FIA."
                 
                 react_match = re.search(r"\*([^*]+)\*\s*$", gen_text.strip())
@@ -318,9 +318,67 @@ class PressConferenceSession:
             self.state["waiting_for_driver"] = target_id
             self.state["waiting_for_driver_name"] = driver_name
             self.state["pending_question_text"] = gen_text
+            self.state["question_asked_timestamp"] = time.time()
             self.state["status"] = "AWAITING_PILOT_REPLY"
             self._save_state(self.state)
             return (full_msg, True, target_id)
+
+    def force_timeout_answer(self, reason: str = "tempo limite esgotado") -> Optional[str]:
+        """
+        Synthesizes an in-character response when a human driver fails to reply within the timeout
+        window or when manually triggered by 'forcar avanco coletiva'.
+        Prevents the race weekend pipeline from getting stuck.
+        """
+        driver_id = self.state.get("waiting_for_driver")
+        if not driver_id or self.state.get("status") != "AWAITING_PILOT_REPLY":
+            return None
+
+        driver_name, discord_tag, car_desc = DRIVER_MENTIONS.get(
+            driver_id, (driver_id.capitalize(), driver_id, "Piloto")
+        )
+        q_text = self.state.get("pending_question_text", "")
+
+        # Try to load driver setup profile
+        profile_path = self.root_dir / "data" / "setup" / f"Setup - Perfil {driver_name}.md"
+        profile_context = ""
+        if profile_path.exists():
+            try:
+                profile_context = profile_path.read_text(encoding="utf-8")[:1500]
+            except Exception:
+                pass
+
+        prompt = (
+            f"PERGUNTA FEITA NA COLETIVA DA FIA AO PILOTO {driver_name.upper()} ({car_desc}):\n"
+            f"{q_text}\n\n"
+            f"PERFIL E ESTILO DO PILOTO:\n{profile_context}\n\n"
+            f"TAREFA:\n"
+            f"O piloto não respondeu a tempo ao microfone da FIA. Você deve gerar a resposta sintética "
+            f"que a assessoria de imprensa do piloto emitiu em seu nome ou a resposta que o próprio piloto daria.\n"
+            f"A declaração deve ser curta (1 a 2 frases), realista, em tom profissional e absolutamente "
+            f"alinhada com a personalidade de {driver_name} descrita no perfil (sem clichês de IA).\n"
+            f"Retorne APENAS o texto da declaração entre aspas, sem introduções ou títulos adicionais."
+        )
+
+        try:
+            synthetic_answer = self.ai_client._call_generate_content(
+                model=self.ai_client.flash_model,
+                parts=[{"text": prompt}],
+                temperature=0.5,
+            ).strip().strip('"').strip("'")
+        except Exception:
+            fallback_map = {
+                "felipe": "Estamos focados no trabalho de engenharia e na evolução constante do carro junto aos mecânicos de Hinwil. O foco é total no fim de semana.",
+                "davi": "A Williams me deu um carro rápido e não vou aliviar nas disputas. Quem quiser me passar na pista vai ter que arriscar tudo.",
+                "sarah": "A equipe tem uma metodologia clara de trabalho. Dados e execução limpa na pista são o que importam, o resto é ruído externo.",
+            }
+            synthetic_answer = fallback_map.get(driver_id, "Estamos totalmente focados na preparação para o fim de semana de GP.")
+
+        full_answer = (
+            f"\"{synthetic_answer}\" "
+            f"*(Declaração emitida pela assessoria de imprensa / resposta sintetizada por {reason})*"
+        )
+        ack_msg = self.submit_pilot_answer(driver_id, full_answer)
+        return ack_msg
 
     def submit_pilot_answer(self, driver_id: str, raw_answer: str) -> str:
         """

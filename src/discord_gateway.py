@@ -60,20 +60,57 @@ ROUND_NUMBER_TO_FOLDER: Dict[int, str] = {
 }
 
 
-def detect_stage_command(text: str) -> Optional[Tuple[str, Optional[int]]]:
+def detect_stage_command(text: str) -> Optional[Tuple[Any, ...]]:
     """
-    Detect stage lifecycle commands in a Discord message:
+    Detect stage lifecycle and ChatOps commands in a Discord message:
       - 'inicio semana etapa 11' -> ('START_SEMANA', 11)
       - 'avancar dia' / 'dia 2 etapa 11' -> ('TICK_SEMANA_2', 11) or ('TICK_SEMANA', None)
       - 'coletiva etapa 11' / 'coletiva fia etapa 11' -> ('START_PRESS_CONF', 11)
+      - 'forcar avanco coletiva' -> ('FORCE_PRESS_CONF_ADVANCE', None)
       - 'inicio da etapa 10' / '!iniciar 10' -> ('START', 10)
       - 'final da etapa 10' / 'fim da etapa' -> ('END', 10)
       - 'pre etapa 10' / 'preview etapa 10' -> ('PRE', 10)
-    Returns (command_type, round_number_or_None) or None.
+      - 'iniciar escuta f1' / 'escutar corrida' -> ('START_UDP_LISTENER', None)
+      - 'status telemetria' -> ('STATUS_UDP_LISTENER', None)
+      - 'parar escuta f1' -> ('STOP_UDP_LISTENER', None)
+      - 'rollback etapa 11 sessao' -> ('STAGE_ROLLBACK', 11, 'sessao')
+      - 'confirmar rollback' -> ('CONFIRM_ROLLBACK', None)
+      - 'cancelar rollback' -> ('CANCEL_ROLLBACK', None)
+    Returns (command_type, round_number_or_None, [optional_extra]) or None.
     """
     clean = text.strip().lower()
 
-    # 1. Weekly Silly Season Schedule
+    # 1. Telemetry UDP Listener ChatOps
+    if re.search(r"\b(?:iniciar|comecar|começar|escutar)\s+(?:a\s+)?(?:escuta\s+f1|escuta|corrida|telemetria|udp)\b", clean):
+        return ("START_UDP_LISTENER", None)
+
+    if re.search(r"\bstatus\s+(?:da\s+)?(?:telemetria|escuta|udp)\b", clean):
+        return ("STATUS_UDP_LISTENER", None)
+
+    if re.search(r"\b(?:parar|encerrar|interromper|stop)\s+(?:a\s+)?(?:escuta\s+f1|escuta|telemetria|udp)\b", clean):
+        return ("STOP_UDP_LISTENER", None)
+
+    # 2. Granular Stage Rollback ChatOps
+    rollback_match = re.search(
+        r"\b(?:rollback|reverter)\s+(?:da\s+)?etapa\s+(\d+)(?:\s+(sessao|sessão|coletiva|semana|tudo))?\b",
+        clean,
+    )
+    if rollback_match:
+        r_num = int(rollback_match.group(1))
+        scope = (rollback_match.group(2) or "sessao").replace("sessão", "sessao")
+        return ("STAGE_ROLLBACK", r_num, scope)
+
+    if re.search(r"\bconfirmar\s+rollback\b", clean):
+        return ("CONFIRM_ROLLBACK", None)
+
+    if re.search(r"\bcancelar\s+rollback\b", clean):
+        return ("CANCEL_ROLLBACK", None)
+
+    # 3. Press Conference Force Timeout Advance
+    if re.search(r"\b(?:forcar|forçar|avancar|avançar)\s+(?:avanco\s+|avanço\s+)?coletiva\b|\btimeout\s+coletiva\b", clean):
+        return ("FORCE_PRESS_CONF_ADVANCE", None)
+
+    # 4. Weekly Silly Season Schedule
     semana_start = re.search(
         r"\b(?:inicio|início|iniciar|start)\s+(?:da\s+|de\s+)?semana(?:\s+(?:da\s+|de\s+)?etapa)?(?:\s+#?(\d+))?",
         clean,
@@ -345,8 +382,148 @@ class DiscordGatewayClient:
             cmd = detect_stage_command(content) if content else None
 
             if cmd and msg_id not in processed_msg_ids:
-                cmd_type, cmd_round = cmd
+                cmd_type = cmd[0]
+                cmd_round = cmd[1]
+                cmd_extra = cmd[2] if len(cmd) > 2 else None
                 processed_msg_ids.add(msg_id)
+
+                if cmd_type == "START_UDP_LISTENER":
+                    from src.orchestrator_cli import start_udp_listener
+                    r_num = cmd_round or state.get("active_round_num") or 11
+                    ok, reply_txt = start_udp_listener(root_dir, round_num=r_num)
+                    if should_reply:
+                        self.post_channel_message(self.ingest_channel_id, reply_txt)
+                    continue
+
+                if cmd_type == "STATUS_UDP_LISTENER":
+                    from src.orchestrator_cli import get_udp_listener_status
+                    ok, reply_txt = get_udp_listener_status(root_dir)
+                    if should_reply:
+                        self.post_channel_message(self.ingest_channel_id, reply_txt)
+                    continue
+
+                if cmd_type == "STOP_UDP_LISTENER":
+                    from src.orchestrator_cli import stop_udp_listener
+                    ok, reply_txt = stop_udp_listener(root_dir)
+                    if should_reply:
+                        self.post_channel_message(self.ingest_channel_id, reply_txt)
+                    continue
+
+                if cmd_type == "STAGE_ROLLBACK":
+                    r_num = cmd_round or state.get("active_round_num") or 11
+                    scope = (cmd_extra or "sessao").lower().strip()
+                    if r_num < 11:
+                        if should_reply:
+                            self.post_channel_message(
+                                self.ingest_channel_id,
+                                f"🛡️ **OPERAÇÃO BLOQUEADA — INTEGRIDADE DO CAMPEONATO:**\n"
+                                f"As Etapas 01 a 10 são canônicas e imutáveis. O rollback só é permitido para a Etapa 11 em diante."
+                            )
+                        continue
+
+                    state["pending_rollback"] = {
+                        "round_num": r_num,
+                        "scope": scope,
+                        "timestamp": time.time(),
+                    }
+                    scope_desc = {
+                        "sessao": "reverte telemetria, fotos, debriefings, classificação da FIA e módulos M3 a M8 (preserva M1 e M2)",
+                        "coletiva": "reverte ata oficial M2 e purga declarações da coletiva no Canon Ledger",
+                        "semana": "reverte pré-semana M1 / M1.5 e reseta o cronograma diário",
+                        "tudo": "apaga todos os dados e módulos da etapa, purga o Canon Ledger e reseta o estado para IDLE",
+                    }.get(scope, scope)
+
+                    if should_reply:
+                        self.post_channel_message(
+                            self.ingest_channel_id,
+                            f"⚠️ **SOLICITAÇÃO DE ROLLBACK DETECTADA — ETAPA {r_num} (Escopo: `{scope.upper()}`)**\n\n"
+                            f"• **Ação que será executada:** {scope_desc}.\n"
+                            f"• **Confirmação Obrigatória:** Para confirmar a reversão imediata, digite **`confirmar rollback`** em até 60 segundos.\n"
+                            f"• Para desistir, digite **`cancelar rollback`**."
+                        )
+                    continue
+
+                if cmd_type == "CONFIRM_ROLLBACK":
+                    pending = state.get("pending_rollback")
+                    now = time.time()
+                    if pending and (now - float(pending.get("timestamp", 0))) <= 60.0:
+                        r_num = pending.get("round_num", 11)
+                        scope = pending.get("scope", "sessao")
+                        state["pending_rollback"] = None
+                        from src.orchestrator_cli import execute_stage_rollback
+                        try:
+                            res = execute_stage_rollback(r_num, scope)
+                            if should_reply:
+                                self.post_channel_message(
+                                    self.ingest_channel_id,
+                                    f"✅ **ROLLBACK EXECUTADO COM SUCESSO — ETAPA {r_num} (Escopo: `{scope.upper()}`)**\n"
+                                    f"• **Arquivos excluídos:** `{res['deleted_files_count']}`\n"
+                                    f"• **Eventos removidos do Canon Ledger:** `{res['purged_canon_events']}`\n"
+                                    f"• **Classificação da FIA:** `{'Restaurada etapa anterior' if res['reverted_standings'] else 'Preservada'}`\n"
+                                    f"• 🌐 **Portal Editorial Recompilado:** Sincronizado e pronto para nova execução."
+                                )
+                        except Exception as exc:
+                            if should_reply:
+                                self.post_channel_message(
+                                    self.ingest_channel_id,
+                                    f"❌ **ERRO AO EXECUTAR ROLLBACK:** {exc}"
+                                )
+                    else:
+                        state["pending_rollback"] = None
+                        if should_reply:
+                            self.post_channel_message(
+                                self.ingest_channel_id,
+                                f"ℹ️ Não há nenhuma solicitação de rollback pendente ou o tempo limite de 60 segundos expirou."
+                            )
+                    continue
+
+                if cmd_type == "CANCEL_ROLLBACK":
+                    state["pending_rollback"] = None
+                    if should_reply:
+                        self.post_channel_message(
+                            self.ingest_channel_id,
+                            f"🛑 **Solicitação de rollback cancelada.** Nenhum dado ou arquivo foi alterado."
+                        )
+                    continue
+
+                if cmd_type == "FORCE_PRESS_CONF_ADVANCE":
+                    active_r_num = int(state.get("active_round_num") or 11)
+                    active_folder = state.get("active_round_folder") or ROUND_NUMBER_TO_FOLDER.get(active_r_num, f"et_{active_r_num:02d}")
+                    press_conf_file = root_dir / "data" / "state" / f"press_conf_et{active_r_num:02d}.json"
+                    if press_conf_file.exists():
+                        try:
+                            pc_data = json.loads(press_conf_file.read_text(encoding="utf-8"))
+                            if pc_data.get("status") == "AWAITING_PILOT_REPLY":
+                                from src.press_conference import PressConferenceSession
+                                pc_sess = PressConferenceSession(root_dir, active_r_num, active_folder)
+                                ack_msg = pc_sess.force_timeout_answer(reason="Comando manual de avanço da assessoria")
+                                if should_reply and ack_msg:
+                                    self.post_channel_message(self.ingest_channel_id, ack_msg)
+                                next_msg, is_lock, next_driver = pc_sess.advance_to_next_question()
+                                if should_reply and next_msg:
+                                    self.post_channel_message(self.ingest_channel_id, next_msg)
+                                while not is_lock and not pc_sess.state.get("completed"):
+                                    time.sleep(3.0)
+                                    next_msg, is_lock, next_driver = pc_sess.advance_to_next_question()
+                                    if should_reply and next_msg:
+                                        self.post_channel_message(self.ingest_channel_id, next_msg)
+                            else:
+                                if should_reply:
+                                    self.post_channel_message(
+                                        self.ingest_channel_id,
+                                        f"ℹ️ A Coletiva da FIA da Etapa {active_r_num} não está aguardando resposta de piloto humano no momento."
+                                    )
+                        except Exception as exc:
+                            if should_reply:
+                                self.post_channel_message(self.ingest_channel_id, f"⚠️ Erro ao forçar avanço da coletiva: {exc}")
+                    else:
+                        if should_reply:
+                            self.post_channel_message(
+                                self.ingest_channel_id,
+                                f"ℹ️ Nenhuma coletiva ativa encontrada para a Etapa {active_r_num}."
+                            )
+                    continue
+
                 if cmd_type == "START_SEMANA":
                     r_num = cmd_round or state.get("active_round_num") or 10
                     r_folder = ROUND_NUMBER_TO_FOLDER.get(r_num, f"et_{r_num:02d}")
@@ -485,6 +662,30 @@ class DiscordGatewayClient:
                         continue
                 except Exception as exc:
                     print(f"[Press Conf Answer Warning] {exc}")
+
+            # Auto-timeout check for Press Conference (Turn-Lock Fallback)
+            if press_conf_file.exists() and not cmd:
+                try:
+                    pc_data = json.loads(press_conf_file.read_text(encoding="utf-8"))
+                    if pc_data.get("status") == "AWAITING_PILOT_REPLY":
+                        asked_ts = float(pc_data.get("question_asked_timestamp", 0))
+                        timeout_limit = float(os.environ.get("PRESS_CONF_TIMEOUT_SECONDS", "300"))
+                        if asked_ts > 0 and (time.time() - asked_ts) > timeout_limit:
+                            from src.press_conference import PressConferenceSession
+                            pc_sess = PressConferenceSession(root_dir, active_r_num, active_folder)
+                            ack_msg = pc_sess.force_timeout_answer(reason=f"tempo regulamentar esgotado ({int(timeout_limit)}s)")
+                            if should_reply and ack_msg:
+                                self.post_channel_message(self.ingest_channel_id, f"⏰ **TEMPO REGULAMENTAR ESGOTADO NA COLETIVA FIA:**\n{ack_msg}")
+                            next_msg, is_lock, next_driver = pc_sess.advance_to_next_question()
+                            if should_reply and next_msg:
+                                self.post_channel_message(self.ingest_channel_id, next_msg)
+                            while not is_lock and not pc_sess.state.get("completed"):
+                                time.sleep(3.0)
+                                next_msg, is_lock, next_driver = pc_sess.advance_to_next_question()
+                                if should_reply and next_msg:
+                                    self.post_channel_message(self.ingest_channel_id, next_msg)
+                except Exception as exc:
+                    print(f"[Press Conf Auto-Timeout Check Warning] {exc}")
 
             # Only collect attachments and debrief notes sent AFTER the current session's `start_message_id`
             start_id = state.get("start_message_id")
