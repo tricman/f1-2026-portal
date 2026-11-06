@@ -320,21 +320,25 @@ def build_specification_document():
         ),
         (
             "M5 — Relatório da Corrida (FIA Official Sporting Report)",
-            "Documento master que audita a prova: classificação final, voltas percorridas, paradas nos boxes, compostos de pneus utilizados e incidentes com punições.",
+            "Documento master que audita a prova: classificação final, voltas percorridas, paradas nos boxes, compostos de pneus utilizados, incidentes e debriefing de áudio.",
             "Bandeira quadriculada da corrida (Packet 8 FinalClassification recebido pelo listener UDP) OU ativação sob demanda via comando do bot Discord 'iniciar escuta f1'.",
-            "Arquivo consolidado race_telemetry_merged.json sintetizado nativamente pelo listener UDP.",
-            "• Verificação obrigatória do regulamento de pneus (mínimo de 2 compostos secos distintos utilizados em provas secas).\n• Consolidação de tempo total de corrida ou gap em relação ao líder.\n• Apuração de tempos de paradas nos boxes e voltas das trocas.\n• Registro formal das deliberações dos comissários (Stewards' Decisions).",
+            "Arquivo consolidado race_telemetry_merged.json sintetizado nativamente pelo listener UDP + Transcrições de áudio e notas de voz de debriefing dos pilotos no Discord (debriefing_notes.md).",
+            "• Ingestão de Debriefing de Áudio: Relatos e desabafos gravados em voz por Felipe, Davi e Sarah no Discord são transcritos e fundidos diretamente na crônica pós-corrida.\n"
+            "• Verificação obrigatória do regulamento de pneus (mínimo de 2 compostos secos distintos utilizados em provas secas).\n"
+            "• Consolidação de tempo total de corrida ou gap em relação ao líder.\n"
+            "• Apuração de tempos de paradas nos boxes e voltas das trocas.\n"
+            "• Registro formal das deliberações dos comissários (Stewards' Decisions).",
             "Documento 05_fia_corrida.md + Atualização do estado de corrida para disparo de M6 e M7."
         ),
         (
             "M6 — Pódio, Sala de Descompressão & Zona Mista",
             "Crônica de dramaturgia esportiva narrada no formato 'Drive to Survive', dividida em 4 atos cinematográficos de bastidores.",
             "Conclusão da auditoria esportiva do M5.",
-            "Resultado oficial da corrida, deltas de chegada, incidentes e danos mecânicos de telemetria.",
+            "Resultado oficial da corrida, deltas de chegada, incidentes, danos mecânicos de telemetria e relatos transcritos de áudio de debriefing.",
             "• Ato 1: Parque Fechado (reações viscerais ao sair do cockpit, abraços nas garagens).\n"
             "• Ato 2: Sala de Descompressão (Cooldown Room - conversas sem filtro entre os 3 primeiros colocados antes de subir ao pódio).\n"
             "• Ato 3: Cerimônia do Pódio (entrega de troféus e banho de champanhe).\n"
-            "• Ato 4: Zona Mista (declarações de Felipe, Davi e Sarah aos repórteres, complementadas obrigatoriamente por declarações de pilotos NPCs de destaque — ex: vencedor da prova, pilotos no pódio ou rivais envolvidos em disputas acirradas e toques de pista).",
+            "• Ato 4: Zona Mista (declarações de Felipe, Davi e Sarah aos repórteres fundidas com os áudios de debriefing, complementadas obrigatoriamente por declarações de pilotos NPCs de destaque — ex: vencedor da prova, pilotos no pódio ou rivais envolvidos em disputas acirradas e toques de pista).",
             "Documento 06_cerimonia_podio.md + Teaser ilustrado no Discord #repercussao-midia."
         ),
         (
@@ -453,6 +457,62 @@ def build_specification_document():
         "e ícones com o tempo exato das paradas de box."
     )
 
+    doc.add_heading("2.5. Dinâmica de 'Corrida em Casa' (Home Circuit Drivers)", level=2)
+    doc.add_paragraph(
+        "O ecossistema implementa uma mecânica nativa de enriquecimento dramático baseada no circuito da etapa. "
+        "Conforme mapeado em src/canon_ledger.py (HOME_CIRCUIT_DRIVERS), pilotos e equipes que competem em seu país de origem "
+        "ou na sede de sua fábrica recebem tratamento editorial diferenciado:\n"
+        "• Mapeamento Canônico: Austrália (Piastri), Japão (Tsunoda), Ímola/Monza (Ferrari/Leclerc/Sainz), Mônaco (Leclerc), "
+        "Espanha (Alonso/Sainz), Áustria (Red Bull/Verstappen/Perez), Grã-Bretanha (Hamilton/Norris/Albon), Holanda (Verstappen) e EUA (Haas).\n"
+        "• Impacto no Storytelling (M1 e M2): A cobertura da Silly Season eleva o foco sobre esses pilotos (pressão da torcida, "
+        "capacete especial, exigência de vitória do patrocinador master local) e a bancada da Coletiva FIA (M2) inclui compulsoriamente "
+        "os pilotos da casa para responderem à imprensa local."
+    )
+
+    doc.add_heading("2.6. Governança Editorial de Assinaturas Institucionais (MODULE_PERSONAS)", level=2)
+    doc.add_paragraph(
+        "A orquestração do Showrunner (src/orchestrator_cli.py) estabelece que cada documento e embed publicado "
+        "no Discord carregue a chancela oficial de uma persona institucional especializada, conferindo tom documental e jornalístico crível:"
+    )
+
+    tbl_prs = doc.add_table(rows=9, cols=3)
+    tbl_prs.alignment = WD_TABLE_ALIGNMENT.CENTER
+    headers_prs = ["Módulo Canônico", "Persona Oficial / Assinatura", "Tom Editorial & Responsabilidade"]
+    for j, h in enumerate(headers_prs):
+        tbl_prs.rows[0].cells[j].text = h
+    style_table_header(tbl_prs.rows[0], [Inches(1.8), Inches(2.3), Inches(2.7)])
+
+    prs_data = [
+        ("M1: Silly Season", "F1 Paddock Insider\nBlog 'A F1 Que Você Não Vê'", "Ágil, sarcástico com políticas de bastidores e focado em rumores de garagens."),
+        ("M2: Coletiva FIA", "FIA Communications\nTom Clarkson", "Mestre de cerimônias oficial da FIA; perguntas formais e provocativas."),
+        ("M3: Treino Livre", "FIA Technical Delegate\nJo Bauer", "Boletim estritamente técnico de medições de peças, setores e velocidade."),
+        ("M4: Classificação", "FIA Race Direction\nNiels Wittich & Jo Bauer", "Direção de prova; publicação oficial do grid e penalidades de grelha."),
+        ("M5: Corrida", "FIA Stewards & Race Control", "Painel dos comissários; relatório oficial de tempos, incidentes e deliberações."),
+        ("M6: Pódio", "F1 TV World Feed &\nDrive to Survive Crew", "Narrativa cinematográfica de bastidores, emoções viscerais e pós-corrida."),
+        ("M7: Boletim Mundial", "FIA World Motor Sport\nCouncil Secretariat", "Secretaria oficial da FIA; transcrição matemática imutável da pontuação."),
+        ("M8: Repercussão", "Global F1 Media Hub\n(Band / Sky / Gazzetta / X)", "Cobertura global da imprensa internacional e debate da Bancada de Lendas."),
+    ]
+    for idx_pr, (mc, pa, te) in enumerate(prs_data, start=1):
+        r_pr = tbl_prs.rows[idx_pr]
+        r_pr.cells[0].text = mc
+        r_pr.cells[1].text = pa
+        r_pr.cells[2].text = te
+        style_table_row(r_pr, is_even=(idx_pr % 2 == 0), col_widths=[Inches(1.8), Inches(2.3), Inches(2.7)])
+
+    doc.add_paragraph().paragraph_format.space_after = Pt(4)
+
+    doc.add_heading("2.7. Mecânica de Renderização Adaptativa para Mensageria Mobile (table_renderer.py)", level=2)
+    doc.add_paragraph(
+        "Devido às restrições de exibição de tabelas Markdown no aplicativo móvel do Discord (que frequentemente sofrem "
+        "truncamento horizontal forçando scroll indesejado), o componente src/table_renderer.py implementa um parser adaptativo:\n"
+        "1. Interceptação de Tabelas GFM: O motor identifica blocos de tabelas no padrão '| Pos | N | Piloto | Equipe | ... |'.\n"
+        "2. Transformação em Cards Resumidos: A tabela é convertida em blocos de citação formatados no formato: "
+        "'> 🔹 **[Pos]** `[Número]` **[Nome do Piloto]** — *[Equipe]* \n> ⏱️ **Tempo/Gap:** `[Delta]` | **Melhor Volta:** `[Tempo]`'.\n"
+        "3. Emojis de Destaque: Posições de pódio recebem medalhas automáticas (🥇 1º, 🥈 2º, 🥉 3º) e a volta mais rápida recebe o badge roxo (🟣 VR).\n"
+        "4. Preservação de Integridade: A versão completa original em Markdown GFM permanece preservada no arquivo .md do disco "
+        "e disponibilizada como anexo para leitura detalhada em desktop."
+    )
+
     doc.add_page_break()
 
     # =========================================================================
@@ -545,19 +605,32 @@ def build_specification_document():
         r_p.cells[2].text = de
         style_table_row(r_p, is_even=(idx_p % 2 == 0), col_widths=[Inches(1.8), Inches(1.6), Inches(3.3)])
 
-    doc.add_paragraph().paragraph_format.space_after = Pt(6)
+    doc.add_paragraph().paragraph_format.space_after = Pt(4)
+    doc.add_paragraph(
+        "📌 Regra de Descarte de Slots Residuais (m_numActiveCars): No protocolo Codemasters F1 2024, os payloads contêm "
+        "sempre 22 structs fixas, embora o grid ativo possua 20 carros na pista. O parser lê o byte 'm_numActiveCars' e itera "
+        "estritamente até esse limite, descartando compulsoriamente os slots residuais 20 e 21 (bytes zerados) para evitar "
+        "a criação de competidores fantasmas ('Piloto #0 / Equipe 0')."
+    )
 
-    doc.add_heading("3.3. Contrato de Interface Canônica (race_telemetry_merged.json)", level=2)
+    doc.add_heading("3.3. Contrato de Interface Canônica & Resiliência de Parser (telemetry_merger.py)", level=2)
     doc.add_paragraph(
         "O listener UDP sintetiza ao término da sessão o arquivo JSON canônico que alimenta diretamente "
-        "os módulos de inteligência artificial e o motor matemático da FIA, sem necessidade de fotos de TV ou OCR."
+        "os módulos de inteligência artificial e o motor matemático da FIA, sem necessidade de fotos de TV ou OCR.\n\n"
+        "📌 Resiliência de Parser e Sanitização de Strings Sujas: O módulo implementa o helper 'parse_lap_time_ms' para "
+        "higienizar dados de voltas e desgaste de pneus enviados pelo simulador e dumps de CSV. Strings atípicas associadas "
+        "a abandonos ou dados corrompidos ('—', 'DNF', '0.0%', 'NC') são interceptadas via expressões regulares e blocos try/except. "
+        "Tempos de volta não concluídos são convertidos automaticamente no valor sentinela 999_999_999 ms, garantindo "
+        "ordenação estável sem quebrar as operações numéricas de float() ou int()."
     )
 
     doc.add_heading("3.4. Especificação do Gateway Discord (ChatOps & FSM)", level=2)
     doc.add_paragraph(
         "O cliente discord_gateway.py gerencia a conexão com a guilda oficial através da API REST v10. "
         "A máquina de estados finitos opera com polling assíncrono controlado (intervalo de 3 segundos), "
-        "armazenando o estado da conversação em data/state/discord_session_state.json."
+        "armazenando o estado da conversação em data/state/discord_session_state.json.\n\n"
+        "O campo 'last_processed_msg_id' desempenha papel fundamental na garantia de IDEMPOTÊNCIA: o bot armazena o Snowflake ID "
+        "da última mensagem processada e descarta qualquer mensagem anterior ou duplicada após reinicialização do serviço."
     )
 
     tbl_fsm = doc.add_table(rows=7, cols=3)
@@ -768,6 +841,54 @@ def build_specification_document():
         r_a.cells[4].text = ta
         r_a.cells[4].paragraphs[0].runs[0].font.size = Pt(8)
         style_table_row(r_a, is_even=(idx_a % 2 == 0), col_widths=[Inches(1.4), Inches(1.2), Inches(1.6), Inches(1.6), Inches(1.4)])
+
+    doc.add_paragraph().paragraph_format.space_after = Pt(6)
+
+    doc.add_heading("3.8.4. Encadeamento Sequencial de Contexto Progressivo (Chained Outputs Pipeline)", level=3)
+    doc.add_paragraph(
+        "Para assegurar a causalidade narrativa estrita entre os módulos pós-corrida (M5, M6, M7 e M8), o cliente "
+        "src/ai_showrunner.py não executa as chamadas de IA de forma isolada. O motor implementa o padrão "
+        "'Chained Context Injection' (armazenado na lista interna 'chained_outputs'):\n"
+        "• Continuidade M5 ➔ M6: O texto completo gerado no Relatório Oficial da Corrida (M5) é injetado diretamente no prompt "
+        "da Cerimônia do Pódio e Bastidores (M6). Isso garante que ultrapassagens milimétricas na última volta, toques de asa "
+        "ou quebras mecânicas relatadas no M5 sejam obrigatoriamente repercutidas nas conversas da Sala de Descompressão.\n"
+        "• Continuidade M6 ➔ M8: O output de M6 e os trechos de M5 são encadeados no prompt da Repercussão de Mídia (M8). "
+        "Dessa forma, os vereditos de Alain Prost, Nigel Mansell e Jacques Villeneuve avaliam fatos consumados idênticos, "
+        "eliminando qualquer contradição factual entre crônicas de uma mesma etapa."
+    )
+
+    doc.add_heading("3.9. Especificação da Interface de Linha de Comando (CLI - orchestrator_cli.py)", level=2)
+    doc.add_paragraph(
+        "A orquestração do ecossistema local é operada via terminal através do utilitário central src/orchestrator_cli.py. "
+        "A tabela a seguir documenta as ações e parâmetros operacionais disponíveis:"
+    )
+
+    tbl_cli = doc.add_table(rows=8, cols=3)
+    tbl_cli.alignment = WD_TABLE_ALIGNMENT.CENTER
+    headers_cli = ["Ação (--action)", "Parâmetros Aceitos", "Propósito & Comportamento Operacional"]
+    for j, h in enumerate(headers_cli):
+        tbl_cli.rows[0].cells[j].text = h
+    style_table_header(tbl_cli.rows[0], [Inches(1.8), Inches(1.8), Inches(3.2)])
+
+    cli_data = [
+        ("autonomous-session", "--round [N]\n--max-hours [H]", "Inicia o ciclo autônomo completo com escuta assíncrona do Discord (#geral) e do listener UDP 20777 em background por até H horas."),
+        ("pilot-test", "--round [N]\n--track [Nome]", "Modo sandbox isolado para testes rápidos em pistas de treino (ex: Portimão). Nenhum arquivo oficial do campeonato é alterado."),
+        ("full-cycle", "--round [N]\n--force", "Executa a pipeline completa da Etapa N em lote (M1 a M8, fusão de telemetria e compilação do portal web editorial)."),
+        ("pre-race-m1", "--round [N]\n--force", "Dispara exclusivamente a geração da Silly Season (M1) e prepara a pauta da Coletiva FIA para a Etapa N."),
+        ("post-race", "--round [N]\n--force", "Processa os dados pós-corrida (M3 a M8) a partir da telemetria gravada em data/seasons/season_01/et_XX/telemetry/."),
+        ("test-telemetry", "--port [20777]\n--test", "Valida a recepção de pacotes UDP do EA Sports F1 24, resolução de nomes dos 20 pilotos e verificação de descarte de slots residuais."),
+        ("test-discord", "--channel [ID]", "Testa autenticação do bot, envio de mensagens no canal de voz e publicação multipart de arquivos no canal de mídia."),
+    ]
+    for idx_c, (ac, pm, pr) in enumerate(cli_data, start=1):
+        r_c = tbl_cli.rows[idx_c]
+        r_c.cells[0].text = ac
+        r_c.cells[0].paragraphs[0].runs[0].font.name = "Consolas"
+        r_c.cells[0].paragraphs[0].runs[0].font.size = Pt(8.5)
+        r_c.cells[1].text = pm
+        r_c.cells[1].paragraphs[0].runs[0].font.name = "Consolas"
+        r_c.cells[1].paragraphs[0].runs[0].font.size = Pt(8.5)
+        r_c.cells[2].text = pr
+        style_table_row(r_c, is_even=(idx_c % 2 == 0), col_widths=[Inches(1.8), Inches(1.8), Inches(3.2)])
 
     doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
