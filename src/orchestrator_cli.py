@@ -6,12 +6,19 @@ import subprocess
 import time
 import urllib.parse
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Optional, List, Any
 from src.telemetry_merger import parse_free_practice_summary, merge_race_telemetry
 from src.fia_calculator import update_championship_standings
 from src.canon_ledger import CanonLedgerManager
 from src.discord_gateway import DiscordGatewayClient
 from src.portal_builder import build_editorial_portal, ROUND_METADATA, classify_module_badge
+from src.season_manager import (
+    get_season_dir,
+    get_current_season_id,
+    initialize_new_season,
+    DEFAULT_NEXT_SEASON_GRID,
+    list_available_seasons,
+)
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
@@ -35,7 +42,8 @@ def load_dotenv_if_present() -> None:
             v = v[1:end_q] if end_q != -1 else v.strip("'")
         else:
             v = v.split("#")[0].strip()
-        os.environ[k] = v
+        if k not in os.environ:
+            os.environ[k] = v
 
 
 MODULE_PERSONAS: Dict[str, str] = {
@@ -60,8 +68,8 @@ def resolve_persona_for_filename(filename: str) -> str:
     return "FIA Official Media Center"
 
 
-def process_round_telemetry(r_num: int, r_folder: str) -> None:
-    round_dir = ROOT_DIR / "data" / "seasons" / "season_01" / r_folder
+def process_round_telemetry(r_num: int, r_folder: str, season_id: Optional[str] = None) -> None:
+    round_dir = get_season_dir(ROOT_DIR, season_id) / r_folder
     tel_dir = round_dir / "telemetry"
     tel_dir.mkdir(parents=True, exist_ok=True)
 
@@ -128,14 +136,14 @@ def process_round_10_telemetry() -> None:
     process_round_telemetry(10, "et_10_espanha")
 
 
-def deploy_portal_to_github_pages(commit_msg: str = "Auto-update F1 2026 Editorial Portal & FIA Wiki") -> Path:
+def deploy_portal_to_github_pages(commit_msg: str = "Auto-update F1 2026 Editorial Portal & FIA Wiki", season_id: Optional[str] = None) -> Path:
     """
     Rebuild `portal/index.html` and root `index.html` from all current Markdown/JSON files in `data/`
     and push directly to `https://github.com/tricman/f1-2026-portal.git` (GitHub Pages).
     """
     from src.logger import log_text
 
-    out_path = build_editorial_portal(ROOT_DIR)
+    out_path = build_editorial_portal(ROOT_DIR, season_id=season_id)
     log_text("[PORTAL BUILD] index.html e portal/portal_data.json recompilados com sucesso.")
     try:
         git_target_dir = ROOT_DIR if (ROOT_DIR / ".git").exists() else (ROOT_DIR / "portal")
@@ -192,13 +200,13 @@ def deploy_portal_to_github_pages(commit_msg: str = "Auto-update F1 2026 Editori
     return out_path
 
 
-def publish_round_to_discord(round_folder: str, teaser_mode: bool = True, base_portal_url: str = "") -> None:
-    round_dir = ROOT_DIR / "data" / "seasons" / "season_01" / round_folder
+def publish_round_to_discord(round_folder: str, teaser_mode: bool = True, base_portal_url: str = "", season_id: Optional[str] = None) -> None:
+    round_dir = get_season_dir(ROOT_DIR, season_id) / round_folder
     if not round_dir.exists():
         raise FileNotFoundError(f"Round folder not found: {round_dir}")
 
     # Always rebuild & deploy the Portal first so deep links are immediately live
-    deploy_portal_to_github_pages(f"Publish {round_folder} to F1 2026 Portal")
+    deploy_portal_to_github_pages(f"Publish {round_folder} to F1 2026 Portal", season_id=season_id)
 
     client = DiscordGatewayClient()
     base_url = (base_portal_url or os.environ.get("PORTAL_PUBLIC_URL") or "https://tricman.github.io/f1-2026-portal/").rstrip("/")
@@ -370,7 +378,7 @@ def stop_udp_listener(root_dir: Optional[Path] = None) -> Tuple[bool, str]:
         return True, f"🛑 Listener encerrado: {exc}"
 
 
-def execute_stage_rollback(round_num: int, scope: str = "sessao") -> Dict[str, Any]:
+def execute_stage_rollback(round_num: int, scope: str = "sessao", season_id: Optional[str] = None) -> Dict[str, Any]:
     """
     Executes a granular rollback for a given round.
     
@@ -381,11 +389,12 @@ def execute_stage_rollback(round_num: int, scope: str = "sessao") -> Dict[str, A
       - 'tudo': Complete round reset (resets everything for the round).
       
     Safety:
-      - Rounds 1 to 10 are canonical history and cannot be rolled back.
+      - Rounds 1 to 10 in season_01 are canonical history and cannot be rolled back.
     """
-    if round_num < 11:
+    eff_season = season_id or get_current_season_id()
+    if eff_season == "season_01" and round_num < 11:
         raise ValueError(
-            f"Proteção de integridade ativada: As Etapas 01 a 10 são canônicas e imutáveis. "
+            f"Proteção de integridade ativada: As Etapas 01 a 10 da Temporada 1 são canônicas e imutáveis. "
             f"O rollback só é permitido para a Etapa 11 em diante (solicitado: Etapa {round_num})."
         )
 
@@ -395,7 +404,7 @@ def execute_stage_rollback(round_num: int, scope: str = "sessao") -> Dict[str, A
         raise ValueError(f"Escopo de rollback inválido: '{scope}'. Opções válidas: {sorted(list(valid_scopes))}")
 
     round_folder = ROUND_NUMBER_TO_FOLDER.get(round_num, f"et_{round_num:02d}")
-    round_dir = ROOT_DIR / "data" / "seasons" / "season_01" / round_folder
+    round_dir = get_season_dir(ROOT_DIR, eff_season) / round_folder
 
     deleted_files: List[str] = []
     purged_events = 0
@@ -666,6 +675,8 @@ def main() -> None:
             "start-listener",
             "stop-listener",
             "status-listener",
+            "start-season",
+            "list-seasons",
         ],
         default="process-et10",
         help="Action to execute",
@@ -673,6 +684,9 @@ def main() -> None:
     parser.add_argument("--file", type=str, help="Markdown file to publish to Discord")
     parser.add_argument("--round-folder", type=str, default="et_10_espanha", help="Season round folder name")
     parser.add_argument("--round", type=int, default=11, help="Championship round number (e.g. 11 for Áustria)")
+    parser.add_argument("--season", type=str, default=None, help="Active season identifier (e.g. season_01, season_02)")
+    parser.add_argument("--new-season", type=str, default="season_02", help="Target new season identifier to initialize")
+    parser.add_argument("--grid-file", type=str, default=None, help="Path to JSON file with new season driver grid registry")
     parser.add_argument(
         "--scope",
         type=str,
@@ -694,10 +708,10 @@ def main() -> None:
     if args.action == "process-et10":
         process_round_10_telemetry()
     elif args.action == "build-portal":
-        out_path = build_editorial_portal(ROOT_DIR)
+        out_path = build_editorial_portal(ROOT_DIR, season_id=args.season)
         print(f"Editorial Portal & Season Wiki built successfully at: {out_path}")
     elif args.action == "deploy-portal":
-        out_path = deploy_portal_to_github_pages()
+        out_path = deploy_portal_to_github_pages(season_id=args.season)
         print(f"Editorial Portal deployed from: {out_path}")
     elif args.action == "publish-discord":
         if not args.file:
@@ -754,10 +768,26 @@ def main() -> None:
         res = generate_paddock_dilemma(ROOT_DIR, r_num, r_folder)
         print(f"Dilema M1.5 gerado com sucesso para {res.get('driver_name')} ({res.get('target_driver')})")
     elif args.action == "publish-round":
-        publish_round_to_discord(args.round_folder, teaser_mode=True, base_portal_url=args.portal_url or "")
+        publish_round_to_discord(args.round_folder, teaser_mode=True, base_portal_url=args.portal_url or "", season_id=args.season)
     elif args.action == "rollback":
-        res = execute_stage_rollback(round_num=args.round, scope=args.scope)
+        res = execute_stage_rollback(round_num=args.round, scope=args.scope, season_id=args.season)
         print(f"Rollback executado com sucesso:\n{json.dumps(res, indent=2, ensure_ascii=False)}")
+    elif args.action == "start-season":
+        grid_data = DEFAULT_NEXT_SEASON_GRID
+        if args.grid_file:
+            g_path = Path(args.grid_file)
+            if g_path.exists():
+                grid_data = json.loads(g_path.read_text(encoding="utf-8"))
+        res = initialize_new_season(
+            root_dir=ROOT_DIR,
+            new_season_id=args.new_season,
+            new_grid_registry=grid_data,
+            prev_season_id=args.season or "season_01",
+        )
+        print(f"Nova temporada inicializada com sucesso:\n{json.dumps(res, indent=2, ensure_ascii=False)}")
+    elif args.action == "list-seasons":
+        seasons = list_available_seasons(ROOT_DIR)
+        print(f"Temporadas disponíveis no diretório 'data/seasons/': {seasons}")
     elif args.action == "start-listener":
         ok, msg = start_udp_listener(ROOT_DIR, round_num=args.round)
         print(msg)
@@ -874,8 +904,9 @@ def main() -> None:
             if stage_ev and stage_ev.startswith("START_PRESS_CONF_"):
                 r_num = int(session_state.get("active_round_num") or 10)
                 r_folder = session_state.get("active_round_folder") or f"et_{r_num:02d}"
+                eff_season = session_state.get("active_season_id") or args.season or get_current_season_id()
                 from src.press_conference import PressConferenceSession
-                sess = PressConferenceSession(ROOT_DIR, r_num, r_folder)
+                sess = PressConferenceSession(ROOT_DIR, r_num, r_folder, season_id=eff_season)
                 opening = sess.start_session()
                 client.post_channel_message(client.ingest_channel_id, opening)
                 time.sleep(2.0)
@@ -890,8 +921,9 @@ def main() -> None:
             if stage_ev and stage_ev.startswith("END_ROUND_") and status_now == "READY_FOR_SIMULATION":
                 r_folder = session_state.get("active_round_folder") or args.round_folder
                 r_num = int(session_state.get("active_round_num") or 10)
-                print(f"[AUTONOMOUS PIPELINE] Iniciando simulação 100% autônoma para {r_folder} (Etapa {r_num})...")
-                round_dir = ROOT_DIR / "data" / "seasons" / "season_01" / r_folder
+                eff_season = session_state.get("active_season_id") or args.season or get_current_season_id()
+                print(f"[AUTONOMOUS PIPELINE] Iniciando simulação 100% autônoma para {r_folder} (Etapa {r_num}, {eff_season})...")
+                round_dir = get_season_dir(ROOT_DIR, eff_season) / r_folder
                 debrief_dir = round_dir / "debriefing"
                 photos_dir = round_dir / "photos"
                 tel_dir = round_dir / "telemetry"
@@ -906,7 +938,7 @@ def main() -> None:
                             round_num=r_num,
                             round_name=meta["name"],
                         )
-                process_round_telemetry(r_num, r_folder)
+                process_round_telemetry(r_num, r_folder, season_id=eff_season)
                 if ai_client.api_key:
                     if client.bot_token and client.ingest_channel_id:
                         client.post_channel_message(
@@ -916,7 +948,7 @@ def main() -> None:
                         )
                     generate_post_race_modules(ROOT_DIR, r_num, r_folder, ai_client)
                 finalize_round_transition(ROOT_DIR, r_num, r_folder, ai_client=ai_client)
-                publish_round_to_discord(r_folder, teaser_mode=True, base_portal_url=args.portal_url or "")
+                publish_round_to_discord(r_folder, teaser_mode=True, base_portal_url=args.portal_url or "", season_id=eff_season)
                 print(f"[AUTONOMOUS PIPELINE] Etapa {r_num} concluída e publicada! Encerrando sessão (Early Exit).")
                 break
             time.sleep(args.interval)

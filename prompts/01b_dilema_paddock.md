@@ -49,3 +49,4 @@ Seu papel é criar um dilema ético, político ou técnico de altíssimo impacto
 🛑 **[TRAVA DE TURNO ATIVA | Aguardando resposta de @{{DISCORD_TAG}}]**
 > 💬 *Piloto, digite sua decisão no chat do canal de voz (ex: "Opção A", "Opção B" ou justifique sua escolha em texto corrido) para registrar a decisão no Canon Oficial e destravar a semana!*
 ```
+

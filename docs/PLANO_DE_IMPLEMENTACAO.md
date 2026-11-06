@@ -91,14 +91,15 @@ flowchart TD
   * Status: Implementado. Criadas as personas de Nigel Mansell ("Il Leone") e Jacques Villeneuve ("O Franco-Atirador"). Prompt `08_repercussao_midia.md` reestruturado em 4 Partes (Crônica de Jornal, Bancada de Lendas com notas 0 a 10 de Prost, Mansell e Villeneuve, Imprensa Internacional/Brasileira e Redes Sociais). Contexto das 3 lendas injetado no pipeline de geração.
 
 ### Sprint 3: Camada de Dados NoSQL Local & Multi-Temporada
-* **Atividade 3.1 — Camada de Abstração NoSQL Local:**
-  * Arquivos: `src/db/repository.py` (usando `tinydb` ou `sqlite3` nativo em modo documento JSON).
-  * Tarefa: Criar repositório atômico para leitura e gravação de `standings`, `canon_ledger`, `race_telemetry` e `press_conferences`, com transações seguras e rollback facilitado.
-* **Atividade 3.2 — Parametrização Multi-Temporada (`season_id`):**
-  * Arquivos: `src/orchestrator_cli.py`, `src/portal_builder.py`, `src/ai_showrunner.py`.
-  * Tarefa: Substituir caminhos fixos `data/seasons/season_01/` pelo parâmetro dinâmico `data/seasons/{season_id}/`.
-* **Atividade 3.3 — Motor de Storytelling de Dança das Cadeiras:**
-  * Tarefa: Comparador de grid entre etapas/temporadas com disparo de anúncios de transferências de pilotos.
+* **Atividade 3.1 — Camada de Abstração NoSQL Local:** ✅
+  * Arquivos: `src/repositories/sqlite_document_repository.py`, `src/db/repository.py`, `src/repositories/factory.py`, `tests/test_sprint3.py`.
+  * Status: Implementado. Camada unificada `SqliteDocumentRepository` nativa (Zero Dependências externas, Python 3.12+ standard library) operando em modo WAL (`PRAGMA journal_mode = WAL`) com transações ACID, tabela genérica de coleções (`canon_ledger`, `standings`, `press_conferences`, `session_state`, `dilemmas`, `race_telemetry`), auto-seeding a partir dos JSONs legados e sincronização bidirecional transparente.
+* **Atividade 3.2 — Parametrização Multi-Temporada (`season_id`):** ✅
+  * Arquivos: `src/season_manager.py`, `src/orchestrator_cli.py`, `src/portal_builder.py`, `src/press_conference.py`, `src/discord_gateway.py`.
+  * Status: Implementado. Resolução dinâmica de caminhos via `get_season_dir(root_dir, season_id)` e `get_current_season_id()`. CLI atualizado com `--season`, `--new-season`, `--grid-file` e ações `list-seasons` / `start-season`. ChatOps no Discord agora detecta comandos como `nova temporada 2` e `iniciar nova temporada season_03`.
+* **Atividade 3.3 — Motor de Storytelling de Dança das Cadeiras:** ✅
+  * Arquivos: `src/season_manager.py`, `tests/test_sprint3.py`.
+  * Status: Implementado. Algoritmo `detect_grid_transfers` compara o grid da temporada anterior contra o novo registro (identificando transferências e estreias como Davi na Ferrari, Felipe na Audi e Sainz na Williams). Função `generate_transfer_announcement` produz matérias jornalísticas de impacto e registra eventos `TRANSFER-{SEASON}-{DRIVER}` no Canon Ledger. A inicialização da nova temporada (`initialize_new_season`) cria tabelas de classificação zeradas para pilotos e construtores e sela o evento `KICKOFF-{SEASON}`.
 
 ### Sprint 4: Portal Web Paddock Dark Mode & Homologação
 * **Atividade 4.1 — Refatoração de Design do Portal Web:**

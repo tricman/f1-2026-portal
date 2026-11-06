@@ -122,6 +122,17 @@ def detect_stage_command(text: str) -> Optional[Tuple[Any, ...]]:
     if re.search(r"\b(?:forcar|forçar|avancar|avançar)\s+(?:avanco\s+|avanço\s+)?dilema\b|\btimeout\s+dilema\b", clean):
         return ("FORCE_DILEMMA_ADVANCE", None)
 
+    # 4.5. New Season Initialization ChatOps
+    new_season_match = re.search(
+        r"\b(?:iniciar\s+)?nova\s+temporada\s+(\d+|season_\d+)\b",
+        clean,
+    )
+    if new_season_match:
+        s_raw = new_season_match.group(1)
+        s_id = s_raw if s_raw.startswith("season_") else f"season_{int(s_raw):02d}"
+        s_num = int(re.sub(r"\D", "", s_raw) or "2")
+        return ("START_NEW_SEASON", s_num, s_id)
+
     # 5. Weekly Silly Season Schedule
     semana_start = re.search(
         r"\b(?:inicio|início|iniciar|start)\s+(?:da\s+|de\s+)?semana(?:\s+(?:da\s+|de\s+)?etapa)?(?:\s+#?(\d+))?",
@@ -578,6 +589,34 @@ class DiscordGatewayClient:
                             self.post_channel_message(
                                 self.ingest_channel_id,
                                 f"ℹ️ Nenhum dilema ativo encontrado para a Etapa {active_r_num}."
+                            )
+                    continue
+
+                if cmd_type == "START_NEW_SEASON":
+                    s_id = cmd_extra or f"season_{int(cmd_round or 2):02d}"
+                    from src.season_manager import initialize_new_season, DEFAULT_NEXT_SEASON_GRID
+                    try:
+                        res = initialize_new_season(
+                            root_dir=root_dir,
+                            new_season_id=s_id,
+                            new_grid_registry=DEFAULT_NEXT_SEASON_GRID,
+                        )
+                        state["active_season_id"] = s_id
+                        state["status"] = "IDLE"
+                        if should_reply:
+                            self.post_channel_message(
+                                self.ingest_channel_id,
+                                f"🏆 **TEMPORADA INICIALIZADA: {res['new_season_id'].upper()} ({res['season_year']})**\n\n"
+                                f"• **Transferências Detectadas:** `{res['transfers_count']}` pilotos com anúncio oficial gerado em `data/seasons/{s_id}/transfers/`.\n"
+                                f"• **Classificação Mundial:** Zerada e persistida no Banco NoSQL / Document Store.\n"
+                                f"• **Canon Ledger:** Evento inaugural `KICKOFF-{res['new_season_id'].upper()}` registrado.\n"
+                                f"• 🚀 *O paddock está pronto para o início da nova temporada!*"
+                            )
+                    except Exception as exc:
+                        if should_reply:
+                            self.post_channel_message(
+                                self.ingest_channel_id,
+                                f"❌ **ERRO AO INICIALIZAR NOVA TEMPORADA:** {exc}"
                             )
                     continue
 

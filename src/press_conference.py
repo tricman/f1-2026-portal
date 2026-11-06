@@ -77,11 +77,14 @@ class PressConferenceSession:
         round_num: int,
         round_folder: str,
         ai_client: Optional[GeminiFreeTierClient] = None,
+        season_id: Optional[str] = None,
     ):
+        from src.season_manager import get_season_dir
         self.root_dir = root_dir
         self.round_num = round_num
         self.round_folder = round_folder
-        self.round_dir = root_dir / "data" / "seasons" / "season_01" / round_folder
+        self.season_id = season_id
+        self.round_dir = get_season_dir(root_dir, season_id) / round_folder
         self.state_file = root_dir / "data" / "state" / f"press_conf_et{round_num:02d}.json"
         self.meta = ROUND_METADATA.get(round_folder, {"name": f"GP Etapa {round_num}", "flag": "🏁"})
         ai_key = os.environ.get("GEMINI_API_KEY", "").strip()

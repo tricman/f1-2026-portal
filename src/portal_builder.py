@@ -57,8 +57,10 @@ def classify_module_badge(filename: str) -> Tuple[int, str, str, str]:
     return (9, "ARQUIVO", filename.replace(".md", ""), "badge-slate")
 
 
-def collect_portal_data(root_dir: Path) -> Dict[str, Any]:
-    season_dir = root_dir / "data" / "seasons" / "season_01"
+def collect_portal_data(root_dir: Path, season_id: Optional[str] = None) -> Dict[str, Any]:
+    from src.season_manager import get_season_dir, get_current_season_id, list_available_seasons
+    s_id = season_id or get_current_season_id()
+    season_dir = get_season_dir(root_dir, s_id)
     setup_dir = root_dir / "data" / "setup"
     state_dir = root_dir / "data" / "state"
 
@@ -123,18 +125,20 @@ def collect_portal_data(root_dir: Path) -> Dict[str, Any]:
 
     return {
         "season": 2026,
+        "season_id": s_id,
+        "available_seasons": list_available_seasons(root_dir),
         "standings": standings,
         "rounds": rounds_list,
         "setup_docs": setup_docs,
     }
 
 
-def build_editorial_portal(root_dir: Path) -> Path:
+def build_editorial_portal(root_dir: Path, season_id: Optional[str] = None) -> Path:
     """
-    Compile all Season 01 rounds (Etapas 1..10), Setup Lore, and FIA Standings
+    Compile rounds, Setup Lore, and FIA Standings
     into a self-contained, mobile-first Editorial Portal & Wiki (`portal/index.html`).
     """
-    portal_data = collect_portal_data(root_dir)
+    portal_data = collect_portal_data(root_dir, season_id=season_id)
     portal_dir = root_dir / "portal"
     portal_dir.mkdir(parents=True, exist_ok=True)
 

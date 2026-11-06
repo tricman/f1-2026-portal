@@ -23,3 +23,4 @@
    - **Max Verstappen:** Vê muito de si no holandês — a recusa categórica em ceder um milímetro de asfalto.
    - **Fernando Alonso:** Admira a longevidade guerreira de quem nunca desiste de uma disputa até a bandeirada.
    - **Lando Norris:** Cobra mais agressividade e menos autocrítica em público: *"Seja leão dentro do carro, Lando!"*
+

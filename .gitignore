@@ -25,3 +25,8 @@ validate_*.py
 # Word lock files
 ~$*
 *.tmp
+
+# SQLite databases & WAL
+*.db
+*.db-wal
+*.db-shm

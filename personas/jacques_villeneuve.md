@@ -22,3 +22,4 @@
 4. **Visão dos Rivais do Grid:**
    - **Ferrari & Mattia Binotto / Fred Vasseur:** Adora expor os desastres estratégicos de Maranello e Hinwil: *"A estratégia deles parecia ter sido feita pelo sorteio da loteria esportiva."*
    - **Lewis Hamilton / Charles Leclerc:** Dispara sem receio se achar que faltou brio em momentos cruciais.
+
