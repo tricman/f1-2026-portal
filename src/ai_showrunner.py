@@ -19,6 +19,7 @@ from typing import Any, Dict, List, Optional
 from src.canon_ledger import CanonLedgerManager, sample_weekly_themes
 from src.logger import log_text
 from src.portal_builder import ROUND_METADATA
+from src.season_manager import get_season_dir, get_current_season_id
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
@@ -289,7 +290,7 @@ def assemble_storytelling_context(root_dir: Path, round_num: int, round_folder: 
     # Layer 3A: Previous Round Narrative Summary (Rolling Window)
     prev_num = round_num - 1
     if prev_num >= 1:
-        seasons_dir = root_dir / "data" / "seasons" / "season_01"
+        seasons_dir = get_season_dir(root_dir)
         prev_folders = [d for d in seasons_dir.glob(f"et_{prev_num:02d}_*") if d.is_dir()]
         if prev_folders:
             prev_dir = prev_folders[0]
@@ -299,7 +300,7 @@ def assemble_storytelling_context(root_dir: Path, round_num: int, round_folder: 
                     sections.append(f"=== MEMÓRIA DA ETAPA ANTERIOR ({prev_dir.name} / {md_file.name}) ===\n{text[:6000]}")
 
     # Layer 3B: Current Round Driver Debriefing Notes
-    debrief_file = root_dir / "data" / "seasons" / "season_01" / round_folder / "debriefing" / "debriefing_notes.md"
+    debrief_file = get_season_dir(root_dir) / round_folder / "debriefing" / "debriefing_notes.md"
     if debrief_file.exists():
         sections.append(
             f"=== RELATOS DE DEBRIEFING DOS PILOTOS (ETAPA {round_num}) ===\n{debrief_file.read_text(encoding='utf-8')}"
@@ -313,6 +314,7 @@ def finalize_round_transition(
     round_num: int,
     round_folder: str,
     ai_client: Optional[GeminiFreeTierClient] = None,
+    season_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Execute the deterministic + narrative transition from Round N to Round N+1:
@@ -331,7 +333,7 @@ def finalize_round_transition(
     event_id = f"ET{round_num:02d}-AUTO-M5"
     existing_ids = {ev.get("event_id") for ev in ledger.get("events", [])}
 
-    round_dir = root_dir / "data" / "seasons" / "season_01" / round_folder
+    round_dir = get_season_dir(root_dir, season_id) / round_folder
     md_summaries = []
     for f in sorted(round_dir.glob("*.md")):
         md_summaries.append(f"## {f.name}\n{f.read_text(encoding='utf-8')[:2500]}")
@@ -375,13 +377,14 @@ def generate_post_race_modules(
     round_num: int,
     round_folder: str,
     ai_client: GeminiFreeTierClient,
+    season_id: Optional[str] = None,
 ) -> List[Path]:
     """
     Generate M3 (Treino Livre), M4 (Classificação), M5 (Resultado Final),
     M6 (Cerimônia do Pódio), M7 (Atualização Classificação) and M8 (Repercussão Imprensa)
     automatically via Gemini if they do not exist yet in the round folder.
     """
-    round_dir = root_dir / "data" / "seasons" / "season_01" / round_folder
+    round_dir = get_season_dir(root_dir, season_id) / round_folder
     round_dir.mkdir(parents=True, exist_ok=True)
     tel_dir = round_dir / "telemetry"
     meta = ROUND_METADATA.get(round_folder, {"name": f"GP Etapa {round_num}", "circuit": "", "flag": "🏁"})
@@ -521,6 +524,7 @@ def generate_pre_race_m1(
     round_folder: str,
     ai_client: GeminiFreeTierClient,
     force_regenerate: bool = False,
+    season_id: Optional[str] = None,
 ) -> Path:
     """
     Generate or load M1 (A F1 Que Você Não Vê — Quadro: A Semana da F1) for Round N,
@@ -529,7 +533,7 @@ def generate_pre_race_m1(
     """
     from src.canon_ledger import sample_weekly_themes
 
-    round_dir = root_dir / "data" / "seasons" / "season_01" / round_folder
+    round_dir = get_season_dir(root_dir, season_id) / round_folder
     round_dir.mkdir(parents=True, exist_ok=True)
     target_file = round_dir / f"ET{round_num:02d}_PRE_A_Semana_da_F1.md"
 
@@ -588,6 +592,7 @@ def generate_m1_daily_episode(
     round_folder: str,
     day_num: int,
     ai_client: GeminiFreeTierClient,
+    season_id: Optional[str] = None,
 ) -> Tuple[Path, str]:
     """
     Generates an episodic daily installment of M1 (A Semana da F1):
@@ -605,7 +610,7 @@ def generate_m1_daily_episode(
     }
     day_label, day_theme_focus = day_names.get(day_num, ("SEGUNDA-FEIRA", "Bastidores da F1"))
 
-    round_dir = root_dir / "data" / "seasons" / "season_01" / round_folder
+    round_dir = get_season_dir(root_dir, season_id) / round_folder
     round_dir.mkdir(parents=True, exist_ok=True)
     target_file = round_dir / f"ET{round_num:02d}_PRE_A_Semana_da_F1.md"
 
@@ -797,6 +802,7 @@ def generate_paddock_dilemma(
     round_folder: str,
     target_driver: Optional[str] = None,
     ai_client: Optional[GeminiFreeTierClient] = None,
+    season_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Generates a high-stakes, polarized paddock dilemma (M1.5) for a human driver,
@@ -805,7 +811,7 @@ def generate_paddock_dilemma(
     from src.canon_ledger import sample_weekly_themes
 
     client = ai_client or GeminiFreeTierClient()
-    round_dir = root_dir / "data" / "seasons" / "season_01" / round_folder
+    round_dir = get_season_dir(root_dir, season_id) / round_folder
     round_dir.mkdir(parents=True, exist_ok=True)
     state_file = root_dir / "data" / "state" / f"dilemma_et{round_num:02d}.json"
 
@@ -888,6 +894,7 @@ def resolve_paddock_dilemma(
     round_folder: str,
     raw_choice: str,
     ai_client: Optional[GeminiFreeTierClient] = None,
+    season_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Receives player's choice from Discord, incorporates into Canon Ledger and generates
@@ -950,7 +957,7 @@ def resolve_paddock_dilemma(
     state_file.write_text(json.dumps(st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     # Append consequence to target markdown
-    round_dir = root_dir / "data" / "seasons" / "season_01" / round_folder
+    round_dir = get_season_dir(root_dir, season_id) / round_folder
     meta = ROUND_METADATA.get(round_folder, {"name": f"GP da Etapa {round_num}"})
     gp_name = meta.get("name", f"Etapa {round_num}")
     target_md = round_dir / f"Etapa {round_num:02d} - Relatório de Bastidores - M1.5 Dilema de Paddock - {gp_name} 2026.md"

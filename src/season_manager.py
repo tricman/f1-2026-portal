@@ -10,9 +10,11 @@ import os
 import re
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 
-from src.ai_showrunner import GeminiFreeTierClient
+if TYPE_CHECKING:
+    from src.ai_showrunner import GeminiFreeTierClient
+
 from src.canon_ledger import CanonLedgerManager
 
 DEFAULT_SEASON_ID = "season_01"
@@ -118,7 +120,11 @@ def generate_transfer_announcement(
     Generates an official blockbuster transfer press release and journalistic feature,
     saves it to data/seasons/{season_id}/transfers/ and registers the event in Canon Ledger.
     """
-    client = ai_client or GeminiFreeTierClient()
+    if ai_client is not None:
+        client = ai_client
+    else:
+        from src.ai_showrunner import GeminiFreeTierClient
+        client = GeminiFreeTierClient()
     season_dir = get_season_dir(root_dir, season_id)
     transfers_dir = season_dir / "transfers"
     transfers_dir.mkdir(parents=True, exist_ok=True)

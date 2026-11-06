@@ -12,3 +12,4 @@ from src.repositories.sqlite_document_repository import SqliteDocumentRepository
 def get_db():
     """Returns the active showrunner document repository."""
     return get_repository()
+

@@ -102,12 +102,21 @@ flowchart TD
   * Status: Implementado. Algoritmo `detect_grid_transfers` compara o grid da temporada anterior contra o novo registro (identificando transferências e estreias como Davi na Ferrari, Felipe na Audi e Sainz na Williams). Função `generate_transfer_announcement` produz matérias jornalísticas de impacto e registra eventos `TRANSFER-{SEASON}-{DRIVER}` no Canon Ledger. A inicialização da nova temporada (`initialize_new_season`) cria tabelas de classificação zeradas para pilotos e construtores e sela o evento `KICKOFF-{SEASON}`.
 
 ### Sprint 4: Portal Web Paddock Dark Mode & Homologação
-* **Atividade 4.1 — Refatoração de Design do Portal Web:**
-  * Arquivos: `src/portal_builder.py`, templates HTML/CSS.
-  * Tarefa: Aplicar o design system *Paddock Dark Mode* (Slate `#0B131E`, FIA Navy `#1B365D`, F1 Red `#E10600`), navegação de abas para M1 a M8 e tabela responsiva com $\Delta$ de posições.
-* **Atividade 4.2 — Testes Automatizados E2E:**
+* **Atividade 4.1 — Refatoração de Design do Portal Web:** ✅
+  * Arquivos: `src/portal_builder.py`, `portal/index.html`, `index.html`.
+  * Status: Implementado. O Portal Editorial e Wiki da Temporada foi totalmente reconstruído com o design system *Paddock Dark Mode* (Slate `#0B131E`, FIA Navy `#1B365D`, F1 Red `#E10600`, Cards `#131D2E` / `#18253A`, Bordas `#22334D`). Foi incorporada a barra de abas horizontais de sequência do fim de semana (`#weekendModuleTabs`) diretamente acima do leitor editorial, permitindo navegação instantânea em 1 clique entre os módulos M1, M1.5, M2, M3, M4, M5, M6, M7 e M8. A modal de classificação oficial do campeonato FIA foi expandida com abas para Pilotos (WDC) e Construtores (WCC), renderização de deltas de posição dinâmicos (`▲ +N`, `▼ -N`, `▬ 0`) e visualização responsiva em cards para telas mobile (< 640px).
+* **Atividade 4.2 — Testes Automatizados E2E:** ✅
   * Arquivos: `tests/test_e2e_showrunner.py`.
-  * Tarefa: Validar todo o fluxo automatizado da Etapa 11 (Áustria) antes da abertura para os pilotos reais.
+  * Status: Implementado e homologado. Criada a suíte completa de homologação ponta a ponta `test_e2e_showrunner.py` simulando o ciclo de vida integral da Etapa 11 (GP da Áustria):
+    1. Geração de episódio diário M1 (A Semana da F1);
+    2. Geração, trava e resolução com consequência do Dilema de Paddock M1.5;
+    3. Sessão interativa da Coletiva Pré-GP M2 com avanço por perguntas da imprensa internacional e contingência de timeout;
+    4. Ingestão de telemetria PaceDex (Treinos Livres e Corrida) com fusão da TV Overlay;
+    5. Cálculo oficial FIA da tabela com cálculo de $\Delta$ de posições;
+    6. Geração dos módulos pós-corrida M3 a M8;
+    7. Transição e promoção da classificação para a Etapa 12, selando o evento consolidado no Canon Ledger;
+    8. Compilação do Portal Paddock Dark Mode e verificação de badges e abas;
+    9. Teste de rollback granular (`sessao`) com validação da trava de integridade contra corrupção das etapas canônicas 01 a 10. Suíte completa com 40 testes unitários e de integração passando com 100% de sucesso.
 
 ---
 

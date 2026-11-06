@@ -460,20 +460,38 @@ def execute_stage_rollback(round_num: int, scope: str = "sessao", season_id: Opt
                 curr_st = json.loads(standings_file.read_text(encoding="utf-8"))
                 if curr_st.get("last_completed_round", 0) >= round_num:
                     curr_st["last_completed_round"] = round_num - 1
-                    for d in curr_st.get("drivers", []):
+                    drivers_key = "drivers_standings" if "drivers_standings" in curr_st else "drivers"
+                    constructors_key = "constructors_standings" if "constructors_standings" in curr_st else "constructors"
+
+                    driver_pts_map = {}
+                    for d in curr_st.get(drivers_key, []):
                         pts_by_r = d.get("points_by_round", [])
                         if len(pts_by_r) >= round_num:
                             d["points_by_round"] = pts_by_r[:round_num - 1]
                             d["points"] = sum(d["points_by_round"])
-                    driver_pts_map = {d["id"]: d["points"] for d in curr_st.get("drivers", [])}
-                    for c in curr_st.get("constructors", []):
-                        c["points"] = sum(driver_pts_map.get(did, 0) for did in c.get("drivers", []))
-                    curr_st["drivers"] = sorted(curr_st["drivers"], key=lambda x: x["points"], reverse=True)
-                    curr_st["constructors"] = sorted(curr_st["constructors"], key=lambda x: x["points"], reverse=True)
+                        driver_pts_map[d.get("id")] = d.get("points", 0)
+
+                    for c in curr_st.get(constructors_key, []):
+                        if "drivers" in c:
+                            pts = sum(driver_pts_map.get(did, 0) for did in c.get("drivers", []))
+                            if "net_points" in c:
+                                c["net_points"] = pts
+                            if "gross_points" in c:
+                                c["gross_points"] = pts
+                            c["points"] = pts
+
+                    if drivers_key in curr_st:
+                        curr_st[drivers_key] = sorted(curr_st[drivers_key], key=lambda x: x.get("points", 0), reverse=True)
+                    if constructors_key in curr_st:
+                        curr_st[constructors_key] = sorted(
+                            curr_st[constructors_key],
+                            key=lambda x: x.get("net_points", x.get("points", 0)),
+                            reverse=True,
+                        )
                     standings_file.write_text(json.dumps(curr_st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
                     reverted_standings = True
-            except Exception:
-                pass
+            except Exception as exc:
+                print(f"[Rollback Warning] Standings fallback error: {exc}")
 
         # Purge Canon Ledger events for M3 to M8
         ledger_file = ROOT_DIR / "data" / "state" / "canon_ledger.json"
