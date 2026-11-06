@@ -629,6 +629,148 @@ def build_specification_document():
         "notifica o Discord e encerra o socket de forma graciosa."
     )
 
+    doc.add_heading("3.8. Especificação Técnica das Chamadas às APIs Gemini (Google AI Studio)", level=2)
+    doc.add_paragraph(
+        "A camada de inteligência artificial generativa é orquestrada pelo cliente src/ai_showrunner.py (classe GeminiFreeTierClient), "
+        "conectando-se diretamente à API REST v1beta do Google AI Studio. A arquitetura foi concebida para operar estritamente dentro "
+        "dos limites do plano gratuito (Free Tier: 15 RPM / 1M TPM), garantindo custo operacional zero (R$ 0,00) com alta disponibilidade."
+    )
+
+    doc.add_heading("3.8.1. Arquitetura de Transporte, Modelos e Fallback Chain", level=3)
+    doc.add_paragraph(
+        "As requisições utilizam o protocolo HTTPS POST com payload codificado em JSON (UTF-8). O cliente implementa uma cadeia "
+        "de fallback automatizada (Circuit Breaker) que transita entre modelos em caso de indisponibilidade ou esgotamento temporário de cota:"
+    )
+
+    tbl_mod = doc.add_table(rows=4, cols=4)
+    tbl_mod.alignment = WD_TABLE_ALIGNMENT.CENTER
+    headers_mod = ["Tier / Papel", "Identificador do Modelo", "Limites Free Tier (Google)", "Casos de Uso na Solução"]
+    for j, h in enumerate(headers_mod):
+        tbl_mod.rows[0].cells[j].text = h
+    style_table_header(tbl_mod.rows[0], [Inches(1.5), Inches(1.8), Inches(1.6), Inches(2.3)])
+
+    mod_data = [
+        ("Primário (Flash)", "gemini-flash-lite-latest\n(ou gemini-2.5-flash)", "15 RPM / 1.000.000 TPM\n(Zero Custo)", "Geração de rotina dos Módulos M1 a M8, síntese de episódios diários, teasers e resumos canônicos."),
+        ("Raciocínio (Pro)", "gemini-2.5-pro\n(ou gemini-3.1-pro-preview)", "2 RPM / 32.000 TPM\n(Pacing obrigatório de 32s)", "Debates complexos da Bancada de Lendas (M8) e síntese profunda de Canon Ledger na virada de temporada."),
+        ("Cadeia de Fallback", "gemini-2.5-flash ->\ngemini-2.0-flash", "Degradação graciosa em cascata", "Acionada automaticamente caso o modelo principal retorne códigos HTTP 429, 500 ou 503."),
+    ]
+    for idx_m, (tp, im, lf, cu) in enumerate(mod_data, start=1):
+        r_m = tbl_mod.rows[idx_m]
+        r_m.cells[0].text = tp
+        r_m.cells[1].text = im
+        r_m.cells[2].text = lf
+        r_m.cells[3].text = cu
+        style_table_row(r_m, is_even=(idx_m % 2 == 0), col_widths=[Inches(1.5), Inches(1.8), Inches(1.6), Inches(2.3)])
+
+    doc.add_paragraph().paragraph_format.space_after = Pt(4)
+
+    doc.add_heading("3.8.2. Políticas de Governança: Pacing, Timeout e Backoff Adaptativo", level=3)
+    doc.add_paragraph(
+        "Para blindar a aplicação contra interrupções de serviço, o cliente aplica as seguintes regras invioláveis de controle:\n"
+        "1. Timeout Rígido de Socket: Todas as conexões HTTP com a API Gemini possuem timeout de 45 segundos por tentativa.\n"
+        "2. Pacing Pro de 32 Segundos: Sempre que o modelo Pro for acionado, o cliente registra o timestamp de conclusão e força "
+        "uma espera ativa (sleep) caso uma nova requisição Pro ocorra antes de transcorridos 32 segundos.\n"
+        "3. Backoff Exponencial com Jitter: Em caso de erro HTTP 429 (Rate Limit), o cliente aguarda 12 segundos * (tentativa + 1); "
+        "em erros 5xx (servidor), aguarda 4 segundos * (tentativa + 1), realizando até 4 tentativas alternando entre os modelos da cadeia de fallback.\n"
+        "4. Circuit Breaker Fallback para Templates Locais: Se todas as tentativas de IA falharem, o motor recorre imediatamente "
+        "aos templates auditados em disco (data/templates/et_XX/), garantindo que a execução do fim de semana nunca seja abortada."
+    )
+
+    doc.add_heading("3.8.3. Matriz Técnica de Chamadas às APIs Gemini por Módulo (M1 a M8)", level=3)
+    doc.add_paragraph(
+        "A tabela a seguir especifica detalhadamente os contratos de entrada, hiperparâmetros de geração, "
+        "diretivas de sistema (System Instructions), orçamento de contexto e travas anti-alucinação para cada módulo:"
+    )
+
+    tbl_api = doc.add_table(rows=10, cols=5)
+    tbl_api.alignment = WD_TABLE_ALIGNMENT.CENTER
+    headers_api = ["Módulo & Função", "Modelo & Params", "System Instruction (Papel)", "Composição do Prompt (Contexto)", "Travas Anti-Alucinação"]
+    for j, h in enumerate(headers_api):
+        tbl_api.rows[0].cells[j].text = h
+    style_table_header(tbl_api.rows[0], [Inches(1.4), Inches(1.2), Inches(1.6), Inches(1.6), Inches(1.4)])
+
+    api_specs = [
+        (
+            "M1: Silly Season\n(generate_m1_daily_episode)",
+            "Modelo: Flash\nTemp: 0.65\nTopP: 0.95\nMaxTok: 4096",
+            "Jornalista investigativo de F1 (Paddock Insider). Português (Brasil) imersivo, ágil e focado nos bastidores.",
+            "• Histórico da Etapa N-1 (18k chars)\n• 4 Temas RNG Sorteados\n• Canon Ledger (eventos abertos)\n• Perfil das 10 equipes",
+            "Fatos de etapas anteriores são injetados como verdade absoluta; proibido alterar resultados de corrida passados.",
+        ),
+        (
+            "M1.5: Dilema Interativo\n(generate_paddock_dilemma)",
+            "Modelo: Flash\nTemp: 0.50\nTopP: 0.90\nMaxTok: 2048",
+            "Game Master de RPG esportivo. Constrói situações de alto impacto com opções polarizadas e consequências críveis.",
+            "• Tema de bastidores sorteado\n• Perfil psicológico do piloto\n• Rivalidades no Canon Ledger\n• Status contratual",
+            "A resposta do jogador humano via Discord é copiada textualmente para o Canon Ledger sem reinterpretação da IA.",
+        ),
+        (
+            "M2: Coletiva FIA\n(generate_press_conference)",
+            "Modelo: Flash\nTemp: 0.45\nTopP: 0.85\nMaxTok: 4096",
+            "Mestre de Cerimônias e Imprensa FIA. Tom institucional e formal confrontando os pilotos com temas quentes.",
+            "• Pauta gerada no M1\n• Tabela atual do campeonato\n• Lista de 5-6 pilotos convocados\n• Histórico de polêmicas",
+            "Perguntas aos pilotos humanos geram Trava de Turno no Discord; caso expire o tempo, gera fala baseada estritamente no perfil do piloto.",
+        ),
+        (
+            "M3: Treino Livre\n(generate_post_race_modules)",
+            "Modelo: Flash\nTemp: 0.20\nTopP: 0.80\nMaxTok: 3072",
+            "Diretor Técnico da FIA (Jo Bauer). Rigor documental absoluto e redação em formato de boletim oficial.",
+            "• fp_telemetry_merged.json (12k chars de parciais S1-S3, Speed Trap e pneus)\n• Prompt 03_fia_treino_livre.md",
+            "Proibido inventar pilotos ou tempos: todos os números da tabela são extraídos exclusivamente da telemetria UDP do TL.",
+        ),
+        (
+            "M4: Classificação\n(generate_post_race_modules)",
+            "Modelo: Flash\nTemp: 0.20\nTopP: 0.80\nMaxTok: 3072",
+            "Comissário de Prova da FIA. Tabela de grid oficial em Markdown e relatório de penalidades de grelha.",
+            "• tv_overlay_etXX.json / Packet 8\n• Histórico de punições de grid\n• Prompt 04_fia_classificacao.md",
+            "Ordem de largada segue determinismo estrito; deltas de tempo para a pole position são calculados em milissegundos exatos.",
+        ),
+        (
+            "M5: Corrida Oficial\n(generate_post_race_modules)",
+            "Modelo: Flash\nTemp: 0.35\nTopP: 0.85\nMaxTok: 6144",
+            "Showrunner Oficial e Diretor Desportivo da FIA. Narrativa técnica e regulatória em tabelas e crônica em 4 seções.",
+            "• race_telemetry_merged.json (14k chars de voltas, pneus, gaps, paradas)\n• Notas de debriefing de áudio\n• Prompt 05_fia_corrida.md",
+            "A tabela final de 20 pilotos, voltas e pontos de corrida é injetada pré-calculada pelo Python e não pode ser recalculada pelo LLM.",
+        ),
+        (
+            "M6: Pódio & Bastidores\n(generate_post_race_modules)",
+            "Modelo: Flash\nTemp: 0.55\nTopP: 0.90\nMaxTok: 5120",
+            "Roteirista cinematográfico estilo 'Drive to Survive'. Dramatização em 4 Atos com foco nas emoções humanas.",
+            "• Resultado oficial M5\n• Telemetria de incidentes e danos\n• Declarações de debriefing\n• Prompt 06_cerimonia_podio.md",
+            "Posições de chegada e deltas de tempo são invioláveis; falas na sala de descompressão devem refletir os toques reais de pista.",
+        ),
+        (
+            "M7: Boletim Mundial\n(generate_post_race_modules)",
+            "Modelo: Flash\nTemp: 0.15\nTopP: 0.70\nMaxTok: 3072",
+            "Auditor Matemático da FIA. Tabela oficial de classificação do Mundial de Pilotos e Construtores.",
+            "• standings.json pré-calculado pelo fia_calculator.py (tabela somada)\n• Prompt 07_fia_mundial.md",
+            "PROIBIÇÃO TOTAL de cálculo aritmético pelo LLM: o modelo é instruído a reproduzir os valores exatos da tabela fornecida.",
+        ),
+        (
+            "M8: Bancada de Lendas\n(generate_post_race_modules)",
+            "Modelo: Pro / Flash\nTemp: 0.50\nTopP: 0.90\nMaxTok: 6144",
+            "Comitê de Lendas da F1 (Alain Prost, Nigel Mansell, Jacques Villeneuve) + Analista da imprensa internacional.",
+            "• Telemetria fina de desgaste de pneus, freios e ERS\n• Crônica de corrida de M5\n• Prompt 08_repercussao_midia.md",
+            "As notas de 0 a 10 de Alain Prost devem ser fundamentadas nos percentuais reais de desgaste mecânico gravados pelo listener UDP.",
+        ),
+    ]
+
+    for idx_a, (mf, mp, si, cp, ta) in enumerate(api_specs, start=1):
+        r_a = tbl_api.rows[idx_a]
+        r_a.cells[0].text = mf
+        r_a.cells[0].paragraphs[0].runs[0].font.size = Pt(8)
+        r_a.cells[1].text = mp
+        r_a.cells[1].paragraphs[0].runs[0].font.size = Pt(8)
+        r_a.cells[2].text = si
+        r_a.cells[2].paragraphs[0].runs[0].font.size = Pt(8)
+        r_a.cells[3].text = cp
+        r_a.cells[3].paragraphs[0].runs[0].font.size = Pt(8)
+        r_a.cells[4].text = ta
+        r_a.cells[4].paragraphs[0].runs[0].font.size = Pt(8)
+        style_table_row(r_a, is_even=(idx_a % 2 == 0), col_widths=[Inches(1.4), Inches(1.2), Inches(1.6), Inches(1.6), Inches(1.4)])
+
+    doc.add_paragraph().paragraph_format.space_after = Pt(6)
+
     doc.add_page_break()
 
     # =========================================================================
