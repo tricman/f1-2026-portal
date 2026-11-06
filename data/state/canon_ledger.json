@@ -351,6 +351,352 @@
       "status": "OPEN",
       "event_id": "ET10-AUTO-M5",
       "module": "M5_CORRIDA"
+    },
+    {
+      "round": 11,
+      "entities": [
+        "verstappen",
+        "fia",
+        "imprensa",
+        "sarah",
+        "felipe",
+        "davi"
+      ],
+      "summary": "Na Coletiva Oficial FIA da Etapa 11, Verstappen respondeu a Ted Kravitz (Sky Sports F1 'The Notebook' (Reino Unido)): 'Declaração aos repórteres da FIA.'. Reação no recinto: A sala de imprensa acompanha em silêncio atento.",
+      "status": "OPEN",
+      "event_id": "ET11-M2-Q2",
+      "module": "M2_COLETIVA"
+    },
+    {
+      "round": 11,
+      "entities": [
+        "felipe",
+        "fia",
+        "equipe",
+        "et_11_austria"
+      ],
+      "summary": "No Dilema de Paddock da Etapa 11, Felipe decidiu: 'Opção A (Focar na telemetria de longo curso)'. Consequência: ## CONTEÚDO NARRATIVO HOMOLOGADO E2E\nAnálise detalhada do Paddock de Spielberg. Sarah, Davi e Felipe travaram duelo tenso nas montanhas austríacas.",
+      "status": "OPEN",
+      "event_id": "ET11-M1.5-DILEMMA",
+      "module": "M1_5_DILEMA"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "davi",
+        "mercado",
+        "scuderia_ferrari_hp",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Davi (DaviMSSon) deixa a Williams Racing e assina com a Scuderia Ferrari HP.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-DAVI",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "hamilton",
+        "mercado",
+        "mercedes_amg_petronas",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Lewis Hamilton deixa a Categorias de Base / Outra Categoria e assina com a Mercedes-AMG Petronas.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-HAMILTON",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "felipe",
+        "mercado",
+        "audi_revolut_f1_team",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Felipe (frdsilva) deixa a Kick Sauber e assina com a Audi Revolut F1 Team.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-FELIPE",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "hulkenberg",
+        "mercado",
+        "audi_revolut_f1_team",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Nico Hülkenberg deixa a Categorias de Base / Outra Categoria e assina com a Audi Revolut F1 Team.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-HULKENBERG",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "leclerc",
+        "mercado",
+        "scuderia_ferrari_hp",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Charles Leclerc deixa a Categorias de Base / Outra Categoria e assina com a Scuderia Ferrari HP.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-LECLERC",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "verstappen",
+        "mercado",
+        "red_bull_racing",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Max Verstappen deixa a Categorias de Base / Outra Categoria e assina com a Red Bull Racing.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-VERSTAPPEN",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "perez",
+        "mercado",
+        "red_bull_racing",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Sergio Pérez deixa a Categorias de Base / Outra Categoria e assina com a Red Bull Racing.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-PEREZ",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "norris",
+        "mercado",
+        "mclaren_formula_1_team",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Lando Norris deixa a Categorias de Base / Outra Categoria e assina com a McLaren Formula 1 Team.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-NORRIS",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "piastri",
+        "mercado",
+        "mclaren_formula_1_team",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Oscar Piastri deixa a Categorias de Base / Outra Categoria e assina com a McLaren Formula 1 Team.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-PIASTRI",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "alonso",
+        "mercado",
+        "aston_martin_aramco",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Fernando Alonso deixa a Categorias de Base / Outra Categoria e assina com a Aston Martin Aramco.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-ALONSO",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "stroll",
+        "mercado",
+        "aston_martin_aramco",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Lance Stroll deixa a Categorias de Base / Outra Categoria e assina com a Aston Martin Aramco.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-STROLL",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "sainz",
+        "mercado",
+        "williams_racing",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Carlos Sainz deixa a Categorias de Base / Outra Categoria e assina com a Williams Racing.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-SAINZ",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "albon",
+        "mercado",
+        "williams_racing",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Alexander Albon deixa a Categorias de Base / Outra Categoria e assina com a Williams Racing.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-ALBON",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "gasly",
+        "mercado",
+        "alpine_f1_team",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Pierre Gasly deixa a Categorias de Base / Outra Categoria e assina com a Alpine F1 Team.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-GASLY",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "doohan",
+        "mercado",
+        "alpine_f1_team",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Jack Doohan deixa a Categorias de Base / Outra Categoria e assina com a Alpine F1 Team.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-DOOHAN",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "tsunoda",
+        "mercado",
+        "visa_cash_app_rb",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Yuki Tsunoda deixa a Categorias de Base / Outra Categoria e assina com a Visa Cash App RB.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-TSUNODA",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "lawson",
+        "mercado",
+        "visa_cash_app_rb",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Liam Lawson deixa a Categorias de Base / Outra Categoria e assina com a Visa Cash App RB.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-LAWSON",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "bearman",
+        "mercado",
+        "moneygram_haas_f1_team",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Oliver Bearman deixa a Categorias de Base / Outra Categoria e assina com a MoneyGram Haas F1 Team.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-BEARMAN",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "ocon",
+        "mercado",
+        "moneygram_haas_f1_team",
+        "fia"
+      ],
+      "summary": "Transferência confirmada para season_02: Esteban Ocon deixa a Categorias de Base / Outra Categoria e assina com a MoneyGram Haas F1 Team.",
+      "status": "CLOSED",
+      "event_id": "TRANSFER-SEASON_02-OCON",
+      "module": "SILLY_SEASON_TRANSFER"
+    },
+    {
+      "round": 0,
+      "entities": [
+        "season_02",
+        "fia",
+        "campeonato"
+      ],
+      "summary": "Temporada 2027 (season_02) oficialmente inicializada com 19 transferências registradas.",
+      "status": "OPEN",
+      "event_id": "KICKOFF-SEASON_02",
+      "module": "SEASON_KICKOFF"
+    },
+    {
+      "round": 11,
+      "entities": [
+        "sarah",
+        "fia",
+        "imprensa",
+        "felipe",
+        "davi"
+      ],
+      "summary": "Na Coletiva Oficial FIA da Etapa 11, Sarah declarou a Julien Fébreau (Canal+ (França)): '\"## CONTEÚDO NARRATIVO HOMOLOGADO E2E\nAnálise detalhada do Paddock de Spielberg. Sarah, Davi e Felipe travaram duelo tenso nas montanhas austríacas.\" *(Declaração emitida pela assessoria de imprensa /'. Reação no recinto: ## CONTEÚDO NARRATIVO HOMOLOGADO E2E\nAnálise detalhada do Paddock de Spielberg. Sarah, Davi e Felipe travaram duelo tenso nas montanhas austríacas.",
+      "status": "OPEN",
+      "event_id": "ET11-M2-Q1",
+      "module": "M2_COLETIVA"
+    },
+    {
+      "round": 11,
+      "entities": [
+        "ricciardo",
+        "fia",
+        "imprensa",
+        "sarah",
+        "felipe",
+        "davi"
+      ],
+      "summary": "Na Coletiva Oficial FIA da Etapa 11, Ricciardo respondeu a Michael Schmidt (Auto Motor und Sport (Alemanha)): 'Declaração aos repórteres da FIA.'. Reação no recinto: A sala de imprensa acompanha em silêncio atento.",
+      "status": "OPEN",
+      "event_id": "ET11-M2-Q3",
+      "module": "M2_COLETIVA"
+    },
+    {
+      "round": 11,
+      "entities": [
+        "perez",
+        "fia",
+        "imprensa",
+        "sarah",
+        "felipe",
+        "davi"
+      ],
+      "summary": "Na Coletiva Oficial FIA da Etapa 11, Perez respondeu a Diego Mejía (Fox Sports México / América Latina): 'Declaração aos repórteres da FIA.'. Reação no recinto: A sala de imprensa acompanha em silêncio atento.",
+      "status": "OPEN",
+      "event_id": "ET11-M2-Q4",
+      "module": "M2_COLETIVA"
+    },
+    {
+      "event_id": "ET11-M2-Q5",
+      "round": 11,
+      "module": "M2_COLETIVA",
+      "summary": "Na Coletiva Oficial FIA da Etapa 11, Tsunoda respondeu a Julianne Cerasoli (UOL Esporte / Band (Brasil)): 'Declaração aos repórteres da FIA.'. Reação no recinto: A sala de imprensa acompanha em silêncio atento.",
+      "entities": [
+        "tsunoda",
+        "fia",
+        "imprensa",
+        "sarah",
+        "felipe",
+        "davi"
+      ],
+      "status": "OPEN"
     }
   ]
 }

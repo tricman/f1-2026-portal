@@ -15,12 +15,16 @@
   <style>
     :root {
       --f1-red: #e10600;
-      --bg-carbon: #0b0d13;
-      --bg-card: #131722;
-      --bg-elevated: #1c2230;
+      --fia-navy: #1b365d;
+      --bg-paddock: #0b131e;
+      --bg-card: #131d2e;
+      --bg-elevated: #18253a;
+      --border-paddock: #22334d;
+      --gold: #f59e0b;
+      --emerald: #10b981;
     }
     body {
-      background-color: var(--bg-carbon);
+      background-color: var(--bg-paddock);
       color: #e2e8f0;
       font-family: 'Inter', sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -33,8 +37,8 @@
     }
     /* Custom Scrollbars */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #0f131d; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    ::-webkit-scrollbar-track { background: #0b131e; }
+    ::-webkit-scrollbar-thumb { background: #22334d; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #e10600; }
 
     /* Editorial Article Typography & Responsive Tables */
@@ -98,8 +102,8 @@
       font-size: 0.88em;
     }
     .editorial-content pre {
-      background: #090b10;
-      border: 1px solid #1e293b;
+      background: #090e17;
+      border: 1px solid #22334d;
       border-radius: 0.6rem;
       padding: 1rem;
       overflow-x: auto;
@@ -111,7 +115,7 @@
       padding: 0;
     }
     .editorial-content blockquote {
-      background: linear-gradient(90deg, rgba(225, 6, 0, 0.12) 0%, rgba(19, 23, 34, 0.9) 100%);
+      background: linear-gradient(90deg, rgba(225, 6, 0, 0.12) 0%, rgba(19, 29, 46, 0.9) 100%);
       border-left: 4px solid #e10600;
       padding: 1rem 1.25rem;
       border-radius: 0 0.6rem 0.6rem 0;
@@ -119,7 +123,7 @@
       color: #f1f5f9;
     }
     .editorial-content hr {
-      border-color: #1e293b;
+      border-color: #22334d;
       margin: 2rem 0;
     }
     /* Horizontal Scroll Wrapper for Wide FIA Tables on Mobile */
@@ -129,8 +133,8 @@
       -webkit-overflow-scrolling: touch;
       margin: 1.25rem 0 1.75rem 0;
       border-radius: 0.65rem;
-      border: 1px solid #263044;
-      background: #0e121b;
+      border: 1px solid #22334d;
+      background: #0e1624;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
     }
     .editorial-content table {
@@ -140,7 +144,7 @@
       white-space: nowrap;
     }
     .editorial-content thead th {
-      background: #181f2e;
+      background: #18253a;
       color: #94a3b8;
       font-family: 'Titillium Web', sans-serif;
       font-weight: 700;
@@ -151,7 +155,7 @@
       text-align: left;
     }
     .editorial-content tbody tr {
-      border-bottom: 1px solid #1e2638;
+      border-bottom: 1px solid #1a273d;
       transition: background 0.15s ease;
     }
     .editorial-content tbody tr:nth-child(even) {
@@ -169,55 +173,55 @@
     .editorial-content td:first-child {
       position: sticky;
       left: 0;
-      background: #131824;
+      background: #131d2e;
       z-index: 1;
-      border-right: 1px solid #263044;
+      border-right: 1px solid #22334d;
       font-weight: 700;
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-red-600 selection:text-white">
+<body class="min-h-screen flex flex-col selection:bg-red-600 selection:text-white bg-[#0b131e]">
 
   <!-- TOP F1 BROADCAST HEADER -->
-  <header class="sticky top-0 z-40 bg-[#0b0d13]/95 backdrop-blur-md border-b border-slate-800/80">
+  <header class="sticky top-0 z-40 bg-[#0b131e]/95 backdrop-blur-md border-b border-[#22334d]">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 h-14 flex items-center justify-between gap-2">
       <div class="flex items-center gap-3">
-        <button id="mobileMenuBtn" onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg bg-slate-800/80 text-slate-200 hover:bg-red-600 hover:text-white transition">
+        <button id="mobileMenuBtn" onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg bg-[#18253a] text-slate-200 hover:bg-[#e10600] hover:text-white transition">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
         <div class="flex items-center gap-2.5 cursor-pointer" onclick="selectRound(10)">
-          <span class="bg-[#e10600] text-white font-f1 font-black italic px-2.5 py-0.5 rounded text-sm tracking-wider">F1 26</span>
+          <span class="bg-[#e10600] text-white font-f1 font-black italic px-2.5 py-0.5 rounded text-sm tracking-wider shadow-sm shadow-red-950/50">F1 26</span>
           <div>
             <h1 class="font-f1 font-bold text-white text-sm sm:text-base leading-none tracking-wide">PADDOCK INSIDER & FIA WIKI</h1>
-            <p class="text-[10px] text-slate-400 font-medium hidden sm:block">TEMPORADA 2026 • BRAZILIAN STORM CHRONICLES</p>
+            <p class="text-[10px] text-slate-400 font-medium hidden sm:block">TEMPORADA 2026 • BRAZILIAN STORM CHRONICLES • PADDOCK DARK MODE</p>
           </div>
         </div>
       </div>
 
       <!-- Quick Top Navigation Pills -->
       <div class="flex items-center gap-1.5 sm:gap-2">
-        <button onclick="openStandingsModal()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-xs font-semibold text-amber-400 border border-amber-500/30 transition">
+        <button onclick="openStandingsModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#18253a] hover:bg-[#22334d] text-xs font-semibold text-amber-400 border border-amber-500/30 transition shadow-sm">
           <span>🏆</span>
-          <span class="hidden xs:inline">Mundial</span>
-          <span id="topStandingsRoundBadge" class="font-mono-code text-[11px] text-white">R10</span>
+          <span class="hidden xs:inline">Mundial FIA</span>
+          <span id="topStandingsRoundBadge" class="font-mono-code text-[11px] text-white font-bold">R10</span>
         </button>
-        <button onclick="openSetupWiki()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-xs font-semibold text-emerald-400 border border-emerald-500/30 transition">
+        <button onclick="openSetupWiki()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#18253a] hover:bg-[#22334d] text-xs font-semibold text-emerald-400 border border-emerald-500/30 transition">
           <span>📚</span>
-          <span class="hidden sm:inline">Enciclopédia & Personas</span>
+          <span class="hidden sm:inline">Enciclopédia & Regras</span>
           <span class="sm:hidden">Wiki</span>
         </button>
-        <button id="mobilePreviewToggleBtn" onclick="toggleMobileFramePreview()" class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-xs font-semibold text-sky-400 border border-sky-500/30 transition" title="Simular tela de celular (390px) no navegador desktop">
+        <button id="mobilePreviewToggleBtn" onclick="toggleMobileFramePreview()" class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#18253a] hover:bg-[#22334d] text-xs font-semibold text-sky-400 border border-sky-500/30 transition" title="Simular tela de celular (390px) no navegador desktop">
           <span>📱</span>
           <span>Simular Mobile</span>
         </button>
         <div class="relative hidden md:block">
-          <input id="searchInput" oninput="handleSearch(this.value)" type="text" placeholder="Buscar piloto, etapa, incidente..." class="w-52 lg:w-64 bg-slate-900/90 border border-slate-700/80 rounded-lg px-3 py-1 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-red-500" />
+          <input id="searchInput" oninput="handleSearch(this.value)" type="text" placeholder="Buscar piloto, GP, tema..." class="w-52 lg:w-64 bg-[#0e1624] border border-[#22334d] rounded-lg px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-[#e10600]" />
         </div>
       </div>
     </div>
 
     <!-- HORIZONTAL ROUND SELECTOR BAR (MOBILE-FIRST SWIPEABLE) -->
-    <div class="border-t border-slate-800/60 bg-[#0f131c]">
+    <div class="border-t border-[#22334d] bg-[#0e1624]">
       <div id="roundSelectorBar" class="max-w-7xl mx-auto px-3 sm:px-6 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar">
         <!-- Populated by JS -->
       </div>
@@ -228,22 +232,22 @@
   <div class="max-w-7xl mx-auto w-full flex-1 flex relative px-3 sm:px-6 py-4 sm:py-6 gap-6">
 
     <!-- LEFT DRAWER / SIDEBAR: MODULE TIMELINE & SEARCH -->
-    <aside id="leftSidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-80 lg:w-72 bg-[#111520] lg:bg-transparent border-r lg:border-r-0 border-slate-800 p-4 lg:p-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out flex flex-col shrink-0 overflow-y-auto">
-      <div class="flex items-center justify-between lg:hidden mb-4 pb-3 border-b border-slate-800">
+    <aside id="leftSidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-80 lg:w-72 bg-[#111a2a] lg:bg-transparent border-r lg:border-r-0 border-[#22334d] p-4 lg:p-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out flex flex-col shrink-0 overflow-y-auto">
+      <div class="flex items-center justify-between lg:hidden mb-4 pb-3 border-b border-[#22334d]">
         <span class="font-f1 font-bold text-sm text-white uppercase tracking-wider">Navegação da Etapa</span>
         <button onclick="toggleSidebar()" class="p-1.5 text-slate-400 hover:text-white">✕</button>
       </div>
 
       <!-- Mobile Search Input -->
       <div class="mb-4 md:hidden">
-        <input id="mobileSearchInput" oninput="handleSearch(this.value)" type="text" placeholder="🔍 Buscar em toda a temporada..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
+        <input id="mobileSearchInput" oninput="handleSearch(this.value)" type="text" placeholder="🔍 Buscar em toda a temporada..." class="w-full bg-[#0e1624] border border-[#22334d] rounded-lg px-3 py-2 text-xs text-white" />
       </div>
 
       <!-- Brazilian Storm Quick Telemetry Trio Card (Dynamic from latest Standings) -->
-      <div class="mb-4 p-3 rounded-xl bg-gradient-to-br from-slate-900 via-[#141a29] to-slate-900 border border-slate-800/90 shadow-lg">
+      <div class="mb-4 p-3 rounded-xl bg-gradient-to-br from-[#131d2e] via-[#18253a] to-[#131d2e] border border-[#22334d] shadow-lg">
         <div class="flex items-center justify-between mb-2">
           <span id="stormWidgetHeader" class="text-[11px] font-f1 font-bold uppercase tracking-wider text-emerald-400">🇧🇷 Brazilian Storm</span>
-          <span class="text-[10px] font-mono-code text-slate-400">2026</span>
+          <span class="text-[10px] font-mono-code text-slate-400 bg-slate-900/60 px-1.5 py-0.5 rounded">2026</span>
         </div>
         <div id="stormWidgetRows" class="space-y-1.5 text-xs">
           <!-- Populated dynamically by JS -->
@@ -267,15 +271,24 @@
 
     <!-- CENTER MAGAZINE READER -->
     <main class="flex-1 min-w-0">
-      <!-- Module Horizontal Pill Switcher for fast thumb navigation on Mobile -->
-      <div id="mobileModulePills" class="flex items-center gap-1.5 overflow-x-auto pb-3 mb-3 border-b border-slate-800/80 lg:hidden">
-        <!-- Populated by JS -->
+      <!-- F1 WEEKEND SEQUENCE TAB BAR (M1 A M8) -->
+      <div class="mb-4">
+        <div class="flex items-center justify-between mb-1.5 px-1">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#e10600] animate-pulse"></span>
+            <span class="text-[11px] font-f1 font-bold uppercase tracking-wider text-slate-400">Cronograma do Fim de Semana Oficial (M1 ➔ M8)</span>
+          </div>
+          <span id="activeModuleOrderBadge" class="text-[11px] font-mono-code text-amber-400 font-semibold"></span>
+        </div>
+        <nav id="weekendModuleTabs" class="overflow-x-auto no-scrollbar flex items-center gap-1.5 p-1.5 bg-[#131d2e] border border-[#22334d] rounded-xl shadow-lg">
+          <!-- Populated dynamically by JS with M1..M8 pills -->
+        </nav>
       </div>
 
       <!-- Article Container -->
-      <article class="bg-[#131722] border border-slate-800/90 rounded-2xl shadow-2xl p-4 sm:p-8 lg:p-10">
+      <article class="bg-[#131d2e] border border-[#22334d] rounded-2xl shadow-2xl p-4 sm:p-8 lg:p-10">
         <!-- Article Metadata Banner -->
-        <div id="articleMetaHeader" class="mb-6 pb-4 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
+        <div id="articleMetaHeader" class="mb-6 pb-4 border-b border-[#22334d] flex flex-wrap items-center justify-between gap-2">
           <!-- Populated by JS -->
         </div>
 
@@ -285,7 +298,7 @@
         </div>
 
         <!-- Prev / Next Module Footer Navigation -->
-        <div id="articleFooterNav" class="mt-10 pt-6 border-t border-slate-800 flex items-center justify-between gap-4">
+        <div id="articleFooterNav" class="mt-10 pt-6 border-t border-[#22334d] flex items-center justify-between gap-4">
           <!-- Populated by JS -->
         </div>
       </article>
@@ -293,17 +306,38 @@
 
   </div>
 
-  <!-- MODAL: FIA CHAMPIONSHIP STANDINGS (DRIVERS & CONSTRUCTORS) -->
-  <div id="standingsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-6">
-    <div class="bg-[#131722] border border-slate-700 rounded-2xl max-w-5xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
-      <div class="bg-[#e10600] px-4 sm:px-6 py-3.5 flex items-center justify-between">
-        <div>
-          <h2 class="font-f1 font-black text-white text-base sm:text-lg tracking-wide uppercase">🏆 FIA WORLD CHAMPIONSHIP STANDINGS — PÓS-ETAPA 10 (ESPANHA)</h2>
-          <p class="text-xs text-red-100">Homologação Oficial WMSC FIA • Opção 1 (Dedução -10 pts Construtores Red Bull Racing)</p>
+  <!-- MODAL: FIA CHAMPIONSHIP STANDINGS (DRIVERS & CONSTRUCTORS) WITH DELTAS -->
+  <div id="standingsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-2 sm:p-6">
+    <div class="bg-[#131d2e] border border-[#22334d] rounded-2xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-r from-[#1b365d] via-[#131d2e] to-[#e10600] px-4 sm:px-6 py-3.5 flex items-center justify-between border-b border-[#22334d]">
+        <div class="flex items-center gap-3">
+          <span class="bg-[#e10600] text-white font-f1 font-black px-2 py-0.5 rounded text-xs tracking-wider shadow-sm">FIA WMSC</span>
+          <div>
+            <h2 id="standingsModalTitle" class="font-f1 font-black text-white text-sm sm:text-base tracking-wide uppercase">🏆 CLASSIFICAÇÃO OFICIAL DO MUNDIAL FIA</h2>
+            <p id="standingsModalSubtitle" class="text-[11px] text-slate-300">Tabela Homologada • Posições, Pontuação e Variação Relativa (Δ)</p>
+          </div>
         </div>
-        <button onclick="closeStandingsModal()" class="text-white hover:bg-black/20 rounded-lg px-2.5 py-1 text-lg font-bold">✕</button>
+        <button onclick="closeStandingsModal()" class="text-white hover:bg-white/10 rounded-lg p-1.5 text-lg font-bold transition">✕</button>
       </div>
-      <div class="p-4 sm:p-6 overflow-y-auto space-y-6" id="standingsModalBody">
+
+      <!-- Standings Switcher Tabs (Drivers / Constructors) -->
+      <div class="px-4 sm:px-6 pt-3 pb-2 border-b border-[#22334d] bg-[#0e1624] flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <button id="standingsTabWdcBtn" onclick="switchStandingsView('drivers')" class="px-3.5 py-1.5 rounded-lg text-xs font-f1 font-bold uppercase tracking-wider transition bg-[#e10600] text-white shadow-sm">
+            🏎️ Pilotos (WDC)
+          </button>
+          <button id="standingsTabWccBtn" onclick="switchStandingsView('constructors')" class="px-3.5 py-1.5 rounded-lg text-xs font-f1 font-bold uppercase tracking-wider transition bg-[#18253a] text-slate-300 hover:text-white border border-[#22334d]">
+            🛠️ Construtores (WCC)
+          </button>
+        </div>
+        <div id="standingsSeasonBadge" class="hidden sm:inline-block font-mono-code text-[11px] text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded">
+          Temporada 2026
+        </div>
+      </div>
+
+      <!-- Standings Content Body -->
+      <div class="p-3 sm:p-6 overflow-y-auto space-y-4" id="standingsModalBody">
         <!-- Populated by JS -->
       </div>
     </div>
@@ -315,6 +349,18 @@
     let currentMode = 'round'; // 'round' | 'setup' | 'search'
     let currentRoundNum = 10;
     let currentArticleId = null;
+    let activeStandingsView = 'drivers'; // 'drivers' | 'constructors'
+
+    const MODULE_SEQUENCE_CONFIG = [
+      { order: 1, tag: 'M1', name: 'Pré-Semana', icon: '📰', badgeCls: 'badge-amber' },
+      { order: 2, tag: 'M2', name: 'Coletiva FIA', icon: '🎙️', badgeCls: 'badge-blue' },
+      { order: 3, tag: 'M3', name: 'Treino Livre', icon: '⏱️', badgeCls: 'badge-cyan' },
+      { order: 4, tag: 'M4', name: 'Qualifying', icon: '⚡', badgeCls: 'badge-purple' },
+      { order: 5, tag: 'M5', name: 'Corrida Oficial', icon: '🏁', badgeCls: 'badge-red' },
+      { order: 6, tag: 'M6', name: 'Pódio & VIP', icon: '🍾', badgeCls: 'badge-gold' },
+      { order: 7, tag: 'M7', name: 'Boletim FIA', icon: '📊', badgeCls: 'badge-emerald' },
+      { order: 8, tag: 'M8', name: 'Crônica & Redes', icon: '📱', badgeCls: 'badge-pink' }
+    ];
 
     function getBadgeStyle(colorClass) {
       const map = {
@@ -350,7 +396,7 @@
         const active = (currentMode === 'round' && r.num === currentRoundNum);
         const cls = active
           ? 'bg-[#e10600] text-white border-[#e10600] shadow-md shadow-red-950/50'
-          : 'bg-slate-900/90 text-slate-300 border-slate-800 hover:border-slate-600 hover:text-white';
+          : 'bg-[#131d2e] text-slate-300 border-[#22334d] hover:border-slate-500 hover:text-white';
         return `
           <button onclick="selectRound(${r.num})" class="shrink-0 px-3 py-1.5 rounded-lg border text-xs font-f1 font-bold tracking-wide transition flex items-center gap-1.5 ${cls}">
             <span>${r.flag}</span>
@@ -358,6 +404,46 @@
             <span class="hidden sm:inline">• ${r.name.replace('GP ', '')}</span>
           </button>
         `;
+      }).join('');
+    }
+
+    function renderWeekendModuleTabs(activeArticle) {
+      const container = document.getElementById('weekendModuleTabs');
+      const badge = document.getElementById('activeModuleOrderBadge');
+      if (!container) return;
+
+      const roundObj = PORTAL_DATA.rounds.find(r => r.num === currentRoundNum);
+      const articles = roundObj ? roundObj.articles : [];
+      const activeOrder = activeArticle ? activeArticle.order : 5;
+
+      if (badge && activeArticle) {
+        badge.textContent = `${activeArticle.short_tag} • ${activeArticle.badge_label}`;
+      }
+
+      container.innerHTML = MODULE_SEQUENCE_CONFIG.map(m => {
+        const art = articles.find(a => a.order === m.order);
+        const isSelected = activeArticle && (activeArticle.order === m.order);
+
+        if (art) {
+          const tabCls = isSelected
+            ? 'bg-[#e10600] text-white border-[#e10600] shadow-md shadow-red-950/60 font-bold'
+            : 'bg-[#0e1624] text-slate-300 border-[#22334d] hover:bg-[#18253a] hover:text-white';
+          return `
+            <button onclick="selectArticle('${art.id}')" class="shrink-0 px-3 py-1.5 rounded-lg border text-xs font-f1 transition flex items-center gap-1.5 ${tabCls}" title="${art.badge_label}">
+              <span>${m.icon}</span>
+              <span class="font-bold">${m.tag}</span>
+              <span class="hidden md:inline text-[11px] font-normal opacity-90">${m.name}</span>
+            </button>
+          `;
+        } else {
+          return `
+            <div class="shrink-0 px-2.5 py-1.5 rounded-lg border border-dashed border-slate-800 text-xs font-f1 text-slate-600 flex items-center gap-1.5 cursor-not-allowed opacity-60" title="Módulo ainda não gerado nesta etapa">
+              <span>${m.icon}</span>
+              <span>${m.tag}</span>
+              <span class="hidden md:inline text-[10px] text-slate-600">⏳</span>
+            </div>
+          `;
+        }
       }).join('');
     }
 
@@ -371,7 +457,6 @@
       document.getElementById('sidebarSectionTitle').textContent = `${roundObj.flag} ETAPA ${roundObj.num} — ${roundObj.name.toUpperCase()}`;
       document.getElementById('sidebarArticleCount').textContent = `${roundObj.articles.length} docs`;
 
-      //Default to M5 (Race Final Report) if selecting Round 10 for the first time, else first article
       if (!targetArticleId) {
         const m5 = roundObj.articles.find(a => a.order === 5);
         targetArticleId = m5 ? m5.id : (roundObj.articles[0] ? roundObj.articles[0].id : null);
@@ -422,11 +507,12 @@
     function renderArticleList(articles, selectedId) {
       currentArticleId = selectedId;
       const nav = document.getElementById('moduleListNav');
-      const mobilePills = document.getElementById('mobileModulePills');
+      const activeArticle = articles.find(a => a.id === selectedId) || articles[0];
+
+      renderWeekendModuleTabs(activeArticle);
 
       if (!articles || articles.length === 0) {
         nav.innerHTML = `<div class="p-4 text-xs text-slate-500 text-center">Nenhum documento encontrado.</div>`;
-        mobilePills.innerHTML = '';
         document.getElementById('articleBody').innerHTML = `<p class="text-slate-400">Nenhum conteúdo selecionado.</p>`;
         return;
       }
@@ -434,8 +520,8 @@
       nav.innerHTML = articles.map(a => {
         const isSelected = a.id === selectedId;
         const cardCls = isSelected
-          ? 'bg-slate-800/95 border-red-500/80 shadow-md'
-          : 'bg-slate-900/60 border-slate-800/80 hover:bg-slate-800/50 hover:border-slate-700';
+          ? 'bg-[#18253a] border-[#e10600] shadow-md shadow-red-950/40'
+          : 'bg-[#131d2e] border-[#22334d] hover:bg-[#18253a] hover:border-slate-600';
         return `
           <button onclick="selectArticle('${a.id}')" class="w-full text-left p-2.5 rounded-xl border transition block ${cardCls}">
             <div class="flex items-center justify-between gap-2 mb-1">
@@ -447,19 +533,6 @@
         `;
       }).join('');
 
-      mobilePills.innerHTML = articles.map(a => {
-        const isSelected = a.id === selectedId;
-        const pillCls = isSelected
-          ? 'bg-red-600 text-white border-red-500'
-          : 'bg-slate-900 text-slate-300 border-slate-800';
-        return `
-          <button onclick="selectArticle('${a.id}')" class="shrink-0 px-2.5 py-1 rounded-lg border text-[11px] font-f1 font-bold ${pillCls}">
-            ${a.short_tag}
-          </button>
-        `;
-      }).join('');
-
-      const activeArticle = articles.find(a => a.id === selectedId) || articles[0];
       displayArticle(activeArticle, articles);
     }
 
@@ -477,7 +550,6 @@
         pool.push(...PORTAL_DATA.setup_docs);
       }
       renderArticleList(pool, articleId);
-      // Close mobile drawer if open
       const sb = document.getElementById('leftSidebar');
       if (!sb.classList.contains('-translate-x-full')) {
         toggleSidebar();
@@ -493,10 +565,9 @@
           <span class="px-2.5 py-1 text-xs font-f1 font-bold rounded-md border ${getBadgeStyle(article.color_class)}">${article.short_tag}</span>
           <span class="text-xs font-semibold text-slate-300">${article.badge_label}</span>
         </div>
-        <span class="text-[11px] font-mono-code text-slate-400 bg-slate-900 px-2.5 py-1 rounded border border-slate-800">${article.filename}</span>
+        <span class="text-[11px] font-mono-code text-slate-400 bg-[#0e1624] px-2.5 py-1 rounded border border-[#22334d]">${article.filename}</span>
       `;
 
-      // Pre-process GitHub callouts (> [!WARNING], > [!IMPORTANT], etc.) into clean badges
       let md = article.markdown.replace(/\[!IMPORTANT\]/g, '**🚨 IMPORTANTE — FIA:**')
                                .replace(/\[!WARNING\]/g, '**⚠️ DECISÃO DOS COMISSÁRIOS:**')
                                .replace(/\[!CAUTION\]/g, '**🛑 BOLETIM TÉCNICO:**')
@@ -506,7 +577,6 @@
       const bodyEl = document.getElementById('articleBody');
       bodyEl.innerHTML = rawHtml;
 
-      // Wrap all <table> elements in a smooth horizontal scroll container for mobile screens
       bodyEl.querySelectorAll('table').forEach(tbl => {
         const wrapper = document.createElement('div');
         wrapper.className = 'table-scroll-wrapper';
@@ -514,85 +584,195 @@
         wrapper.appendChild(tbl);
       });
 
-      // Prev / Next navigation buttons
       const idx = pool.findIndex(x => x.id === article.id);
       const prev = idx > 0 ? pool[idx - 1] : null;
       const next = idx >= 0 && idx < pool.length - 1 ? pool[idx + 1] : null;
 
       document.getElementById('articleFooterNav').innerHTML = `
         <div>
-          ${prev ? `<button onclick="selectArticle('${prev.id}')" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition flex items-center gap-2"><span>←</span><span>${prev.short_tag}</span></button>` : '<div></div>'}
+          ${prev ? `<button onclick="selectArticle('${prev.id}')" class="px-3.5 py-2 rounded-xl bg-[#18253a] hover:bg-[#22334d] text-xs font-semibold text-slate-200 transition flex items-center gap-2 border border-[#22334d]"><span>←</span><span>${prev.short_tag}</span></button>` : '<div></div>'}
         </div>
         <div>
-          ${next ? `<button onclick="selectArticle('${next.id}')" class="px-3.5 py-2 rounded-xl bg-[#e10600] hover:bg-red-700 text-xs font-semibold text-white transition flex items-center gap-2"><span>${next.short_tag}</span><span>→</span></button>` : '<div></div>'}
+          ${next ? `<button onclick="selectArticle('${next.id}')" class="px-3.5 py-2 rounded-xl bg-[#e10600] hover:bg-red-700 text-xs font-semibold text-white transition flex items-center gap-2 shadow-md"><span>${next.short_tag}</span><span>→</span></button>` : '<div></div>'}
         </div>
       `;
     }
 
-    function openStandingsModal() {
-      const modal = document.getElementById('standingsModal');
+    function renderDeltaBadge(delta) {
+      const d = parseInt(delta || 0, 10);
+      if (d > 0) {
+        return `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono-code font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">▲ +${d}</span>`;
+      } else if (d < 0) {
+        return `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono-code font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">▼ ${d}</span>`;
+      } else {
+        return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono-code text-slate-500 bg-slate-900/60 border border-slate-800">▬ 0</span>`;
+      }
+    }
+
+    function switchStandingsView(viewType) {
+      activeStandingsView = viewType;
+      const wdcBtn = document.getElementById('standingsTabWdcBtn');
+      const wccBtn = document.getElementById('standingsTabWccBtn');
+      if (viewType === 'drivers') {
+        wdcBtn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-f1 font-bold uppercase tracking-wider transition bg-[#e10600] text-white shadow-sm';
+        wccBtn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-f1 font-bold uppercase tracking-wider transition bg-[#18253a] text-slate-300 hover:text-white border border-[#22334d]';
+      } else {
+        wccBtn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-f1 font-bold uppercase tracking-wider transition bg-[#e10600] text-white shadow-sm';
+        wdcBtn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-f1 font-bold uppercase tracking-wider transition bg-[#18253a] text-slate-300 hover:text-white border border-[#22334d]';
+      }
+      renderStandingsTableContent();
+    }
+
+    function renderStandingsTableContent() {
       const body = document.getElementById('standingsModalBody');
-      const st = PORTAL_DATA.standings;
+      const st = PORTAL_DATA.standings || {};
+      const drivers = st.drivers_standings || st.drivers || [];
+      const constructors = st.constructors_standings || st.constructors || [];
 
-      const driversRows = (st.drivers_standings || []).map(d => {
-        const isBr = d.nationality === 'BRA';
-        const rowBg = isBr ? 'bg-emerald-950/30 font-semibold' : '';
-        return `
-          <tr class="${rowBg} border-b border-slate-800">
-            <td class="p-2.5 font-mono-code font-bold text-white">${d.pos}º</td>
-            <td class="p-2.5 font-mono-code text-slate-400">#${d.car_number}</td>
-            <td class="p-2.5 text-white">${d.name} ${isBr ? '🇧🇷' : ''}</td>
-            <td class="p-2.5 text-slate-300 text-xs uppercase">${d.team_id.replace('_', ' ')}</td>
-            <td class="p-2.5 font-mono-code text-slate-400">${d.wins}</td>
-            <td class="p-2.5 font-mono-code text-slate-400">${d.podiums}</td>
-            <td class="p-2.5 font-mono-code font-bold text-emerald-400 text-right">${d.points} pts</td>
-          </tr>
-        `;
-      }).join('');
+      if (activeStandingsView === 'drivers') {
+        const driversRows = drivers.map((d, idx) => {
+          const pos = d.pos || idx + 1;
+          const isBr = d.nationality === 'BRA' || ['sarah', 'felipe', 'davi'].includes(d.id);
+          const rowBg = isBr ? 'bg-emerald-950/25 border-emerald-500/30 font-semibold' : 'border-[#22334d]';
+          const carNum = d.car_number || d.number || '-';
+          const teamName = (d.team_id || d.team || '').replace(/_/g, ' ');
+          const deltaBadge = renderDeltaBadge(d.pos_delta);
+          const flag = isBr ? '🇧🇷' : (d.nationality ? `[${d.nationality}]` : '');
+          return `
+            <tr class="${rowBg} border-b hover:bg-slate-800/40 transition">
+              <td class="p-2.5 font-mono-code font-bold text-white">${pos}º</td>
+              <td class="p-2.5">${deltaBadge}</td>
+              <td class="p-2.5 font-mono-code text-slate-400">#${carNum}</td>
+              <td class="p-2.5 text-white font-medium">${d.name} ${flag}</td>
+              <td class="p-2.5 text-slate-300 text-xs uppercase">${teamName}</td>
+              <td class="p-2.5 font-mono-code text-slate-400 text-center">${d.wins || 0}</td>
+              <td class="p-2.5 font-mono-code text-slate-400 text-center">${d.podiums || 0}</td>
+              <td class="p-2.5 font-mono-code font-bold text-emerald-400 text-right">${d.points || 0} pts</td>
+            </tr>
+          `;
+        }).join('');
 
-      const teamsRows = (st.constructors_standings || []).map(t => {
-        const pen = t.fia_penalty_points ? `<span class="text-red-400 text-xs">(${t.fia_penalty_points} WMSC)</span>` : '0';
-        return `
-          <tr class="border-b border-slate-800">
-            <td class="p-2.5 font-mono-code font-bold text-white">${t.pos}º</td>
-            <td class="p-2.5 text-white font-semibold">${t.name}</td>
-            <td class="p-2.5 font-mono-code text-slate-400">${t.gross_points}</td>
-            <td class="p-2.5 font-mono-code">${pen}</td>
-            <td class="p-2.5 font-mono-code font-bold text-amber-400 text-right">${t.net_points} pts</td>
-          </tr>
-        `;
-      }).join('');
+        // Mobile Cards for Drivers
+        const mobileCards = drivers.map((d, idx) => {
+          const pos = d.pos || idx + 1;
+          const isBr = d.nationality === 'BRA' || ['sarah', 'felipe', 'davi'].includes(d.id);
+          const borderStyle = isBr ? 'border-emerald-500/50 bg-[#14232f]' : 'border-[#22334d] bg-[#0e1624]';
+          const carNum = d.car_number || d.number || '-';
+          const teamName = (d.team_id || d.team || '').replace(/_/g, ' ');
+          return `
+            <div class="sm:hidden p-3 rounded-xl border ${borderStyle} flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5">
+                <span class="font-f1 font-black text-sm text-white w-6 text-center">${pos}º</span>
+                <div>
+                  <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span>${d.name}</span>
+                    ${isBr ? '<span>🇧🇷</span>' : ''}
+                  </div>
+                  <div class="text-[11px] text-slate-400 uppercase">${teamName} <span class="font-mono-code">#${carNum}</span></div>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <div class="font-mono-code font-bold text-emerald-400 text-xs">${d.points || 0} pts</div>
+                <div class="mt-0.5">${renderDeltaBadge(d.pos_delta)}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
 
-      body.innerHTML = `
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        body.innerHTML = `
           <div>
-            <h3 class="font-f1 font-bold text-sm uppercase tracking-wider text-amber-400 mb-3">🏎️ Mundial de Pilotos (Pós-Etapa 10)</h3>
-            <div class="table-scroll-wrapper !m-0">
+            <div class="hidden sm:block table-scroll-wrapper !m-0">
               <table class="w-full text-xs text-left">
                 <thead>
-                  <tr class="bg-slate-900 text-slate-400">
-                    <th class="p-2.5">Pos</th><th class="p-2.5">Nº</th><th class="p-2.5">Piloto</th><th class="p-2.5">Equipe</th><th class="p-2.5">Vit</th><th class="p-2.5">Pód</th><th class="p-2.5 text-right">Pontos</th>
+                  <tr class="bg-[#18253a] text-slate-300">
+                    <th class="p-2.5">Pos</th>
+                    <th class="p-2.5">Δ Pos</th>
+                    <th class="p-2.5">Nº</th>
+                    <th class="p-2.5">Piloto</th>
+                    <th class="p-2.5">Equipe</th>
+                    <th class="p-2.5 text-center">Vitórias</th>
+                    <th class="p-2.5 text-center">Pódios</th>
+                    <th class="p-2.5 text-right">Total Pontos</th>
                   </tr>
                 </thead>
                 <tbody>${driversRows}</tbody>
               </table>
             </div>
+            <div class="sm:hidden space-y-2">${mobileCards}</div>
           </div>
+        `;
+      } else {
+        const teamsRows = constructors.map((t, idx) => {
+          const pos = t.pos || idx + 1;
+          const pen = t.fia_penalty_points ? `<span class="text-rose-400 text-xs font-mono-code">(${t.fia_penalty_points} WMSC)</span>` : '<span class="text-slate-500 font-mono-code">0</span>';
+          const gross = t.gross_points !== undefined ? t.gross_points : (t.points || 0);
+          const net = t.net_points !== undefined ? t.net_points : (t.points || 0);
+          const deltaBadge = renderDeltaBadge(t.pos_delta);
+          return `
+            <tr class="border-b border-[#22334d] hover:bg-slate-800/40 transition">
+              <td class="p-2.5 font-mono-code font-bold text-white">${pos}º</td>
+              <td class="p-2.5">${deltaBadge}</td>
+              <td class="p-2.5 text-white font-semibold">${t.name}</td>
+              <td class="p-2.5 font-mono-code text-slate-300">${gross} pts</td>
+              <td class="p-2.5 font-mono-code">${pen}</td>
+              <td class="p-2.5 font-mono-code font-bold text-amber-400 text-right">${net} pts</td>
+            </tr>
+          `;
+        }).join('');
+
+        // Mobile Cards for Constructors
+        const mobileTeamCards = constructors.map((t, idx) => {
+          const pos = t.pos || idx + 1;
+          const net = t.net_points !== undefined ? t.net_points : (t.points || 0);
+          return `
+            <div class="sm:hidden p-3 rounded-xl border border-[#22334d] bg-[#0e1624] flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5">
+                <span class="font-f1 font-black text-sm text-white w-6 text-center">${pos}º</span>
+                <div>
+                  <div class="text-xs font-bold text-white">${t.name}</div>
+                  <div class="text-[10px] text-slate-400">Total homologado FIA</div>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <div class="font-mono-code font-bold text-amber-400 text-xs">${net} pts</div>
+                <div class="mt-0.5">${renderDeltaBadge(t.pos_delta)}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        body.innerHTML = `
           <div>
-            <h3 class="font-f1 font-bold text-sm uppercase tracking-wider text-sky-400 mb-3">🛠️ Mundial de Construtores (Pós-Etapa 10)</h3>
-            <div class="table-scroll-wrapper !m-0">
+            <div class="hidden sm:block table-scroll-wrapper !m-0">
               <table class="w-full text-xs text-left">
                 <thead>
-                  <tr class="bg-slate-900 text-slate-400">
-                    <th class="p-2.5">Pos</th><th class="p-2.5">Construtor</th><th class="p-2.5">Brutos</th><th class="p-2.5">Dedução FIA</th><th class="p-2.5 text-right">Total Líquido</th>
+                  <tr class="bg-[#18253a] text-slate-300">
+                    <th class="p-2.5">Pos</th>
+                    <th class="p-2.5">Δ Pos</th>
+                    <th class="p-2.5">Construtor</th>
+                    <th class="p-2.5">Pontos Brutos</th>
+                    <th class="p-2.5">Deduções FIA</th>
+                    <th class="p-2.5 text-right">Total Líquido</th>
                   </tr>
                 </thead>
                 <tbody>${teamsRows}</tbody>
               </table>
             </div>
+            <div class="sm:hidden space-y-2">${mobileTeamCards}</div>
           </div>
-        </div>
-      `;
+        `;
+      }
+    }
+
+    function openStandingsModal() {
+      const modal = document.getElementById('standingsModal');
+      const st = PORTAL_DATA.standings || {};
+      const lastR = st.last_completed_round || PORTAL_DATA.rounds.length || 10;
+      const subtitle = document.getElementById('standingsModalSubtitle');
+      if (subtitle) {
+        subtitle.textContent = `Homologação Oficial FIA • Pós-Etapa ${lastR} • Paddock Dark Mode`;
+      }
+      renderStandingsTableContent();
       modal.classList.remove('hidden');
       modal.classList.add('flex');
     }
@@ -610,11 +790,10 @@
       if (isMobilePreview) {
         document.body.style.maxWidth = '412px';
         document.body.style.margin = '12px auto';
-        document.body.style.border = '8px solid #263044';
+        document.body.style.border = '8px solid #22334d';
         document.body.style.borderRadius = '32px';
         document.body.style.boxShadow = '0 25px 60px rgba(0,0,0,0.85)';
         document.getElementById('leftSidebar').classList.add('lg:hidden');
-        document.getElementById('mobileModulePills').classList.remove('lg:hidden');
         btn.innerHTML = '<span>🖥️</span><span>Voltar p/ Desktop</span>';
       } else {
         document.body.style.maxWidth = '';
@@ -623,7 +802,6 @@
         document.body.style.borderRadius = '';
         document.body.style.boxShadow = '';
         document.getElementById('leftSidebar').classList.remove('lg:hidden');
-        document.getElementById('mobileModulePills').classList.add('lg:hidden');
         btn.innerHTML = '<span>📱</span><span>Simular Mobile</span>';
       }
     }
@@ -634,20 +812,30 @@
       const topBadge = document.getElementById('topStandingsRoundBadge');
       if (topBadge) topBadge.textContent = `R${lastR}`;
       const header = document.getElementById('stormWidgetHeader');
-      if (header) header.textContent = `🇧🇷 Brazilian Storm • Pós-R${lastR}`;
+      if (header) header.textContent = `🇧🇷 Brazilian Storm • R${lastR}`;
 
       const colors = { sarah: '#00d2be', felipe: '#00e64d', davi: '#00a0ff' };
-      const brDrivers = (st.drivers_standings || []).filter(d => ['sarah', 'felipe', 'davi'].includes(d.id));
+      const drivers = st.drivers_standings || st.drivers || [];
+      const brDrivers = drivers.filter(d => ['sarah', 'felipe', 'davi'].includes(d.id));
       const container = document.getElementById('stormWidgetRows');
       if (!container) return;
       container.innerHTML = brDrivers.map(d => {
         const c = colors[d.id] || '#38bdf8';
         const shortName = d.name.split(' ')[0];
-        const statTag = d.wins > 0 ? `${d.wins}V` : `${d.podiums}P`;
+        const carNum = d.car_number || d.number || '';
+        const statTag = (d.wins && d.wins > 0) ? `${d.wins}V` : ((d.podiums && d.podiums > 0) ? `${d.podiums}P` : '');
+        const delta = renderDeltaBadge(d.pos_delta);
         return `
-          <div class="flex items-center justify-between py-1 px-2 rounded bg-slate-800/60" style="border-left: 2px solid ${c}">
-            <span class="font-semibold text-white">${d.pos}º ${shortName} <span class="text-slate-400 font-mono-code">#${d.car_number}</span></span>
-            <span class="font-mono-code font-bold" style="color: ${c}">${d.points} pts (${statTag})</span>
+          <div class="flex items-center justify-between py-1.5 px-2 rounded bg-[#0e1624] border border-[#22334d]" style="border-left: 3px solid ${c}">
+            <div class="flex items-center gap-1.5">
+              <span class="font-bold text-white text-[11px]">${d.pos || '-'}º</span>
+              <span class="font-semibold text-white text-xs">${shortName}</span>
+              <span class="text-slate-400 font-mono-code text-[10px]">#${carNum}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="font-mono-code font-bold text-xs" style="color: ${c}">${d.points || 0} pts</span>
+              ${delta}
+            </div>
           </div>
         `;
       }).join('');
@@ -671,7 +859,6 @@
       selectRound(isNaN(rNum) ? latestRound : rNum, artId);
     }
 
-    // Initialize on URL Hash or Round 10 (GP da Espanha)
     window.addEventListener('DOMContentLoaded', () => {
       parseUrlHashAndNavigate();
     });
