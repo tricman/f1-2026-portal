@@ -167,19 +167,24 @@ class TestPaddockAssistantEngine(unittest.TestCase):
         self.assertIn("BRIEFING OFICIAL FIA", res_standings)
         self.assertEqual(voice1, "Marcus Thorne (Staff Felipe)")
 
-        # Case 2: Lore query
-        res_lore, voice2 = process_paddock_assistant_query(
-            author_name="SarahMarinsS",
-            author_id="456",
-            query_text="Aconteceu algum fato relevante esta semana?",
+        # Case 3: Cross-driver inquiry (Felipe asks about Davi)
+        res_cross, voice3 = process_paddock_assistant_query(
+            author_name="Felipe Rodrigues",
+            author_id="123",
+            query_text="E aconteceu algo relevante com o Davi essa semana?",
             round_num=11,
             round_folder="et_11_austria",
             root_dir=self.temp_dir,
             repo=self.repo,
             ai_client=mock_ai,
         )
-        self.assertIn("MEMORANDO CONFIDENCIAL • JULES MOREAU", res_lore)
-        self.assertEqual(voice2, "Jules Moreau (Assessoria Sarah)")
+        self.assertIn("MEMORANDO CONFIDENCIAL • MARCUS THORNE", res_cross)
+        self.assertEqual(voice3, "Marcus Thorne (Staff Felipe)")
+
+        # Verify that Gemini was instructed that caller is Felipe and target is Davi
+        call_args = mock_ai._call_generate_content.call_args[1]
+        self.assertIn("Interlocutor (Seu Piloto): Felipe", call_args["parts"][0]["text"])
+        self.assertIn("Alvo da Investigação (Rival): Davi", call_args["parts"][0]["text"])
 
 
 if __name__ == "__main__":

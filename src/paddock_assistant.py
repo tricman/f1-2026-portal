@@ -67,30 +67,47 @@ QUESTION_TRIGGER_KEYWORDS = [
 ]
 
 
-def resolve_driver_identity(author_name: str, author_id: Optional[str], content: str) -> Dict[str, Any]:
+def resolve_caller_driver(author_name: str, author_id: Optional[str] = None) -> Dict[str, Any]:
     """
-    Resolves the driver identity from the message author and contextual inquiry.
-    Supports first-person questions ("comigo", "meu carro") and third-party inquires ("o que houve com a Sarah?").
+    Identifies which driver is communicating in Discord based on author username or display name.
+    Defaults to Felipe (#5) if no explicit match is found.
     """
     author_clean = (author_name or "").strip().lower()
-    content_clean = (content or "").strip().lower()
-
-    # 1. Check if the question explicitly asks about another Brazilian Storm driver
-    if "sarah" in content_clean and not any(k in author_clean for k in ["sarah", "marinss"]):
-        return PILOT_REGISTRY["sarah"]
-    if "davi" in content_clean and not any(k in author_clean for k in ["davi", "msson"]):
-        return PILOT_REGISTRY["davi"]
-    if "felipe" in content_clean and not any(k in author_clean for k in ["felipe", "frdsilva"]):
-        return PILOT_REGISTRY["felipe"]
-
-    # 2. Match author against pilot registry
     for driver_id, data in PILOT_REGISTRY.items():
-        for kw in data["keywords"]:
-            if kw in author_clean:
-                return data
-
-    # 3. Fallback: Default to Felipe (#5) as default human team principal/driver
+        if any(kw in author_clean for kw in data["keywords"]):
+            return data
     return PILOT_REGISTRY["felipe"]
+
+
+def resolve_target_subject(query_text: str, caller_driver: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Identifies who the query is inquiring about.
+    If the question mentions another pilot (e.g. 'com o Davi', 'sobre a Sarah'), returns that pilot.
+    If the question uses first-person pronouns ('comigo', 'meu carro') or doesn't mention another pilot,
+    returns the caller_driver.
+    """
+    clean = (query_text or "").strip().lower()
+
+    # 1. Explicit first-person keywords always refer to caller
+    first_person_patterns = [r"\bcomigo\b", r"\bmeu\b", r"\bminha\b", r"\beu\b", r"\bpara mim\b", r"\bpra mim\b"]
+    if any(re.search(pat, clean) for pat in first_person_patterns):
+        return caller_driver
+
+    # 2. Check if another specific driver is mentioned in the query
+    for driver_id, data in PILOT_REGISTRY.items():
+        if any(kw in clean for kw in data["keywords"][:2]):  # e.g. "sarah", "davi", "felipe"
+            return data
+
+    # 3. Default: subject is the caller himself
+    return caller_driver
+
+
+def resolve_driver_identity(author_name: str, author_id: Optional[str], content: str) -> Dict[str, Any]:
+    """
+    Backward-compatible resolver. Returns the target subject of the query.
+    """
+    caller = resolve_caller_driver(author_name, author_id)
+    return resolve_target_subject(content, caller)
 
 
 def is_assistant_query(content: str, is_mentioned: bool = False, in_dedicated_channel: bool = False) -> bool:
@@ -154,6 +171,7 @@ def classify_query_intent(query: str) -> str:
 def handle_deterministic_standings_query(
     driver_data: Dict[str, Any],
     repo: Optional[IDataRepository] = None,
+    target_subject: Optional[Dict[str, Any]] = None,
 ) -> str:
     """
     Generates a sub-50ms instant deterministic briefing of current official standings.
@@ -162,11 +180,15 @@ def handle_deterministic_standings_query(
     active_repo = repo or get_repository()
     standings = active_repo.get_standings()
 
+    subject = target_subject or driver_data
+    caller = driver_data
+    is_about_rival = (subject["driver_id"] != caller["driver_id"])
+
     last_r = standings.get("last_completed_round", 10)
     drivers = standings.get("drivers_standings") or standings.get("drivers") or []
     constructors = standings.get("constructors_standings") or standings.get("constructors") or []
 
-    d_id = driver_data["driver_id"]
+    d_id = subject["driver_id"]
     driver_entry = next((d for d in drivers if d.get("id") == d_id), None)
     leader_entry = drivers[0] if drivers else None
 
@@ -177,7 +199,7 @@ def handle_deterministic_standings_query(
     poles = driver_entry.get("poles", 0) if driver_entry else 0
 
     # Construct team entry
-    c_id = driver_data["team_id"]
+    c_id = subject["team_id"]
     team_entry = next((c for c in constructors if c.get("id") == c_id), None)
     team_pos = team_entry.get("pos", 2) if team_entry else 2
     team_pts = team_entry.get("net_points", team_entry.get("points", 0)) if team_entry else 0
@@ -186,20 +208,22 @@ def handle_deterministic_standings_query(
     delta_str = ""
     if leader_entry and leader_entry.get("id") != d_id:
         gap = leader_entry.get("points", 0) - pts
-        delta_str = f" • *-{gap} pts de Sarah (P1)*"
+        delta_str = f" • *-{gap} pts do líder ({leader_entry.get('name', 'P1')})*"
     elif len(drivers) > 1:
         p2_gap = pts - drivers[1].get("points", 0)
         delta_str = f" • *+{p2_gap} pts de vantagem sobre P2*"
 
     portal_url = "https://tricman.github.io/f1-2026-portal/"
 
+    inquiry_footer = f"\n*Solicitado por {caller['display_name']} ({caller['team_name']})*" if is_about_rival else ""
+
     card = (
         f"📋 **[BRIEFING OFICIAL FIA] Campeonato Mundial de F1 2026**\n"
         f"📍 *Situação após Etapa {last_r}*\n\n"
-        f"👤 **{driver_data['display_name']} (#{driver_data['car_number']}):**\n"
+        f"👤 **{subject['display_name']} (#{subject['car_number']}):**\n"
         f"• **Posição no Mundial:** **{pos}º Lugar** com **{pts} pontos**{delta_str}\n"
         f"• **Desempenho:** {wins} Vitórias | {podiums} Pódios | {poles} Poles\n"
-        f"🏢 **{driver_data['team_name']}:** {team_pos}º Lugar nos Construtores ({team_pts} pts)\n\n"
+        f"🏢 **{subject['team_name']}:** {team_pos}º Lugar nos Construtores ({team_pts} pts){inquiry_footer}\n\n"
         f"🔗 *Tabela completa e telemetria detalhada no Portal:* {portal_url}#standings"
     )
     return card
@@ -215,11 +239,13 @@ def handle_semantic_paddock_query(
     repo: Optional[IDataRepository] = None,
     ai_client: Optional[Any] = None,
     season_id: Optional[str] = None,
+    target_subject: Optional[Dict[str, Any]] = None,
 ) -> str:
     """
     RAG-grounded semantic query processed via Gemini Flash-Lite.
     Retrieves current week M1 chronicles (Days 1 to 4), Canon Ledger events,
     and formats as an exclusive confidential agent memorandum.
+    Supports asking about oneself or gathering intelligence on rivals.
     """
     from src.season_manager import get_season_dir
     from src.ai_showrunner import GeminiFreeTierClient
@@ -227,15 +253,23 @@ def handle_semantic_paddock_query(
     active_repo = repo or get_repository()
     client = ai_client or GeminiFreeTierClient()
 
-    # 1. Collect open Canon Ledger events for this round & driver
+    caller = driver_data
+    subject = target_subject or driver_data
+    is_about_rival = (subject["driver_id"] != caller["driver_id"])
+
+    # 1. Collect open Canon Ledger events for this round & target subject
     ledger = active_repo.get_canon_ledger()
     events = ledger.get("events", [])
     relevant_events = []
+    subject_kw = subject["keywords"]
     for ev in events:
-        if ev.get("round") == round_num or driver_data["driver_id"] in ev.get("entities", []):
-            relevant_events.append(f"- [{ev.get('module')}] {ev.get('summary')}")
+        if ev.get("round") == round_num or subject["driver_id"] in ev.get("entities", []):
+            summary_lower = str(ev.get("summary", "")).lower()
+            entities_lower = [str(e).lower() for e in ev.get("entities", [])]
+            if any(k in entities_lower for k in subject_kw) or any(k in summary_lower for k in subject_kw) or not is_about_rival:
+                relevant_events.append(f"- [{ev.get('module')}] {ev.get('summary')}")
 
-    events_summary = "\n".join(relevant_events) if relevant_events else "Nenhum incidente disciplinar ou queixa registrada pela FIA."
+    events_summary = "\n".join(relevant_events) if relevant_events else "Nenhum incidente disciplinar ou queixa registrada pela FIA sobre esta equipe."
 
     # 2. Collect generated daily chronicles of M1 for this round
     season_dir = get_season_dir(root_dir, season_id)
@@ -244,54 +278,84 @@ def handle_semantic_paddock_query(
     if target_round_dir.exists():
         for day_file in sorted(target_round_dir.glob("ET*_PRE_A_Semana_da_F1_Dia_*.md")):
             text = day_file.read_text(encoding="utf-8")
-            # Extract sections relevant to the driver's team or driver name
-            team_kw = driver_data["keywords"][0]
-            lines = [l for l in text.splitlines() if any(k in l.lower() for k in driver_data["keywords"])]
+            lines = [l for l in text.splitlines() if any(k in l.lower() for k in subject_kw)]
             if lines:
-                daily_snippets.append(f"### {day_file.stem}:\n" + "\n".join(lines[:6]))
+                daily_snippets.append(f"### {day_file.stem}:\n" + "\n".join(lines[:8]))
 
-    chronicles_context = "\n\n".join(daily_snippets) if daily_snippets else "A semana de preparação em fábrica decorre dentro do cronograma padrão."
+    chronicles_context = "\n\n".join(daily_snippets) if daily_snippets else f"A semana de preparação em fábrica decorre dentro do cronograma padrão para {subject['display_name']}."
 
-    # 3. Assemble RAG Prompt
+    # 3. Assemble RAG Prompt according to relationship (self vs rival)
+    if is_about_rival:
+        system_instruction = (
+            f"Você é {caller['agent_name']}, assessor pessoal e estrategista do piloto {caller['display_name']}. "
+            f"Seu piloto {caller['display_name']} perguntou a você sobre o rival {subject['display_name']} ({subject['team_name']}). "
+            f"Responda diretamente a {caller['display_name']} apresentando um memorando de inteligência confidencial, perspicaz e mordaz "
+            f"sobre o que você apurou a respeito de {subject['display_name']} e sua equipe. "
+            f"Dirija-se a {caller['display_name']} pelo nome dele ({caller['display_name']}) e JAMAIS o confunda com {subject['display_name']}."
+        )
+        relationship_prompt = (
+            f"=== RELAÇÃO DE INTERLOCUÇÃO ===\n"
+            f"Interlocutor (Seu Piloto): {caller['display_name']} (#{caller['car_number']}, {caller['team_name']})\n"
+            f"Seu Papel: {caller['agent_name']} ({caller['agent_role']})\n"
+            f"Alvo da Investigação (Rival): {subject['display_name']} (#{subject['car_number']}, {subject['team_name']})\n\n"
+            f"DIRETRIZES DE RESPOSTA:\n"
+            f"1. Responda ESTRITAMENTE em Português (Brasil) como {caller['agent_name']} falando com seu piloto {caller['display_name']}.\n"
+            f"2. Fale com {caller['display_name']} em tom íntimo, mordaz e analítico sobre o que você apurou sobre o rival {subject['display_name']}.\n"
+            f"3. Destaque de 2 a 3 pontos essenciais (máximo 140 palavras) baseando-se RIGOROSAMENTE nos fatos fornecidos acima.\n"
+            f"4. NUNCA trate {caller['display_name']} como se ele fosse o {subject['display_name']}."
+        )
+    else:
+        system_instruction = (
+            f"Você é {caller['agent_name']}, assessor pessoal e estrategista do piloto {caller['display_name']}. "
+            f"Responda ao seu piloto com precisão cirúrgica de bastidor sobre a equipe dele ({caller['team_name']}), sem inventar fatos inexistentes."
+        )
+        relationship_prompt = (
+            f"=== RELAÇÃO DE INTERLOCUÇÃO ===\n"
+            f"Interlocutor (Seu Piloto): {caller['display_name']} (#{caller['car_number']}, {caller['team_name']})\n"
+            f"Seu Papel: {caller['agent_name']} ({caller['agent_role']})\n\n"
+            f"DIRETRIZES DE RESPOSTA:\n"
+            f"1. Responda ESTRITAMENTE em Português (Brasil) como {caller['agent_name']} falando com seu piloto {caller['display_name']}.\n"
+            f"2. Fale diretamente com {caller['display_name']} em tom íntimo, profissional, inteligente e mordaz de bastidor de F1.\n"
+            f"3. Destaque de 2 a 3 pontos essenciais (máximo 140 palavras) baseando-se RIGOROSAMENTE nos fatos acima.\n"
+            f"4. Se nenhum fato dramático tiver acontecido, afirme com segurança que a semana na equipe está estável e focada na engenharia."
+        )
+
     prompt = (
         f"=== CONTEXTO OFICIAL DO PADDOCK DE FÓRMULA 1 2026 ===\n"
         f"Etapa Atual: Etapa {round_num} ({round_folder})\n"
-        f"Piloto Alvo: {driver_data['full_name']} ({driver_data['team_name']})\n"
-        f"Agente Responsável: {driver_data['agent_name']} ({driver_data['agent_role']})\n\n"
+        f"Sujeito em Análise: {subject['full_name']} ({subject['team_name']})\n\n"
         f"=== EVENTOS CANÔNICOS RELEVANTES ===\n"
         f"{events_summary}\n\n"
         f"=== BASTIDORES & CRÔNICAS DA SEMANA (DIAS GERADOS) ===\n"
         f"{chronicles_context}\n\n"
-        f"=== PERGUNTA DO PILOTO ===\n"
+        f"=== PERGUNTA DE {caller['display_name'].upper()} ===\n"
         f"\"{query}\"\n\n"
-        f"DIRETRIZES DE RESPOSTA:\n"
-        f"1. Responda ESTRITAMENTE em Português (Brasil) como o agente/assessor {driver_data['agent_name']}.\n"
-        f"2. Fale diretamente com {driver_data['display_name']} em tom íntimo, profissional, inteligente e mordaz de bastidor de F1.\n"
-        f"3. Destaque de 2 a 3 pontos essenciais (máximo 140 palavras) baseando-se RIGOROSAMENTE nos fatos acima.\n"
-        f"4. Se nenhum fato dramático tiver acontecido com o piloto, afirme com segurança que a semana na equipe está estável e focada na engenharia.\n"
-        f"5. NUNCA alucine pontuações ou acidentes que não estejam no contexto."
+        f"{relationship_prompt}"
     )
 
     try:
         raw_answer = client._call_generate_content(
             model=client.flash_model,
             parts=[{"text": prompt}],
-            system_instruction=(
-                f"Você é {driver_data['agent_name']}, assessor pessoal e estrategista do piloto {driver_data['display_name']}. "
-                "Responda ao seu piloto com precisão cirúrgica de bastidor, sem inventar fatos inexistentes."
-            ),
+            system_instruction=system_instruction,
             temperature=0.25,
         ).strip()
     except Exception as exc:
         warning(f"[PADDOCK ASSISTANT GEMINI ERROR] Fallback ativado: {exc}")
-        raw_answer = (
-            f"{driver_data['display_name']}, nossos relatórios de bastidores para esta etapa indicam foco absoluto "
-            f"na calibração do carro para o circuito. Sem crises contratuais ou rumores fora do planejado até o momento."
-        )
+        if is_about_rival:
+            raw_answer = (
+                f"{caller['display_name']}, nossos contatos no paddock indicam que {subject['display_name']} e a {subject['team_name']} "
+                f"mantêm o foco estrito no acerto aerodinâmico para a pista. Sem crises imediatas no radar deles até o momento."
+            )
+        else:
+            raw_answer = (
+                f"{caller['display_name']}, nossos relatórios de bastidores para esta etapa indicam foco absoluto "
+                f"na calibração do carro para o circuito. Sem crises contratuais ou rumores fora do planejado até o momento."
+            )
 
     card = (
-        f"📱 **[MEMORANDO CONFIDENCIAL • {driver_data['agent_name'].upper()}]**\n"
-        f"*{driver_data['agent_role']}*\n\n"
+        f"📱 **[MEMORANDO CONFIDENCIAL • {caller['agent_name'].upper()}]**\n"
+        f"*{caller['agent_role']}*\n\n"
         f"{raw_answer}\n\n"
         f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     )
@@ -311,23 +375,27 @@ def process_paddock_assistant_query(
 ) -> Tuple[str, str]:
     """
     Main entrypoint for processing driver queries.
+    Identifies the speaking driver (caller) and the target subject being asked about.
+    The response is always voiced by the caller's personal agent.
     Returns: (formatted_response, sender_persona_name)
     """
-    driver_data = resolve_driver_identity(author_name, author_id, query_text)
+    caller_driver = resolve_caller_driver(author_name, author_id)
+    target_subject = resolve_target_subject(query_text, caller_driver)
     intent = classify_query_intent(query_text)
 
     trace(
-        f"Processing assistant query for {driver_data['display_name']} | Intent: {intent}",
+        f"Processing assistant query for {caller_driver['display_name']} about {target_subject['display_name']} | Intent: {intent}",
         event="PADDOCK_ASSISTANT_QUERY",
-        driver_id=driver_data["driver_id"],
+        caller_id=caller_driver["driver_id"],
+        target_id=target_subject["driver_id"],
         intent=intent,
     )
 
     if intent == "STANDINGS":
-        response = handle_deterministic_standings_query(driver_data, repo=repo)
+        response = handle_deterministic_standings_query(caller_driver, repo=repo, target_subject=target_subject)
     else:
         response = handle_semantic_paddock_query(
-            driver_data=driver_data,
+            driver_data=caller_driver,
             query=query_text,
             round_num=round_num,
             round_folder=round_folder,
@@ -335,7 +403,8 @@ def process_paddock_assistant_query(
             repo=repo,
             ai_client=ai_client,
             season_id=season_id,
+            target_subject=target_subject,
         )
 
-    sender_persona = driver_data["voice_persona"]
+    sender_persona = caller_driver["voice_persona"]
     return response, sender_persona
