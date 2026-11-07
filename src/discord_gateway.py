@@ -39,7 +39,8 @@ def load_dotenv_if_present() -> None:
 
 
 DISCORD_GUILD_ID = "1457392707604578460"
-DISCORD_VOICE_INGEST_CHANNEL_ID = "1457392708355096580"
+DISCORD_TEXT_INGEST_CHANNEL_ID = "1457392708355096579"  # Canal de texto #geral
+DISCORD_VOICE_INGEST_CHANNEL_ID = "1457392708355096579"  # Alias retrocompatível apontando para #geral
 DISCORD_MEDIA_PUBLISH_CHANNEL_ID = "1536416375969685524"
 DISCORD_API_BASE = "https://discord.com/api/v10"
 
@@ -248,15 +249,43 @@ class DiscordGatewayClient:
         bot_token: Optional[str] = None,
         webhook_url: Optional[str] = None,
         guild_id: str = DISCORD_GUILD_ID,
-        ingest_channel_id: str = DISCORD_VOICE_INGEST_CHANNEL_ID,
+        ingest_channel_id: Optional[str] = None,
         publish_channel_id: str = DISCORD_MEDIA_PUBLISH_CHANNEL_ID,
     ):
         load_dotenv_if_present()
         self.bot_token = bot_token or os.environ.get("DISCORD_BOT_TOKEN")
         self.webhook_url = webhook_url or os.environ.get("DISCORD_WEBHOOK_URL")
         self.guild_id = guild_id
-        self.ingest_channel_id = ingest_channel_id
+        # Default to text channel #geral (1457392708355096579) unless overridden
+        raw_env_ingest = os.environ.get("DISCORD_INGEST_CHANNEL_ID") or os.environ.get("DISCORD_VOICE_INGEST_CHANNEL_ID")
+        self.ingest_channel_id = ingest_channel_id or (
+            raw_env_ingest if raw_env_ingest and raw_env_ingest != "1457392708355096580" else DISCORD_TEXT_INGEST_CHANNEL_ID
+        )
         self.publish_channel_id = publish_channel_id
+
+    def discover_staff_channels(self) -> Dict[str, str]:
+        """
+        Discovers dedicated private staff channels in the Discord server (e.g. #staff-felipe, #staff-sarah, #staff-davi).
+        Returns a mapping of driver_id -> channel_id.
+        """
+        if not self.bot_token:
+            return {}
+        url = f"{DISCORD_API_BASE}/guilds/{self.guild_id}/channels"
+        channels = self._request_with_backoff(url, method="GET")
+        if not isinstance(channels, list):
+            return {}
+
+        mapping: Dict[str, str] = {}
+        for ch in channels:
+            name = (ch.get("name") or "").lower().replace("_", "-")
+            ch_id = str(ch.get("id"))
+            if "staff-felipe" in name or name == "felipe-staff":
+                mapping["felipe"] = ch_id
+            elif "staff-sarah" in name or name == "sarah-staff":
+                mapping["sarah"] = ch_id
+            elif "staff-davi" in name or name == "davi-staff":
+                mapping["davi"] = ch_id
+        return mapping
 
     @trace_span("discord_rest_request")
     def _request_with_backoff(
@@ -417,31 +446,45 @@ class DiscordGatewayClient:
         processed_keys = set(state.get("downloaded_keys", []))
         processed_msg_ids = set(state.get("processed_msg_ids", []))
 
-        url = f"{DISCORD_API_BASE}/channels/{self.ingest_channel_id}/messages?limit={limit}"
-        messages = self._request_with_backoff(url, method="GET")
-        if not isinstance(messages, list):
-            return state
+        # Channels to poll: primary text chat (#geral) + any discovered private staff channels
+        channels_to_poll: List[Tuple[str, Optional[str]]] = [(self.ingest_channel_id, None)]
+        try:
+            staff_map = self.discover_staff_channels()
+            for d_id, s_ch_id in staff_map.items():
+                if s_ch_id != self.ingest_channel_id:
+                    channels_to_poll.append((s_ch_id, d_id))
+        except Exception:
+            pass
 
-        # Find latest message ID already posted by F1 Showrunner bot to prevent duplicate replies on resume
-        bot_msg_ids = [
-            int(m["id"])
-            for m in messages
-            if m.get("author", {}).get("bot") and "Showrunner" in (m.get("author", {}).get("username") or "")
-        ]
-        last_bot_msg_id = max(bot_msg_ids) if bot_msg_ids else 0
+        all_messages: List[Tuple[Dict[str, Any], str, Optional[str], int]] = []
+        for curr_channel_id, assigned_driver in channels_to_poll:
+            url = f"{DISCORD_API_BASE}/channels/{curr_channel_id}/messages?limit={limit}"
+            channel_msgs = self._request_with_backoff(url, method="GET")
+            if not isinstance(channel_msgs, list):
+                continue
+            bot_msg_ids = [
+                int(m["id"])
+                for m in channel_msgs
+                if m.get("author", {}).get("bot") and "Showrunner" in (m.get("author", {}).get("username") or "")
+            ]
+            last_bot_id = max(bot_msg_ids) if bot_msg_ids else 0
+            for m in channel_msgs:
+                all_messages.append((m, curr_channel_id, assigned_driver, last_bot_id))
 
-        # Process in chronological order (oldest -> newest)
+        # Sort strictly by message ID ascending (chronological order across all polled channels)
+        all_messages.sort(key=lambda item: int(item[0].get("id", 0)))
+
         new_files: List[str] = []
         new_debriefs: List[str] = []
         stage_event: Optional[str] = None
 
-        for msg in reversed(messages):
+        for msg, reply_channel_id, assigned_driver, last_bot_msg_id in all_messages:
             msg_id = msg.get("id", "")
             author_obj = msg.get("author", {})
             if author_obj.get("bot"):
                 continue
 
-            # If this message was posted before the bot's latest reply, it belongs to a past session:
+            # If this message was posted before the bot's latest reply in this channel, it belongs to a past session:
             # mark as processed and do not re-trigger actions.
             if last_bot_msg_id and int(msg_id) <= last_bot_msg_id:
                 processed_msg_ids.add(msg_id)
@@ -449,6 +492,10 @@ class DiscordGatewayClient:
 
             should_reply = send_bot_replies and (int(msg_id) > last_bot_msg_id)
             author_name = author_obj.get("global_name") or author_obj.get("username") or "Piloto"
+            # If inquiry is in a private staff channel and author name is ambiguous, default to the assigned driver
+            if assigned_driver and not any(kw in author_name.lower() for kw in ["felipe", "sarah", "davi"]):
+                author_name = assigned_driver
+
             raw_content = (msg.get("content") or "").strip()
             # Clean any @Bot mentions (<@123456> or <@!123456>) so both mentioned and plain text work
             content = re.sub(r"<@!?\d+>", "", raw_content).strip()
@@ -465,21 +512,21 @@ class DiscordGatewayClient:
                     r_num = cmd_round or state.get("active_round_num") or 11
                     ok, reply_txt = start_udp_listener(root_dir, round_num=r_num)
                     if should_reply:
-                        self.post_channel_message(self.ingest_channel_id, reply_txt)
+                        self.post_channel_message(reply_channel_id, reply_txt)
                     continue
 
                 if cmd_type == "STATUS_UDP_LISTENER":
                     from src.orchestrator_cli import get_udp_listener_status
                     ok, reply_txt = get_udp_listener_status(root_dir)
                     if should_reply:
-                        self.post_channel_message(self.ingest_channel_id, reply_txt)
+                        self.post_channel_message(reply_channel_id, reply_txt)
                     continue
 
                 if cmd_type == "STOP_UDP_LISTENER":
                     from src.orchestrator_cli import stop_udp_listener
                     ok, reply_txt = stop_udp_listener(root_dir)
                     if should_reply:
-                        self.post_channel_message(self.ingest_channel_id, reply_txt)
+                        self.post_channel_message(reply_channel_id, reply_txt)
                     continue
 
                 if cmd_type == "ENABLE_TRACE":
@@ -605,15 +652,15 @@ class DiscordGatewayClient:
                                 pc_sess = PressConferenceSession(root_dir, active_r_num, active_folder)
                                 ack_msg = pc_sess.force_timeout_answer(reason="Comando manual de avanço da assessoria")
                                 if should_reply and ack_msg:
-                                    self.post_channel_message(self.ingest_channel_id, ack_msg)
+                                    self.post_channel_message(reply_channel_id, ack_msg)
                                 next_msg, is_lock, next_driver = pc_sess.advance_to_next_question()
                                 if should_reply and next_msg:
-                                    self.post_channel_message(self.ingest_channel_id, next_msg)
+                                    self.post_channel_message(reply_channel_id, next_msg)
                                 while not is_lock and not pc_sess.state.get("completed"):
                                     time.sleep(3.0)
                                     next_msg, is_lock, next_driver = pc_sess.advance_to_next_question()
                                     if should_reply and next_msg:
-                                        self.post_channel_message(self.ingest_channel_id, next_msg)
+                                        self.post_channel_message(reply_channel_id, next_msg)
                             else:
                                 if should_reply:
                                     self.post_channel_message(
@@ -622,7 +669,7 @@ class DiscordGatewayClient:
                                     )
                         except Exception as exc:
                             if should_reply:
-                                self.post_channel_message(self.ingest_channel_id, f"⚠️ Erro ao forçar avanço da coletiva: {exc}")
+                                self.post_channel_message(reply_channel_id, f"⚠️ Erro ao forçar avanço da coletiva: {exc}")
                     else:
                         if should_reply:
                             self.post_channel_message(
@@ -640,7 +687,7 @@ class DiscordGatewayClient:
                     state["active_round_num"] = r_num
                     state["active_round_folder"] = r_folder
                     if should_reply:
-                        self.post_channel_message(self.ingest_channel_id, d_data.get("dilemma_text", ""))
+                        self.post_channel_message(reply_channel_id, d_data.get("dilemma_text", ""))
                     continue
 
                 if cmd_type == "FORCE_DILEMMA_ADVANCE":
@@ -658,7 +705,7 @@ class DiscordGatewayClient:
                                 )
                                 state["status"] = "SEMANA_ACTIVE"
                                 if should_reply:
-                                    self.post_channel_message(self.ingest_channel_id, res.get("ack_message", ""))
+                                    self.post_channel_message(reply_channel_id, res.get("ack_message", ""))
                             else:
                                 if should_reply:
                                     self.post_channel_message(
@@ -667,7 +714,7 @@ class DiscordGatewayClient:
                                     )
                         except Exception as exc:
                             if should_reply:
-                                self.post_channel_message(self.ingest_channel_id, f"⚠️ Erro ao forçar avanço do dilema: {exc}")
+                                self.post_channel_message(reply_channel_id, f"⚠️ Erro ao forçar avanço do dilema: {exc}")
                     else:
                         if should_reply:
                             self.post_channel_message(
@@ -821,7 +868,7 @@ class DiscordGatewayClient:
                         res = resolve_paddock_dilemma(root_dir, active_r_num, active_folder, content)
                         state["status"] = "SEMANA_ACTIVE"
                         if should_reply:
-                            self.post_channel_message(self.ingest_channel_id, res.get("ack_message", ""))
+                            self.post_channel_message(reply_channel_id, res.get("ack_message", ""))
                         continue
                 except Exception as exc:
                     print(f"[Dilemma Answer Warning] {exc}")
@@ -840,17 +887,17 @@ class DiscordGatewayClient:
                         pc_sess = PressConferenceSession(root_dir, active_r_num, active_folder)
                         ack_msg = pc_sess.submit_pilot_answer(waiting_driver, content)
                         if should_reply:
-                            self.post_channel_message(self.ingest_channel_id, ack_msg)
+                            self.post_channel_message(reply_channel_id, ack_msg)
                         next_msg, is_lock, next_driver = pc_sess.advance_to_next_question()
                         if should_reply and next_msg:
-                            self.post_channel_message(self.ingest_channel_id, next_msg)
+                            self.post_channel_message(reply_channel_id, next_msg)
 
                         # Se a pergunta seguinte for de NPC (is_lock == False), avança automaticamente até atingir o próximo piloto humano ou o término
                         while not is_lock and not pc_sess.state.get("completed"):
                             time.sleep(3.0)
                             next_msg, is_lock, next_driver = pc_sess.advance_to_next_question()
                             if should_reply and next_msg:
-                                self.post_channel_message(self.ingest_channel_id, next_msg)
+                                self.post_channel_message(reply_channel_id, next_msg)
                         continue
                 except Exception as exc:
                     print(f"[Press Conf Answer Warning] {exc}")
@@ -867,15 +914,15 @@ class DiscordGatewayClient:
                             pc_sess = PressConferenceSession(root_dir, active_r_num, active_folder)
                             ack_msg = pc_sess.force_timeout_answer(reason=f"tempo regulamentar esgotado ({int(timeout_limit)}s)")
                             if should_reply and ack_msg:
-                                self.post_channel_message(self.ingest_channel_id, f"⏰ **TEMPO REGULAMENTAR ESGOTADO NA COLETIVA FIA:**\n{ack_msg}")
+                                self.post_channel_message(reply_channel_id, f"⏰ **TEMPO REGULAMENTAR ESGOTADO NA COLETIVA FIA:**\n{ack_msg}")
                             next_msg, is_lock, next_driver = pc_sess.advance_to_next_question()
                             if should_reply and next_msg:
-                                self.post_channel_message(self.ingest_channel_id, next_msg)
+                                self.post_channel_message(reply_channel_id, next_msg)
                             while not is_lock and not pc_sess.state.get("completed"):
                                 time.sleep(3.0)
                                 next_msg, is_lock, next_driver = pc_sess.advance_to_next_question()
                                 if should_reply and next_msg:
-                                    self.post_channel_message(self.ingest_channel_id, next_msg)
+                                    self.post_channel_message(reply_channel_id, next_msg)
                 except Exception as exc:
                     print(f"[Press Conf Auto-Timeout Check Warning] {exc}")
 
@@ -898,12 +945,12 @@ class DiscordGatewayClient:
                             root_dir=root_dir,
                             season_id=state.get("active_season_id"),
                         )
-                        self.post_channel_message(self.ingest_channel_id, reply_card)
+                        self.post_channel_message(reply_channel_id, reply_card)
                     except Exception as exc:
                         from src.logger import warning
                         warning(f"[PADDOCK ASSISTANT DISPATCH ERROR] {exc}")
                         self.post_channel_message(
-                            self.ingest_channel_id,
+                            reply_channel_id,
                             f"⚠️ **Falha no Paddock Assistant:** Erro ao processar briefing ({exc})."
                         )
                 continue

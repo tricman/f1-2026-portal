@@ -871,7 +871,7 @@ def main() -> None:
         from src.logger import log_text
         log_text(
             f"[Autonomous Showrunner Session] Sentinel={args.sentinel} | Janela máxima: {args.max_hours:.1f}h ({max_seconds}s) "
-            f"escutando #1457392708355096580 a cada {args.interval}s..."
+            f"escutando #{client.ingest_channel_id} a cada {args.interval}s..."
         )
         poll_count = 0
         while time.time() < deadline:
@@ -884,7 +884,7 @@ def main() -> None:
             if poll_count % 8 == 1:
                 r_curr = session_state.get("active_round_num", 11)
                 d_curr = session_state.get("semana_day", 1)
-                log_text(f"[HEARTBEAT] Listener escutando #1457392708355096580 a cada {args.interval}s | Status: {status_now} (Etapa {r_curr}, Dia {d_curr}/4)")
+                log_text(f"[HEARTBEAT] Listener escutando #{client.ingest_channel_id} a cada {args.interval}s | Status: {status_now} (Etapa {r_curr}, Dia {d_curr}/4)")
 
             if stage_ev:
                 log_text(f"🔔 [STAGE EVENT DETECTADO] {stage_ev} -> Status: {status_now}")
