@@ -49,10 +49,12 @@ def get_repository(force_refresh: bool = False) -> IDataRepository:
 
     if backend in ("local_json", "json"):
         repo = LocalJsonRepository()
+        log_text(f"[REPOSITORY FACTORY] Conectado ao Local JSON Repository ({repo.state_dir}).")
         _GLOBAL_REPO_INSTANCE = repo
         return repo
 
     repo = SqliteDocumentRepository()
+    log_text(f"[REPOSITORY FACTORY] Conectado ao SQLite Document Store NoSQL Local ({repo.db_path.name}).")
     _GLOBAL_REPO_INSTANCE = repo
     return repo
 
