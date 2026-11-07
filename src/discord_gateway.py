@@ -713,10 +713,9 @@ class DiscordGatewayClient:
                         meta = ROUND_METADATA.get(r_folder, {"name": f"Etapa {r_num}", "flag": "🏁"})
                         self.post_channel_message(
                             self.ingest_channel_id,
-                            f"📅 **AGENDADOR DIÁRIO DA SILLY SEASON ATIVADO — {meta['flag']} Etapa {r_num}: {meta['name']}**!\n"
-                            f"• Simulando a cobertura de Segunda a Quinta-feira.\n"
-                            f"• 🚨 **Disparando Dia 1/4 (Segunda-Feira: Ressaca & Diagnóstico Técnico)**...\n"
-                            f"💡 *Para avançar de dia rapidamente no teste, digite `avancar dia` ou `dia 2`.*",
+                            f"📅 **Silly Season Ativada — {meta['flag']} {meta['name']} (Dia 1/4)**\n"
+                            f"• Cobertura iniciada rumo à Coletiva FIA.\n"
+                            f"💡 *Para avançar de dia: `avancar dia` ou `dia 2`.*",
                         )
                     continue
 
@@ -734,8 +733,7 @@ class DiscordGatewayClient:
                         meta = ROUND_METADATA.get(r_folder, {"name": f"Etapa {r_num}", "flag": "🏁"})
                         self.post_channel_message(
                             self.ingest_channel_id,
-                            f"⏩ **AVANÇANDO SILLY SEASON: DIA {target_day}/4 — {meta['flag']} Etapa {r_num}: {meta['name']}**!\n"
-                            f"• Gerando dossiê de bastidores e publicando no Portal + `#repercussao-midia`...",
+                            f"⏩ **Silly Season · Dia {target_day}/4 ({meta['flag']} {meta['name']})** ➔ Publicado em <#{self.publish_channel_id}>",
                         )
                     continue
 
@@ -749,9 +747,8 @@ class DiscordGatewayClient:
                         meta = ROUND_METADATA.get(r_folder, {"name": f"Etapa {r_num}", "flag": "🏁"})
                         self.post_channel_message(
                             self.ingest_channel_id,
-                            f"🏛️ **COLETIVA OFICIAL DA FIA CONVOCADA — {meta['flag']} Etapa {r_num}: {meta['name']}**!\n"
-                            f"• Convocando Sarah, Felipe, Davi e rivais para a bancada oficial.\n"
-                            f"• 🎙️ A imprensa mundial fará perguntas aos pilotos humanos com **Trava de Turno** no chat!",
+                            f"🏛️ **Coletiva Oficial da FIA — {meta['flag']} Etapa {r_num}: {meta['name']}**\n"
+                            f"🎙️ Microfone aberto aos pilotos com **Trava de Turno** no chat.",
                         )
                     continue
 
@@ -765,8 +762,8 @@ class DiscordGatewayClient:
                         meta = ROUND_METADATA.get(r_folder, {"name": f"Etapa {r_num}", "flag": "🏁"})
                         self.post_channel_message(
                             self.ingest_channel_id,
-                            f"📰 **DOSSIÊ SILLY SEASON DISPARADO — {meta['flag']} Etapa {r_num}: {meta['name']}** (`{r_folder}`)\n"
-                            f"Coletando fofocas de fábrica, contratos e sorteando temas RNG. Gerando 'A Semana da F1' (Módulo #1) para o Portal e `#repercussao-midia`!",
+                            f"📰 **Dossiê Silly Season — {meta['flag']} Etapa {r_num}: {meta['name']}**\n"
+                            f"• Gerando 'A Semana da F1' para o Portal e <#{self.publish_channel_id}>.",
                         )
                     continue
 
@@ -784,12 +781,10 @@ class DiscordGatewayClient:
                         meta = ROUND_METADATA.get(r_folder, {"name": f"Etapa {r_num}", "flag": "🏁"})
                         self.post_channel_message(
                             self.ingest_channel_id,
-                            f"🟢 **SESSÃO INICIADA — {meta['flag']} Etapa {r_num}: {meta['name']}** (`{r_folder}`)\n"
-                            f"Estou escutando este canal! Podem subir:\n"
-                            f"• 📸 **Fotos da TV** (TL, Classificação e 4 abas da Corrida)\n"
-                            f"• 📊 **Arquivos `.csv` do PaceDex** (TL e Corrida)\n"
-                            f"• 🎙️ **Áudios ou Textos de Debriefing** (sensações pós-corrida de Felipe, Davi e Sarah)\n"
-                            f"Quando terminarem tudo, digitem **`final da etapa {r_num}`**!",
+                            f"🟢 **Sessão Aberta — {meta['flag']} Etapa {r_num}: {meta['name']}**\n"
+                            f"• 📡 **Telemetria UDP:** Transmissão em tempo real ativa na porta `20777`.\n"
+                            f"• 🎙️ **Debriefing:** Enviem relatos em áudio ou texto aqui no chat.\n"
+                            f"• Para encerrar a sessão: digitem **`final da etapa {r_num}`**.",
                         )
                     continue
 
@@ -804,10 +799,9 @@ class DiscordGatewayClient:
                     if should_reply:
                         self.post_channel_message(
                             self.ingest_channel_id,
-                            f"🏁 **ETAPA {r_num} ENCERRADA (`{r_folder}`) — PACOTE RECEBIDO!**\n"
-                            f"• Total de arquivos baixados na sessão: `{total_session_files}` (`{state.get('session_files', [])}`)\n"
-                            f"• Relatos de Debriefing capturados: `{len(state.get('debrief_messages', []))}`\n"
-                            f"⚙️ Iniciando fusão de telemetria PaceDex, cálculo oficial da FIA, geração dos relatórios e publicação no Portal Mobile + `#repercussao-midia`!",
+                            f"🏁 **Etapa {r_num} Encerrada ({r_folder})**\n"
+                            f"• 📡 Telemetria consolidada & {len(state.get('debrief_messages', []))} debriefing(s) capturado(s).\n"
+                            f"⚙️ Processando classificação FIA e publicando em <#{self.publish_channel_id}> e no Portal Mobile!",
                         )
                     continue
 
@@ -920,15 +914,13 @@ class DiscordGatewayClient:
 
             if should_reply and (msg_photos or msg_csvs or msg_audios):
                 ack_parts: List[str] = []
-                if msg_photos:
-                    ack_parts.append(f"📸 **{len(msg_photos)} foto(s) da TV** arquivadas em `photos/`")
-                if msg_csvs:
-                    ack_parts.append(f"📊 **{len(msg_csvs)} telemetria(s) PaceDex (`.csv`)** arquivadas em `telemetry/` (`{', '.join(msg_csvs)}`)")
                 if msg_audios:
-                    ack_parts.append(f"🎙️ **{len(msg_audios)} áudio(s) de debriefing** arquivados em `debriefing/`")
+                    ack_parts.append(f"🎙️ {len(msg_audios)} áudio(s) de debriefing")
+                if msg_photos or msg_csvs:
+                    ack_parts.append(f"📁 {len(msg_photos) + len(msg_csvs)} anexo(s) de backup")
                 self.post_channel_message(
                     self.ingest_channel_id,
-                    f"📥 **Recebido de {author_name}:** " + " | ".join(ack_parts),
+                    f"📥 **{author_name}:** " + " · ".join(ack_parts),
                 )
 
             # 2. Capture non-command text messages as driver debriefing notes
@@ -942,9 +934,10 @@ class DiscordGatewayClient:
                 existing_notes = notes_file.read_text(encoding="utf-8") if notes_file.exists() else "# Relatos de Debriefing Pós-Corrida (Discord Voice Chat)\n\n"
                 notes_file.write_text(existing_notes + note_entry + "\n", encoding="utf-8")
                 if should_reply:
+                    preview = content[:60] + ("..." if len(content) > 60 else "")
                     self.post_channel_message(
                         self.ingest_channel_id,
-                        f"📝 **Debriefing de {author_name} registrado!** (`\"{content[:80]}{'...' if len(content) > 80 else ''}\"`)",
+                        f"🎙️ **Debriefing ({author_name}):** *\"{preview}\"*",
                     )
 
         state["downloaded_keys"] = sorted(processed_keys)
@@ -1135,22 +1128,21 @@ class DiscordGatewayClient:
         """
         transformed_md, table_images = transform_markdown_tables_for_discord(markdown_text)
 
-        # Extract the first 3 mobile cards or first 2 paragraphs as an executive teaser
+        # Extract executive summary (compact for mobile lock-screen & feed)
         lines = [ln.strip() for ln in transformed_md.splitlines() if ln.strip()]
-        quote_lines = [ln for ln in lines if ln.startswith("> ")][:9]
         body_paragraphs = [
-            ln for ln in lines if not ln.startswith(("#", "*", ">", "---", "📱"))
-        ][:2]
+            ln for ln in lines if not ln.startswith(("#", "*", ">", "---", "📱", "🚨", "📖", "👉"))
+        ]
+        quote_lines = [ln for ln in lines if ln.startswith("> ")]
 
         teaser_parts = [f"🚨 **{article_title.upper()}**"]
         if body_paragraphs:
-            teaser_parts.append("\n".join(body_paragraphs)[:450])
-        if quote_lines:
-            teaser_parts.append("\n".join(quote_lines)[:750])
+            teaser_parts.append(body_paragraphs[0][:280])
+        elif quote_lines:
+            teaser_parts.append(quote_lines[0][:280])
 
         teaser_parts.append(
-            f"📖 **Leia a matéria completa, crônica de pista e tabelas interativas no Portal Mobile:**\n"
-            f"👉 {portal_url}"
+            f"👉 **Ler matéria completa e tabelas no Portal Mobile:**\n{portal_url}"
         )
         content_str = "\n\n".join(teaser_parts)[:1950]
 
