@@ -287,6 +287,23 @@ class DiscordGatewayClient:
                 mapping["davi"] = ch_id
         return mapping
 
+    def get_or_create_dm_channel(self, user_id: str) -> Optional[str]:
+        """
+        Opens or retrieves an existing 1-on-1 private Direct Message (DM) channel between the Bot and a user.
+        DMs are 100% confidential and cannot be read by anyone else (not even the Server Owner).
+        """
+        if not self.bot_token or not user_id:
+            return None
+        url = f"{DISCORD_API_BASE}/users/@me/channels"
+        payload = {"recipient_id": str(user_id)}
+        try:
+            res = self._request_with_backoff(url, method="POST", payload=payload)
+            if isinstance(res, dict) and res.get("id"):
+                return str(res["id"])
+        except Exception as exc:
+            trace(f"[DM Channel Error] Falha ao abrir DM com user {user_id}: {exc}")
+        return None
+
     @trace_span("discord_rest_request")
     def _request_with_backoff(
         self,
@@ -446,7 +463,7 @@ class DiscordGatewayClient:
         processed_keys = set(state.get("downloaded_keys", []))
         processed_msg_ids = set(state.get("processed_msg_ids", []))
 
-        # Channels to poll: primary text chat (#geral) + any discovered private staff channels
+        # Channels to poll: primary text chat (#geral) + discovered staff channels + 1-on-1 private DMs
         channels_to_poll: List[Tuple[str, Optional[str]]] = [(self.ingest_channel_id, None)]
         try:
             staff_map = self.discover_staff_channels()
@@ -455,6 +472,12 @@ class DiscordGatewayClient:
                     channels_to_poll.append((s_ch_id, d_id))
         except Exception:
             pass
+
+        # Include registered 1-on-1 private DMs (100% confidential between driver and agent)
+        pilot_dms: Dict[str, str] = state.setdefault("pilot_dm_channels", {})
+        for d_id, dm_id in pilot_dms.items():
+            if dm_id and all(ch[0] != dm_id for ch in channels_to_poll):
+                channels_to_poll.append((dm_id, d_id))
 
         all_messages: List[Tuple[Dict[str, Any], str, Optional[str], int]] = []
         for curr_channel_id, assigned_driver in channels_to_poll:
@@ -495,6 +518,15 @@ class DiscordGatewayClient:
             # If inquiry is in a private staff channel and author name is ambiguous, default to the assigned driver
             if assigned_driver and not any(kw in author_name.lower() for kw in ["felipe", "sarah", "davi"]):
                 author_name = assigned_driver
+
+            # Proactively register pilot's confidential 1-on-1 DM channel when identified
+            author_id_str = str(author_obj.get("id") or "")
+            if author_id_str:
+                for d_key, p_info in [("felipe", ["felipe", "frdsilva"]), ("sarah", ["sarah", "marinss"]), ("davi", ["davi", "msson"])]:
+                    if any(kw in author_name.lower() for kw in p_info) and d_key not in state.setdefault("pilot_dm_channels", {}):
+                        dm_ch = self.get_or_create_dm_channel(author_id_str)
+                        if dm_ch:
+                            state["pilot_dm_channels"][d_key] = dm_ch
 
             raw_content = (msg.get("content") or "").strip()
             # Clean any @Bot mentions (<@123456> or <@!123456>) so both mentioned and plain text work

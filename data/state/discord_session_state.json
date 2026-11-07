@@ -17,6 +17,9 @@
     "1566507000056123514_pacedex_catalunya-espanha_2026-10-17_laps_TL.csv"
   ],
   "debrief_messages": [],
+  "pilot_dm_channels": {
+    "felipe": "1568712156814377171"
+  },
   "semana_day": 4,
   "processed_msg_ids": [
     "1457393547094396949",
@@ -102,7 +105,8 @@
     "1568706109533851750",
     "1568706277616394352",
     "1568707883867177001",
-    "1568708149823668308"
+    "1568708149823668308",
+    "1568712636739227780"
   ],
   "last_poll_new_files": [],
   "last_poll_stage_event": null,
