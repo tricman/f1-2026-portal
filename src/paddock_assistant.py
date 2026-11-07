@@ -27,7 +27,8 @@ PILOT_REGISTRY: Dict[str, Dict[str, Any]] = {
         "agent_name": "Marcus Thorne",
         "agent_role": "O Tubarão de Silverstone (Gestão de Carreira & Contratos)",
         "voice_persona": "Marcus Thorne (Staff Felipe)",
-        "keywords": ["felipe", "frdsilva", "professor", "hinwil", "sauber", "audi"],
+        "discord_user_id": "1424052555943514194",
+        "keywords": ["felipe", "frdsilva", "frdsilva83", "professor", "hinwil", "sauber", "audi"],
     },
     "sarah": {
         "driver_id": "sarah",
@@ -39,7 +40,8 @@ PILOT_REGISTRY: Dict[str, Dict[str, Any]] = {
         "agent_name": "Jules Moreau",
         "agent_role": "Brackley PR & Proteção de Carreira",
         "voice_persona": "Jules Moreau (Assessoria Sarah)",
-        "keywords": ["sarah", "sarahmarinss", "ice queen", "brackley", "mercedes"],
+        "discord_user_id": "1549908557372198984",
+        "keywords": ["sarah", "sarahmarinss", "sarahms2013", "ice queen", "brackley", "mercedes"],
     },
     "davi": {
         "driver_id": "davi",
@@ -51,6 +53,7 @@ PILOT_REGISTRY: Dict[str, Dict[str, Any]] = {
         "agent_name": "Chloe Vance",
         "agent_role": "Grove Management & Captação Global",
         "voice_persona": "Chloe Vance (Staff Davi)",
+        "discord_user_id": "1438310004280262689",
         "keywords": ["davi", "davimsson", "leão de grove", "grove", "williams"],
     },
 }
