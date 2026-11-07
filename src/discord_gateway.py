@@ -926,6 +926,33 @@ class DiscordGatewayClient:
                     f"📥 **{author_name}:** " + " · ".join(ack_parts),
                 )
 
+            # 1.5. Interactive Paddock Personal Assistant Q&A (Sprint 4)
+            from src.paddock_assistant import is_assistant_query, process_paddock_assistant_query
+            is_bot_mention = bool(re.search(r"<@!?\d+>", raw_content)) or ("showrunner" in raw_content.lower())
+            if content and not cmd and msg_id not in processed_msg_ids and is_assistant_query(content, is_mentioned=is_bot_mention, in_dedicated_channel=True):
+                processed_msg_ids.add(msg_id)
+                if should_reply:
+                    active_r_num = state.get("active_round_num", 11)
+                    active_r_folder = state.get("active_round_folder", f"et_{active_r_num:02d}")
+                    try:
+                        reply_card, persona_voice = process_paddock_assistant_query(
+                            author_name=author_name,
+                            author_id=author_obj.get("id"),
+                            query_text=content,
+                            round_num=active_r_num,
+                            round_folder=active_r_folder,
+                            root_dir=root_dir,
+                            season_id=state.get("active_season_id"),
+                        )
+                        self.post_channel_message(self.ingest_channel_id, reply_card)
+                    except Exception as exc:
+                        warning(f"[PADDOCK ASSISTANT DISPATCH ERROR] {exc}")
+                        self.post_channel_message(
+                            self.ingest_channel_id,
+                            f"⚠️ **Falha no Paddock Assistant:** Erro ao processar briefing ({exc})."
+                        )
+                continue
+
             # 2. Capture non-command text messages as driver debriefing notes
             if content and not cmd and msg_id not in processed_msg_ids and state.get("status") == "COLLECTING":
                 processed_msg_ids.add(msg_id)
