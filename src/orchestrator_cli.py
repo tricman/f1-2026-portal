@@ -835,34 +835,7 @@ def main() -> None:
             f"Active Round: {session_state.get('active_round_folder')} | "
             f"New Files: {session_state.get('last_poll_new_files')}"
         )
-    elif args.action == "watch-discord":
-        client = DiscordGatewayClient()
-        state_file = ROOT_DIR / "data" / "state" / "discord_session_state.json"
-        if state_file.exists():
-            st = json.loads(state_file.read_text(encoding="utf-8"))
-            if st.get("status") == "READY_FOR_SIMULATION":
-                st["status"] = "IDLE"
-                state_file.write_text(json.dumps(st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-        print(
-            f"[F1 Showrunner Bot] Escutando o Canal de Voz (#1457392708355096580) a cada {args.interval}s...\n"
-            f"  -> Digite 'inicio da etapa <N>' no chat do canal de voz para abrir o pacote da corrida.\n"
-            f"  -> Suba as fotos da TV, CSVs do PaceDex e áudios/textos de debriefing.\n"
-            f"  -> Digite 'final da etapa <N>' para encerrar a coleta e disparar o processamento!"
-        )
-        while True:
-            session_state = client.process_voice_channel_session(ROOT_DIR, state_file)
-            stage_ev = session_state.get("last_poll_stage_event")
-            new_f = session_state.get("last_poll_new_files", [])
-            if stage_ev:
-                print(f"[STAGE EVENT] {stage_ev} -> Status: {session_state.get('status')}")
-            if new_f:
-                log_text(f"[FILES DOWNLOADED] {len(new_f)} arquivos salvos: {new_f}")
-            if stage_ev and stage_ev.startswith("END_ROUND_") and session_state.get("status") == "READY_FOR_SIMULATION":
-                r_folder = session_state.get("active_round_folder") or args.round_folder
-                print(f"[READY FOR SIMULATION] Etapa encerrada no Discord ({r_folder})!")
-                break
-            time.sleep(args.interval)
-    elif args.action == "autonomous-session":
+    elif args.action in ("watch-discord", "autonomous-session"):
         acquire_listener_lock(ROOT_DIR / "data" / "state" / "listener.pid")
         from src.ai_showrunner import (
             GeminiFreeTierClient,
