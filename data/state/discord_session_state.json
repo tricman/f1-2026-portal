@@ -1,5 +1,5 @@
 {
-  "status": "IDLE",
+  "status": "SEMANA_ACTIVE",
   "active_round_num": 11,
   "active_round_folder": "et_11_austria",
   "last_message_id": null,
@@ -17,7 +17,7 @@
     "1566507000056123514_pacedex_catalunya-espanha_2026-10-17_laps_TL.csv"
   ],
   "debrief_messages": [],
-  "semana_day": 1,
+  "semana_day": 4,
   "processed_msg_ids": [
     "1558572125911126036",
     "1558572289178734622",
@@ -81,9 +81,12 @@
     "1568657290163265568",
     "1568657962942341203",
     "1568658128478802001",
-    "1568673518286147615"
+    "1568673518286147615",
+    "1568682856316932169",
+    "1568683518278500374",
+    "1568684340689371288"
   ],
   "last_poll_new_files": [],
-  "last_poll_stage_event": "SEMANA_TICK_11_1",
+  "last_poll_stage_event": null,
   "session_files": []
 }

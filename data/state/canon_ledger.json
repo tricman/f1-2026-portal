@@ -610,6 +610,25 @@
       "status": "OPEN",
       "event_id": "KICKOFF-SEASON_02",
       "module": "SEASON_KICKOFF"
+    },
+    {
+      "event_id": "ET11-M1-WEEK",
+      "round": 11,
+      "module": "M1_SEMANA_EQUIPES",
+      "summary": "A semana pré-corrida na Áustria evidenciou graves crises de bastidor e fraturas políticas nas principais equipes do grid. Na Mercedes, a liderança isolada e implacável da jovem prodígio Sarah motivou uma campanha de blindagem e guerra psicológica liderada por seu agente, Jules Moreau, gerando pânico nos rivais. Na Sauber, a vice-liderança de Felipe colidiu com a decisão da diretoria de congelar o desenvolvimento do carro atual para priorizar a transição à Audi em 2027, provocando um ultimato implacável de seu empresário, Marcus Thorne. Paralelamente, a Red Bull mergulhou em uma profunda crise técnica e moral após perder a liderança dos Construtores, sofrer uma punição de dez pontos da FIA e acumular falhas críticas de correlação no simulador.",
+      "entities": [
+        "sarah",
+        "felipe",
+        "davi",
+        "verstappen",
+        "audi",
+        "red_bull",
+        "mercedes",
+        "sauber",
+        "mclaren",
+        "fia"
+      ],
+      "status": "OPEN"
     }
   ]
 }

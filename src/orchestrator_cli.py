@@ -453,86 +453,87 @@ def execute_stage_rollback(round_num: int, scope: str = "sessao", season_id: Opt
                     md_file.unlink()
                     deleted_files.append(str(md_file.relative_to(ROOT_DIR)))
 
-        # Standings rollback
-        standings_et_snap = ROOT_DIR / "data" / "state" / f"standings_et{round_num:02d}.json"
-        if standings_et_snap.exists():
-            standings_et_snap.unlink()
-            deleted_files.append(str(standings_et_snap.relative_to(ROOT_DIR)))
+        # Standings rollback (only for active season)
+        if eff_season == get_current_season_id():
+            standings_et_snap = ROOT_DIR / "data" / "state" / f"standings_et{round_num:02d}.json"
+            if standings_et_snap.exists():
+                standings_et_snap.unlink()
+                deleted_files.append(str(standings_et_snap.relative_to(ROOT_DIR)))
 
-        prev_standings_file = ROOT_DIR / "data" / "state" / f"standings_et{round_num - 1:02d}.json"
-        standings_file = ROOT_DIR / "data" / "state" / "standings.json"
-        if prev_standings_file.exists():
-            shutil.copy2(prev_standings_file, standings_file)
-            reverted_standings = True
-        elif standings_file.exists():
-            try:
-                curr_st = json.loads(standings_file.read_text(encoding="utf-8"))
-                if curr_st.get("last_completed_round", 0) >= round_num:
-                    curr_st["last_completed_round"] = round_num - 1
-                    drivers_key = "drivers_standings" if "drivers_standings" in curr_st else "drivers"
-                    constructors_key = "constructors_standings" if "constructors_standings" in curr_st else "constructors"
+            prev_standings_file = ROOT_DIR / "data" / "state" / f"standings_et{round_num - 1:02d}.json"
+            standings_file = ROOT_DIR / "data" / "state" / "standings.json"
+            if prev_standings_file.exists():
+                shutil.copy2(prev_standings_file, standings_file)
+                reverted_standings = True
+            elif standings_file.exists():
+                try:
+                    curr_st = json.loads(standings_file.read_text(encoding="utf-8"))
+                    if curr_st.get("last_completed_round", 0) >= round_num:
+                        curr_st["last_completed_round"] = round_num - 1
+                        drivers_key = "drivers_standings" if "drivers_standings" in curr_st else "drivers"
+                        constructors_key = "constructors_standings" if "constructors_standings" in curr_st else "constructors"
 
-                    driver_pts_map = {}
-                    for d in curr_st.get(drivers_key, []):
-                        pts_by_r = d.get("points_by_round", [])
-                        if len(pts_by_r) >= round_num:
-                            d["points_by_round"] = pts_by_r[:round_num - 1]
-                            d["points"] = sum(d["points_by_round"])
-                        driver_pts_map[d.get("id")] = d.get("points", 0)
+                        driver_pts_map = {}
+                        for d in curr_st.get(drivers_key, []):
+                            pts_by_r = d.get("points_by_round", [])
+                            if len(pts_by_r) >= round_num:
+                                d["points_by_round"] = pts_by_r[:round_num - 1]
+                                d["points"] = sum(d["points_by_round"])
+                            driver_pts_map[d.get("id")] = d.get("points", 0)
 
-                    for c in curr_st.get(constructors_key, []):
-                        if "drivers" in c:
-                            pts = sum(driver_pts_map.get(did, 0) for did in c.get("drivers", []))
-                            if "net_points" in c:
-                                c["net_points"] = pts
-                            if "gross_points" in c:
-                                c["gross_points"] = pts
-                            c["points"] = pts
+                        for c in curr_st.get(constructors_key, []):
+                            if "drivers" in c:
+                                pts = sum(driver_pts_map.get(did, 0) for did in c.get("drivers", []))
+                                if "net_points" in c:
+                                    c["net_points"] = pts
+                                if "gross_points" in c:
+                                    c["gross_points"] = pts
+                                c["points"] = pts
 
-                    if drivers_key in curr_st:
-                        curr_st[drivers_key] = sorted(curr_st[drivers_key], key=lambda x: x.get("points", 0), reverse=True)
-                    if constructors_key in curr_st:
-                        curr_st[constructors_key] = sorted(
-                            curr_st[constructors_key],
-                            key=lambda x: x.get("net_points", x.get("points", 0)),
-                            reverse=True,
-                        )
-                    standings_file.write_text(json.dumps(curr_st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-                    reverted_standings = True
-            except Exception as exc:
-                print(f"[Rollback Warning] Standings fallback error: {exc}")
+                        if drivers_key in curr_st:
+                            curr_st[drivers_key] = sorted(curr_st[drivers_key], key=lambda x: x.get("points", 0), reverse=True)
+                        if constructors_key in curr_st:
+                            curr_st[constructors_key] = sorted(
+                                curr_st[constructors_key],
+                                key=lambda x: x.get("net_points", x.get("points", 0)),
+                                reverse=True,
+                            )
+                        standings_file.write_text(json.dumps(curr_st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+                        reverted_standings = True
+                except Exception as exc:
+                    print(f"[Rollback Warning] Standings fallback error: {exc}")
 
-        # Purge Canon Ledger events for M3 to M8
-        ledger_file = ROOT_DIR / "data" / "state" / "canon_ledger.json"
-        if ledger_file.exists():
-            try:
-                ledger_data = json.loads(ledger_file.read_text(encoding="utf-8"))
-                events = ledger_data.get("events", [])
-                kept_events = []
-                for ev in events:
-                    if ev.get("round") == round_num:
-                        mod = str(ev.get("module", "")).upper()
-                        if any(x in mod for x in ["M3", "M4", "M5", "M6", "M7", "M8", "TELEMETRIA", "CORRIDA", "QUALIFYING"]):
-                            purged_events += 1
-                            continue
-                    kept_events.append(ev)
-                ledger_data["events"] = kept_events
-                ledger_file.write_text(json.dumps(ledger_data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-            except Exception:
-                pass
+            # Purge Canon Ledger events for M3 to M8
+            ledger_file = ROOT_DIR / "data" / "state" / "canon_ledger.json"
+            if ledger_file.exists():
+                try:
+                    ledger_data = json.loads(ledger_file.read_text(encoding="utf-8"))
+                    events = ledger_data.get("events", [])
+                    kept_events = []
+                    for ev in events:
+                        if ev.get("round") == round_num:
+                            mod = str(ev.get("module", "")).upper()
+                            if any(x in mod for x in ["M3", "M4", "M5", "M6", "M7", "M8", "TELEMETRIA", "CORRIDA", "QUALIFYING"]):
+                                purged_events += 1
+                                continue
+                        kept_events.append(ev)
+                    ledger_data["events"] = kept_events
+                    ledger_file.write_text(json.dumps(ledger_data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+                except Exception:
+                    pass
 
-        # Reset discord session state if active
-        state_file = ROOT_DIR / "data" / "state" / "discord_session_state.json"
-        if state_file.exists():
-            try:
-                st = json.loads(state_file.read_text(encoding="utf-8"))
-                if int(st.get("active_round_num", 0)) == round_num:
-                    st["status"] = "IDLE"
-                    st["session_files"] = []
-                    st["debrief_messages"] = []
-                    state_file.write_text(json.dumps(st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-            except Exception:
-                pass
+            # Reset discord session state if active
+            state_file = ROOT_DIR / "data" / "state" / "discord_session_state.json"
+            if state_file.exists():
+                try:
+                    st = json.loads(state_file.read_text(encoding="utf-8"))
+                    if int(st.get("active_round_num", 0)) == round_num:
+                        st["status"] = "IDLE"
+                        st["session_files"] = []
+                        st["debrief_messages"] = []
+                        state_file.write_text(json.dumps(st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+                except Exception:
+                    pass
 
     # 2. ROLLBACK DE COLETIVA (M2)
     if scope_norm in ("coletiva", "tudo"):
@@ -543,26 +544,27 @@ def execute_stage_rollback(round_num: int, scope: str = "sessao", season_id: Opt
                     md_file.unlink()
                     deleted_files.append(str(md_file.relative_to(ROOT_DIR)))
 
-        press_file = ROOT_DIR / "data" / "state" / f"press_conf_et{round_num:02d}.json"
-        if press_file.exists():
-            press_file.unlink()
-            deleted_files.append(str(press_file.relative_to(ROOT_DIR)))
+        if eff_season == get_current_season_id():
+            press_file = ROOT_DIR / "data" / "state" / f"press_conf_et{round_num:02d}.json"
+            if press_file.exists():
+                press_file.unlink()
+                deleted_files.append(str(press_file.relative_to(ROOT_DIR)))
 
-        ledger_file = ROOT_DIR / "data" / "state" / "canon_ledger.json"
-        if ledger_file.exists():
-            try:
-                ledger_data = json.loads(ledger_file.read_text(encoding="utf-8"))
-                events = ledger_data.get("events", [])
-                kept_events = []
-                for ev in events:
-                    if ev.get("round") == round_num and "M2" in str(ev.get("module", "")).upper():
-                        purged_events += 1
-                        continue
-                    kept_events.append(ev)
-                ledger_data["events"] = kept_events
-                ledger_file.write_text(json.dumps(ledger_data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-            except Exception:
-                pass
+            ledger_file = ROOT_DIR / "data" / "state" / "canon_ledger.json"
+            if ledger_file.exists():
+                try:
+                    ledger_data = json.loads(ledger_file.read_text(encoding="utf-8"))
+                    events = ledger_data.get("events", [])
+                    kept_events = []
+                    for ev in events:
+                        if ev.get("round") == round_num and "M2" in str(ev.get("module", "")).upper():
+                            purged_events += 1
+                            continue
+                        kept_events.append(ev)
+                    ledger_data["events"] = kept_events
+                    ledger_file.write_text(json.dumps(ledger_data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+                except Exception:
+                    pass
 
     # 3. ROLLBACK DE SEMANA (M1 E M1.5)
     if scope_norm in ("semana", "tudo"):
@@ -573,31 +575,32 @@ def execute_stage_rollback(round_num: int, scope: str = "sessao", season_id: Opt
                     md_file.unlink()
                     deleted_files.append(str(md_file.relative_to(ROOT_DIR)))
 
-        ledger_file = ROOT_DIR / "data" / "state" / "canon_ledger.json"
-        if ledger_file.exists():
-            try:
-                ledger_data = json.loads(ledger_file.read_text(encoding="utf-8"))
-                events = ledger_data.get("events", [])
-                kept_events = []
-                for ev in events:
-                    if ev.get("round") == round_num and any(x in str(ev.get("module", "")).upper() for x in ["M1", "DILEMA"]):
-                        purged_events += 1
-                        continue
-                    kept_events.append(ev)
-                ledger_data["events"] = kept_events
-                ledger_file.write_text(json.dumps(ledger_data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-            except Exception:
-                pass
+        if eff_season == get_current_season_id():
+            ledger_file = ROOT_DIR / "data" / "state" / "canon_ledger.json"
+            if ledger_file.exists():
+                try:
+                    ledger_data = json.loads(ledger_file.read_text(encoding="utf-8"))
+                    events = ledger_data.get("events", [])
+                    kept_events = []
+                    for ev in events:
+                        if ev.get("round") == round_num and any(x in str(ev.get("module", "")).upper() for x in ["M1", "DILEMA"]):
+                            purged_events += 1
+                            continue
+                        kept_events.append(ev)
+                    ledger_data["events"] = kept_events
+                    ledger_file.write_text(json.dumps(ledger_data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+                except Exception:
+                    pass
 
-        state_file = ROOT_DIR / "data" / "state" / "discord_session_state.json"
-        if state_file.exists():
-            try:
-                st = json.loads(state_file.read_text(encoding="utf-8"))
-                if int(st.get("active_round_num", 0)) == round_num:
-                    st["semana_day"] = 1
-                    state_file.write_text(json.dumps(st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-            except Exception:
-                pass
+            state_file = ROOT_DIR / "data" / "state" / "discord_session_state.json"
+            if state_file.exists():
+                try:
+                    st = json.loads(state_file.read_text(encoding="utf-8"))
+                    if int(st.get("active_round_num", 0)) == round_num:
+                        st["semana_day"] = 1
+                        state_file.write_text(json.dumps(st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+                except Exception:
+                    pass
 
     # 4. ROLLBACK TUDO (CLEANUP RESIDUAL)
     if scope_norm == "tudo":
@@ -609,32 +612,34 @@ def execute_stage_rollback(round_num: int, scope: str = "sessao", season_id: Opt
                     f.unlink()
                     deleted_files.append(str(f.relative_to(ROOT_DIR)))
 
-        ledger_file = ROOT_DIR / "data" / "state" / "canon_ledger.json"
-        if ledger_file.exists():
-            try:
-                ledger_data = json.loads(ledger_file.read_text(encoding="utf-8"))
-                events = ledger_data.get("events", [])
-                kept_events = [ev for ev in events if ev.get("round") != round_num]
-                purged_events += (len(events) - len(kept_events))
-                ledger_data["events"] = kept_events
-                ledger_file.write_text(json.dumps(ledger_data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-            except Exception:
-                pass
+        if eff_season == get_current_season_id():
+            ledger_file = ROOT_DIR / "data" / "state" / "canon_ledger.json"
+            if ledger_file.exists():
+                try:
+                    ledger_data = json.loads(ledger_file.read_text(encoding="utf-8"))
+                    events = ledger_data.get("events", [])
+                    kept_events = [ev for ev in events if ev.get("round") != round_num]
+                    purged_events += (len(events) - len(kept_events))
+                    ledger_data["events"] = kept_events
+                    ledger_file.write_text(json.dumps(ledger_data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+                except Exception:
+                    pass
 
-        state_file = ROOT_DIR / "data" / "state" / "discord_session_state.json"
-        if state_file.exists():
-            try:
-                st = json.loads(state_file.read_text(encoding="utf-8"))
-                st["status"] = "IDLE"
-                st["session_files"] = []
-                st["debrief_messages"] = []
-                st["semana_day"] = 1
-                state_file.write_text(json.dumps(st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-            except Exception:
-                pass
+            state_file = ROOT_DIR / "data" / "state" / "discord_session_state.json"
+            if state_file.exists():
+                try:
+                    st = json.loads(state_file.read_text(encoding="utf-8"))
+                    st["status"] = "IDLE"
+                    st["session_files"] = []
+                    st["debrief_messages"] = []
+                    st["semana_day"] = 1
+                    state_file.write_text(json.dumps(st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+                except Exception:
+                    pass
 
-    # Always recompile the editorial portal to reflect the purged state
-    build_editorial_portal(ROOT_DIR)
+    # Always recompile the editorial portal to reflect the purged state (active season only)
+    if eff_season == get_current_season_id():
+        build_editorial_portal(ROOT_DIR)
 
     return {
         "success": True,
