@@ -57,13 +57,17 @@ PILOT_REGISTRY: Dict[str, Dict[str, Any]] = {
 
 QUESTION_INTENT_STANDINGS_KEYWORDS = [
     "classificação", "classificacao", "pontuação", "pontuacao", "pontos", "tabela",
-    "campeonato", "posição", "posicao", "líder", "lider", "vice", "pontuar", "construtores"
+    "campeonato", "posição", "posicao", "líder", "lider", "vice", "pontuar", "construtores",
+    "campeã", "campea", "campeão", "campeao", "título", "titulo", "distância", "distancia",
+    "diferença", "diferenca", "vantagem", "desvantagem", "chance", "chances", "matemática", "matematica"
 ]
 
 QUESTION_TRIGGER_KEYWORDS = [
     "aconteceu", "relevante", "bastidor", "bastidores", "semana", "fofoca", "notícia", "noticia",
     "boato", "imprensa", "jornalista", "falaram", "comigo", "minha equipe", "meu carro",
-    "como estou", "como foi", "situação", "situacao", "briefing", "o que houve"
+    "como estou", "como foi", "situação", "situacao", "briefing", "o que houve", "novidade", "novidades",
+    "sarah", "davi", "felipe", "verstappen", "mercedes", "williams", "sauber", "audi", "ferrari", "red bull",
+    "perto", "longe", "ganhar", "vencer", "esperar", "opinião", "opiniao"
 ]
 
 
@@ -140,29 +144,31 @@ def is_assistant_query(content: str, is_mentioned: bool = False, in_dedicated_ch
     has_trigger_kw = any(w in clean for w in QUESTION_TRIGGER_KEYWORDS)
 
     # Trigger conditions:
-    # 1. User explicitly tagged the bot or asked a question
-    # 2. In a dedicated chat, any question mark or assistant keyword triggers it
-    if is_mentioned:
-        return has_question_mark or has_standings_kw or has_trigger_kw or len(clean.split()) >= 2
-
-    if has_question_mark and (has_standings_kw or has_trigger_kw):
+    # 1. Any message with '?' that is not a game stage command is an assistant query
+    if has_question_mark:
         return True
 
-    if in_dedicated_channel and (has_standings_kw or has_trigger_kw):
-        return True
+    # 2. User explicitly tagged the bot or asked in dedicated channel
+    if is_mentioned or in_dedicated_channel:
+        return has_standings_kw or has_trigger_kw or len(clean.split()) >= 2
 
-    return False
+    return has_standings_kw or has_trigger_kw
 
 
 def classify_query_intent(query: str) -> str:
     """
     Classifies the user query as 'STANDINGS' (deterministic) or 'PADDOCK_LORE' (semantic Gemini RAG).
+    Complex inquiries involving 'perto', 'campeã', 'título' or 'chance' are routed to RAG.
     """
     clean = query.strip().lower()
-    has_standings = any(w in clean for w in QUESTION_INTENT_STANDINGS_KEYWORDS)
-    has_lore = any(w in clean for w in ["aconteceu", "relevante", "bastidor", "fofoca", "notícia", "noticia", "boato", "semana", "falaram"])
+    has_complex_lore = any(w in clean for w in [
+        "aconteceu", "relevante", "bastidor", "fofoca", "notícia", "noticia", "boato", "semana", "falaram",
+        "perto", "longe", "chance", "chances", "ser campeã", "ser campea", "ser campeão", "ser campeao",
+        "título", "titulo", "ganhar", "vencer", "opinião", "opiniao"
+    ])
+    has_pure_standings = any(w in clean for w in ["classificação", "classificacao", "tabela", "pontuação", "pontuacao", "pontos", "posição", "posicao"])
 
-    if has_standings and not has_lore:
+    if has_pure_standings and not has_complex_lore:
         return "STANDINGS"
     return "PADDOCK_LORE"
 
@@ -257,7 +263,15 @@ def handle_semantic_paddock_query(
     subject = target_subject or driver_data
     is_about_rival = (subject["driver_id"] != caller["driver_id"])
 
-    # 1. Collect open Canon Ledger events for this round & target subject
+    # 1. Collect Standings overview for mathematical / championship context
+    standings_info = active_repo.get_standings()
+    drivers_list = standings_info.get("drivers_standings") or standings_info.get("drivers") or []
+    standings_summary_lines = []
+    for d in drivers_list[:6]:
+        standings_summary_lines.append(f"- P{d.get('pos', '?')}: {d.get('name')} ({d.get('points', 0)} pts, {d.get('wins', 0)} vitórias)")
+    standings_context = "\n".join(standings_summary_lines) if standings_summary_lines else "Tabela em consolidação."
+
+    # 2. Collect open Canon Ledger events for this round & target subject
     ledger = active_repo.get_canon_ledger()
     events = ledger.get("events", [])
     relevant_events = []
@@ -322,8 +336,10 @@ def handle_semantic_paddock_query(
 
     prompt = (
         f"=== CONTEXTO OFICIAL DO PADDOCK DE FÓRMULA 1 2026 ===\n"
-        f"Etapa Atual: Etapa {round_num} ({round_folder})\n"
+        f"Etapa Atual: Etapa {round_num} ({round_folder}) de um total de 24 etapas na temporada (Restam {max(24 - round_num + 1, 0)} etapas e até {max(24 - round_num + 1, 0) * 26} pontos em disputa).\n"
         f"Sujeito em Análise: {subject['full_name']} ({subject['team_name']})\n\n"
+        f"=== CLASSIFICAÇÃO ATUAL DO CAMPEONATO (TOP 6) ===\n"
+        f"{standings_context}\n\n"
         f"=== EVENTOS CANÔNICOS RELEVANTES ===\n"
         f"{events_summary}\n\n"
         f"=== BASTIDORES & CRÔNICAS DA SEMANA (DIAS GERADOS) ===\n"
