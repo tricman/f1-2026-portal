@@ -115,11 +115,16 @@ def detect_stage_command(text: str) -> Optional[Tuple[Any, ...]]:
 
     # 4. M1.5 Paddock Dilemma ChatOps
     dilemma_match = re.search(
-        r"\b(?:dilema|dilemma)\s+(?:da\s+|de\s+)?etapa\s+(\d+)\b",
-        clean,
+        r"^[!/]?\s*(?:dilema|dilemma)(?:\s+(?:da\s+|de\s+)?etapa\s+(\d+))?(?:\s*[:\-–—]?\s*(.*))?$",
+        text.strip(),
+        re.IGNORECASE,
     )
     if dilemma_match:
-        r_num = int(dilemma_match.group(1))
+        r_str = dilemma_match.group(1)
+        r_num = int(r_str) if r_str else None
+        custom_theme = (dilemma_match.group(2) or "").strip() or None
+        if custom_theme:
+            return ("START_DILEMMA", r_num, custom_theme)
         return ("START_DILEMMA", r_num)
 
     if re.search(r"\b(?:forcar|forçar|avancar|avançar)\s+(?:avanco\s+|avanço\s+)?dilema\b|\btimeout\s+dilema\b", clean):
@@ -236,6 +241,19 @@ def split_markdown_for_discord(content: str, max_chars: int = 1950) -> List[str]
             chunks.append(final_str)
 
     return chunks
+
+
+def extract_audio_attachment(msg: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """
+    Extracts an audio attachment (voice message, .ogg, .mp3, .wav, .m4a, .opus, etc.) from a Discord message.
+    """
+    audio_exts = (".ogg", ".mp3", ".wav", ".m4a", ".opus", ".aac", ".flac")
+    for att in msg.get("attachments", []):
+        fn = (att.get("filename") or "").lower()
+        ct = (att.get("content_type") or "").lower()
+        if any(fn.endswith(ext) for ext in audio_exts) or ct.startswith("audio/"):
+            return att
+    return None
 
 
 class DiscordGatewayClient:
@@ -531,6 +549,32 @@ class DiscordGatewayClient:
             raw_content = (msg.get("content") or "").strip()
             # Clean any @Bot mentions (<@123456> or <@!123456>) so both mentioned and plain text work
             content = re.sub(r"<@!?\d+>", "", raw_content).strip()
+
+            # Automatic Voice Note / Audio debrief transcription via Gemini Flash
+            audio_att = extract_audio_attachment(msg)
+            is_voice_msg = False
+            voice_transcription = None
+            if audio_att and audio_att.get("url"):
+                try:
+                    from src.ai_showrunner import GeminiFreeTierClient
+                    ai_c = GeminiFreeTierClient()
+                    if ai_c.api_key:
+                        audio_data = self.download_attachment_bytes(audio_att["url"])
+                        if audio_data:
+                            voice_transcription = ai_c.transcribe_audio_bytes(
+                                audio_bytes=audio_data,
+                                filename=audio_att.get("filename", "voice.ogg"),
+                                instruction=(
+                                    f"Transcreva fielmente em Português (Brasil) este áudio gravado pelo piloto de F1 {author_name}. "
+                                    f"Retorne apenas o texto falado com máxima fidelidade, sem notas introdutórias ou metadados."
+                                ),
+                            )
+                            if voice_transcription:
+                                is_voice_msg = True
+                                content = f"{content} {voice_transcription}".strip() if content else voice_transcription
+                except Exception as exc:
+                    trace(f"[Voice Message Transcription Error] {exc}")
+
             cmd = detect_stage_command(content) if content else None
 
             if cmd and msg_id not in processed_msg_ids:
@@ -714,7 +758,7 @@ class DiscordGatewayClient:
                     r_num = cmd_round or state.get("active_round_num") or 11
                     r_folder = ROUND_NUMBER_TO_FOLDER.get(r_num, f"et_{r_num:02d}")
                     from src.ai_showrunner import generate_paddock_dilemma
-                    d_data = generate_paddock_dilemma(root_dir, r_num, r_folder)
+                    d_data = generate_paddock_dilemma(root_dir, r_num, r_folder, custom_theme=cmd_extra)
                     state["status"] = "DILEMMA_LOCKED"
                     state["active_round_num"] = r_num
                     state["active_round_folder"] = r_folder
@@ -897,10 +941,19 @@ class DiscordGatewayClient:
                     if d_info.get("status") == "AWAITING_DILEMMA_CHOICE":
                         processed_msg_ids.add(msg_id)
                         from src.ai_showrunner import resolve_paddock_dilemma
-                        res = resolve_paddock_dilemma(root_dir, active_r_num, active_folder, content)
+                        res = resolve_paddock_dilemma(
+                            root_dir,
+                            active_r_num,
+                            active_folder,
+                            content,
+                            is_voice=is_voice_msg,
+                        )
                         state["status"] = "SEMANA_ACTIVE"
                         if should_reply:
-                            self.post_channel_message(reply_channel_id, res.get("ack_message", ""))
+                            msg_out = res.get("ack_message", "")
+                            if is_voice_msg and voice_transcription:
+                                msg_out = f"🎙️ **[MENSAGEM DE VOZ PROCESSADA • @{author_name}]**\n> *\"{voice_transcription}\"*\n\n{msg_out}"
+                            self.post_channel_message(reply_channel_id, msg_out)
                         continue
                 except Exception as exc:
                     print(f"[Dilemma Answer Warning] {exc}")
@@ -1070,6 +1123,15 @@ class DiscordGatewayClient:
         with urllib.request.urlopen(req, timeout=30) as resp:
             target_path.write_bytes(resp.read())
         return target_path
+
+    def download_attachment_bytes(self, url: str) -> bytes:
+        """
+        Download a Discord CDN attachment in memory as raw bytes.
+        """
+        headers = {"User-Agent": "F1SimulatorBot (https://antigravity.google, 1.0)"}
+        req = urllib.request.Request(url, headers=headers, method="GET")
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return resp.read()
 
     def sync_ingest_channel_to_dir(
         self,

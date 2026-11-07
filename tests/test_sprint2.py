@@ -75,6 +75,13 @@ class TestSprint2StorytellingAndPrompts(unittest.TestCase):
         cmd2 = detect_stage_command("dilemma etapa 12")
         self.assertEqual(cmd2, ("START_DILEMMA", 12))
 
+        # Custom theme suggestion
+        cmd_custom = detect_stage_command("dilema etapa 11 Davi aparece com uma namorada.")
+        self.assertEqual(cmd_custom, ("START_DILEMMA", 11, "Davi aparece com uma namorada."))
+
+        cmd_custom_not_explicit_round = detect_stage_command("dilema Davi aparece com uma namorada")
+        self.assertEqual(cmd_custom_not_explicit_round, ("START_DILEMMA", None, "Davi aparece com uma namorada"))
+
         cmd3 = detect_stage_command("forcar avanco dilema")
         self.assertEqual(cmd3[0], "FORCE_DILEMMA_ADVANCE")
 
@@ -129,6 +136,28 @@ class TestSprint2StorytellingAndPrompts(unittest.TestCase):
         dilemma_ev = next((ev for ev in ledger.get("events", []) if ev.get("event_id") == f"ET{round_num:02d}-M1.5-DILEMMA"), None)
         self.assertIsNotNone(dilemma_ev)
         self.assertIn("Felipe decidiu", dilemma_ev["summary"])
+
+        # 3. Test Custom Theme generation and Voice Message resolution
+        d_custom = generate_paddock_dilemma(
+            self.root_dir,
+            round_num,
+            round_folder,
+            custom_theme="Davi aparece com uma namorada no paddock de Spielberg.",
+        )
+        self.assertEqual(d_custom["target_driver"], "davi")
+        self.assertEqual(d_custom["driver_name"], "Davi")
+        self.assertEqual(d_custom["custom_theme"], "Davi aparece com uma namorada no paddock de Spielberg.")
+
+        res_voice = resolve_paddock_dilemma(
+            self.root_dir,
+            round_num,
+            round_folder,
+            raw_choice="Vou assumir o relacionamento publicamente",
+            is_voice=True,
+        )
+        self.assertEqual(res_voice["status"], "COMPLETED")
+        self.assertTrue(res_voice["is_voice"])
+        self.assertIn("Mensagem de Voz", res_voice["ack_message"])
 
         # Clean up temporary test files
         if state_file.exists():

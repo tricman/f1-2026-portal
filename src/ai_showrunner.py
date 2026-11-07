@@ -251,6 +251,31 @@ class GeminiFreeTierClient:
         output_json_path.write_text(json.dumps(parsed, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         return parsed
 
+    def transcribe_audio_bytes(
+        self,
+        audio_bytes: bytes,
+        filename: str = "voice.ogg",
+        instruction: str = "",
+    ) -> str:
+        """
+        Transcribe audio bytes (e.g. Discord voice note, debrief) using Gemini Flash.
+        """
+        mime_type = mimetypes.guess_type(filename)[0] or "audio/ogg"
+        b64_audio = base64.b64encode(audio_bytes).decode("ascii")
+        prompt_text = instruction or (
+            "Transcreva fielmente em Português (Brasil) este áudio enviado pelo piloto de Fórmula 1. "
+            "Retorne apenas o texto transcrito com máxima fidelidade, sem notas introdutórias ou metadados."
+        )
+        parts = [
+            {"inlineData": {"mimeType": mime_type, "data": b64_audio}},
+            {"text": prompt_text},
+        ]
+        return self._call_generate_content(
+            model=self.flash_model,
+            parts=parts,
+            temperature=0.2,
+        ).strip()
+
     def transcribe_audio_debriefs(self, debrief_dir: Path) -> str:
         """
         Stage 1B: Transcribe any .ogg, .mp3, .wav, .m4a audio files in `debriefing/`
@@ -272,23 +297,15 @@ class GeminiFreeTierClient:
             marker = f"[Áudio: {audio_path.name}]"
             if marker in existing_notes:
                 continue
-            mime_type = mimetypes.guess_type(audio_path.name)[0] or "audio/ogg"
-            b64_audio = base64.b64encode(audio_path.read_bytes()).decode("ascii")
-            parts = [
-                {"inlineData": {"mimeType": mime_type, "data": b64_audio}},
-                {
-                    "text": (
+            try:
+                transcript = self.transcribe_audio_bytes(
+                    audio_bytes=audio_path.read_bytes(),
+                    filename=audio_path.name,
+                    instruction=(
                         "Transcreva fielmente em Português (Brasil) este áudio de debriefing pós-corrida "
                         "enviado por um dos pilotos (Felipe, Davi ou Sarah) e indique o tom emocional."
-                    )
-                },
-            ]
-            try:
-                transcript = self._call_generate_content(
-                    model=self.flash_model,
-                    parts=parts,
-                    temperature=0.2,
-                ).strip()
+                    ),
+                )
                 entry = f"- **{marker} Transcrição de Áudio:** {transcript}\n"
                 existing_notes += entry
             except Exception as exc:
@@ -830,12 +847,14 @@ def generate_paddock_dilemma(
     round_num: int,
     round_folder: str,
     target_driver: Optional[str] = None,
+    custom_theme: Optional[str] = None,
     ai_client: Optional[GeminiFreeTierClient] = None,
     season_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Generates a high-stakes, polarized paddock dilemma (M1.5) for a human driver,
-    grounded on Wednesday's theme and psychological profile, pausing in TURN_LOCKED.
+    grounded on Wednesday's theme or a custom user theme, pausing in TURN_LOCKED.
+    Supports driver response via text choice OR audio voice note.
     """
     from src.canon_ledger import sample_weekly_themes
 
@@ -844,17 +863,50 @@ def generate_paddock_dilemma(
     round_dir.mkdir(parents=True, exist_ok=True)
     state_file = root_dir / "data" / "state" / f"dilemma_et{round_num:02d}.json"
 
-    # Select target driver deterministically if not specified: rotate Felipe, Davi, Sarah
-    available_drivers = ["felipe", "davi", "sarah"]
-    driver_id = target_driver.lower() if target_driver and target_driver.lower() in DRIVER_SETUP_MAP else available_drivers[(round_num - 1) % len(available_drivers)]
+    # 1. Infer target driver:
+    driver_id = None
+    if target_driver and target_driver.lower() in DRIVER_SETUP_MAP:
+        driver_id = target_driver.lower()
+    elif custom_theme:
+        ct_low = custom_theme.lower()
+        if any(k in ct_low for k in ["davi", "davimsson", "msson", "williams"]):
+            driver_id = "davi"
+        elif any(k in ct_low for k in ["sarah", "sarahmarinss", "mercedes"]):
+            driver_id = "sarah"
+        elif any(k in ct_low for k in ["felipe", "frdsilva", "sauber", "audi"]):
+            driver_id = "felipe"
+
+    if not driver_id:
+        available_drivers = ["felipe", "davi", "sarah"]
+        driver_id = available_drivers[(round_num - 1) % len(available_drivers)]
+
     driver_name, discord_tag, car_desc, team_id, team_name = DRIVER_SETUP_MAP[driver_id]
 
     meta = ROUND_METADATA.get(round_folder, {"name": f"GP da Etapa {round_num}"})
     gp_name = meta.get("name", f"Etapa {round_num}")
 
-    # Sample theme for Wednesday
-    themes = sample_weekly_themes(round_num, team_id)
-    wed_theme = themes.get("wednesday", "Crise Contratual & Mercado de Pilotos")
+    # 2. Sample or define theme
+    if custom_theme:
+        effective_theme = custom_theme.strip()
+        theme_directive = (
+            f"=== TEMA PERSONALIZADO SOLICITADO PELO SHOWRUNNER ===\n"
+            f"Premissa Obrigatória: '{effective_theme}'\n\n"
+            f"DIRETRIZ DE ENREDO:\n"
+            f"Crie um dilema dramático, polarizado e com alto impacto humano e esportivo centrado EXATAMENTE nesta premissa: '{effective_theme}'.\n"
+            f"O dilema DEVE envolver diretamente o piloto {driver_name} ({car_desc}) da equipe {team_name}.\n"
+            f"Apresente duas escolhas irreconciliáveis:\n"
+            f"- [OPÇÃO A]: Rota de impacto direto / enfrentamento público / risco esportivo ou midiático.\n"
+            f"- [OPÇÃO B]: Rota de blindagem institucional / controle de danos / discrição máxima ou concessão interna.\n"
+            f"Ambas devem ter ganhos claros e perdas dolorosas reais para o piloto e sua equipe."
+        )
+    else:
+        themes = sample_weekly_themes(round_num, team_id)
+        effective_theme = themes.get("wednesday", "Crise Contratual & Mercado de Pilotos")
+        theme_directive = (
+            f"=== TEMA DE QUARTA-FEIRA ===\n"
+            f"Tema Obrigatório: '{effective_theme}'\n\n"
+            f"Gere um dilema polarizado com Opção A e Opção B para {driver_name} ({team_name})."
+        )
 
     # Load context & prompt template
     prompt_file = root_dir / "prompts" / "01b_dilema_paddock.md"
@@ -869,8 +921,11 @@ def generate_paddock_dilemma(
         f"{base_context}\n\n"
         f"=== PERFIL DO PILOTO ===\n{profile_text}\n\n"
         f"=== DIRETRIZ DO DILEMA ===\n{prompt_template}\n\n"
+        f"{theme_directive}\n\n"
         f"Gere agora o dilema de paddock polarizado para {driver_name} ({team_name}), "
-        f"centrado no tema obrigatório: '{wed_theme}', para a Etapa {round_num} ({gp_name})."
+        f"para a Etapa {round_num} ({gp_name}).\n"
+        f"IMPORTANTE: Indique claramente que o piloto pode responder digitando 'Opção A' / 'Opção B' "
+        f"OU enviando uma MENSAGEM DE VOZ (áudio de debrief/roleplay) diretamente no chat ou na DM!"
     )
 
     try:
@@ -888,12 +943,12 @@ def generate_paddock_dilemma(
             f"# ⚡ DILEMA DE PADDOCK — {gp_name.upper()} (MÓDULO #1.5)\n"
             f"### 🛑 DECISÃO ESTRATÉGICA CONVOCADA: @{discord_tag} ({driver_name} · {team_name})\n\n"
             f"**Cenário de Bastidor:**\n"
-            f"Nos bastidores desta quarta-feira, a cúpula técnica apresentou uma proposta crítica em torno de {wed_theme}.\n\n"
+            f"Nos bastidores desta quarta-feira, uma situação crítica veio à tona em torno de: *\"{effective_theme}\"*.\n\n"
             f"### ⚖️ SUAS OPÇÕES DE DECISÃO:\n"
-            f"* **[OPÇÃO A] — Rota Agressiva:** Assumir o pacote experimental com risco de confiabilidade.\n"
-            f"* **[OPÇÃO B] — Rota Conservadora:** Manter a especificação padrão e focar em pontos seguros.\n\n"
+            f"* **[OPÇÃO A] — Rota Agressiva / Exposição Aberta:** Enfrentar a situação publicamente e assumir as repercussões imediatas com patrocinadores e mídia.\n"
+            f"* **[OPÇÃO B] — Rota Diplomática / Blindagem Institucional:** Blindar os bastidores da equipe, manter discrição máxima e negociar uma solução interna.\n\n"
             f"🛑 **[TRAVA DE TURNO ATIVA | Aguardando resposta de @{discord_tag}]**\n"
-            f"> 💬 *Piloto, digite 'Opção A' ou 'Opção B' no chat do canal de voz para registrar a decisão no Canon Oficial!*"
+            f"> 💬 *Piloto, responda digitando **Opção A** / **Opção B** OU envie uma **MENSAGEM DE VOZ** no chat ou na DM privada para registrar sua decisão no Canon Oficial!*"
         )
 
     # Save Markdown file
@@ -906,6 +961,7 @@ def generate_paddock_dilemma(
         "target_driver": driver_id,
         "driver_name": driver_name,
         "discord_tag": discord_tag,
+        "custom_theme": custom_theme,
         "status": "AWAITING_DILEMMA_CHOICE",
         "dilemma_text": dilemma_md,
         "timestamp": time.time(),
@@ -923,12 +979,13 @@ def resolve_paddock_dilemma(
     round_num: int,
     round_folder: str,
     raw_choice: str,
+    is_voice: bool = False,
     ai_client: Optional[GeminiFreeTierClient] = None,
     season_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
-    Receives player's choice from Discord, incorporates into Canon Ledger and generates
-    context-aware paddock consequence, unlocking the weekly state machine.
+    Receives player's choice from Discord (text or transcribed voice), incorporates into Canon Ledger
+    and generates context-aware paddock consequence, unlocking the weekly state machine.
     """
     from src.canon_ledger import CanonLedgerManager
 
@@ -942,14 +999,15 @@ def resolve_paddock_dilemma(
     driver_name = st.get("driver_name", "Felipe")
     discord_tag = st.get("discord_tag", "piloto")
     clean_choice = raw_choice.strip()
+    voice_note = " (Decisão enviada por Mensagem de Voz)" if is_voice else ""
 
     prompt = (
         f"DILEMA DE PADDOCK APRESENTADO (Etapa {round_num}):\n"
         f"{st.get('dilemma_text', '')[:3000]}\n\n"
-        f"ESCOLHA FEITA PELO PILOTO {driver_name.upper()} (@{discord_tag}):\n"
+        f"ESCOLHA FEITA PELO PILOTO {driver_name.upper()} (@{discord_tag}){voice_note}:\n"
         f"\"{clean_choice}\"\n\n"
         f"TAREFA:\n"
-        f"1. Como Game Master e narrador de F1, gere em 2 parágrafos curtos a reação imediata nos bastidores da equipe e o impacto político/técnico da escolha feita pelo piloto.\n"
+        f"1. Como Game Master e narrador de F1, interprete a decisão do piloto (mesmo que expressa em linguagem falada/áudio livre) e gere em 2 parágrafos curtos a reação imediata nos bastidores da equipe e o impacto político/técnico da escolha feita pelo piloto.\n"
         f"2. Escreva em tom realista, tenso e cinematográfico.\n"
         f"3. Finalize com um resumo executivo de 1 linha da consequência para o Canon Ledger."
     )
@@ -970,11 +1028,12 @@ def resolve_paddock_dilemma(
     # Register in Canon Ledger
     ledger_path = root_dir / "data" / "state" / "canon_ledger.json"
     mgr = CanonLedgerManager(ledger_path)
+    via_str = " via Mensagem de Voz" if is_voice else ""
     mgr.append_event(
         event_id=f"ET{round_num:02d}-M1.5-DILEMMA",
         round_num=round_num,
         module="M1_5_DILEMA",
-        summary=f"No Dilema de Paddock da Etapa {round_num}, {driver_name} decidiu: '{clean_choice[:140]}'. Consequência: {consequence_text[:200]}",
+        summary=f"No Dilema de Paddock da Etapa {round_num}, {driver_name} decidiu{via_str}: '{clean_choice[:140]}'. Consequência: {consequence_text[:200]}",
         entities=[driver_id, "fia", "equipe", round_folder],
         status="OPEN",
     )
@@ -984,6 +1043,7 @@ def resolve_paddock_dilemma(
     st["chosen_option"] = clean_choice
     st["resolution_text"] = consequence_text
     st["resolved_timestamp"] = time.time()
+    st["input_type"] = "voice" if is_voice else "text"
     state_file.write_text(json.dumps(st, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     # Append consequence to target markdown
@@ -992,16 +1052,18 @@ def resolve_paddock_dilemma(
     gp_name = meta.get("name", f"Etapa {round_num}")
     target_md = round_dir / f"Etapa {round_num:02d} - Relatório de Bastidores - M1.5 Dilema de Paddock - {gp_name} 2026.md"
     if target_md.exists():
+        voice_badge_md = " *(Registrado via Áudio/Mensagem de Voz)*" if is_voice else ""
         append_res = (
             f"\n\n---\n\n"
-            f"### ✅ DECISÃO REGISTRADA NO CANON OFICIAL\n"
+            f"### ✅ DECISÃO REGISTRADA NO CANON OFICIAL{voice_badge_md}\n"
             f"**Escolha do Piloto @{discord_tag} ({driver_name}):**\n> *\"{clean_choice}\"*\n\n"
             f"**Repercussão Imediata nos Bastidores:**\n{consequence_text}\n"
         )
         target_md.write_text(target_md.read_text(encoding="utf-8") + append_res, encoding="utf-8")
 
+    voice_badge_ack = " 🎙️ *(Gravado via Mensagem de Voz)*" if is_voice else ""
     ack_message = (
-        f"✅ **DECISÃO DE {driver_name.upper()} REGISTRADA NO CANON LEDGER DA F1 2026!**\n"
+        f"✅ **DECISÃO DE {driver_name.upper()} REGISTRADA NO CANON LEDGER DA F1 2026!**{voice_badge_ack}\n"
         f"> *\"{clean_choice}\"*\n\n"
         f"📋 **Repercussão nos Bastidores:**\n{consequence_text}\n\n"
         f"🔓 **Trava de Turno Liberada!** A semana da F1 avança rumo à Coletiva de Imprensa Oficial da FIA (M2)!"
@@ -1013,6 +1075,7 @@ def resolve_paddock_dilemma(
         "choice": clean_choice,
         "consequence": consequence_text,
         "ack_message": ack_message,
+        "is_voice": is_voice,
     }
 
 

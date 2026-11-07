@@ -730,6 +730,7 @@ def main() -> None:
         help="Rollback scope (sessao, coletiva, semana, tudo)",
     )
     parser.add_argument("--persona", type=str, default=None)
+    parser.add_argument("--theme", type=str, default=None, help="Custom theme or premise for M1.5 Paddock Dilemma")
     parser.add_argument("--portal-url", type=str, default=None, help="Base public URL of the Editorial Portal")
     parser.add_argument("--interval", type=int, default=15, help="Polling interval in seconds for watch-discord")
     parser.add_argument("--max-hours", type=float, default=4.0, help="Max session listener duration in hours (default: 4h)")
@@ -802,9 +803,16 @@ def main() -> None:
         print(f"M1 Teaser publicado no Discord: {msg_id} -> {deep_link}")
     elif args.action == "generate-dilemma":
         from src.ai_showrunner import generate_paddock_dilemma
-        r_num = getattr(args, "round", 11)
-        r_folder = getattr(args, "round_folder", f"et_{r_num:02d}")
-        res = generate_paddock_dilemma(ROOT_DIR, r_num, r_folder)
+        r_num = getattr(args, "round", 11) or 11
+        r_folder = getattr(args, "round_folder", None) or f"et_{r_num:02d}"
+        res = generate_paddock_dilemma(
+            ROOT_DIR,
+            r_num,
+            r_folder,
+            target_driver=args.persona,
+            custom_theme=args.theme,
+            season_id=args.season,
+        )
         print(f"Dilema M1.5 gerado com sucesso para {res.get('driver_name')} ({res.get('target_driver')})")
     elif args.action == "publish-round":
         publish_round_to_discord(args.round_folder, teaser_mode=True, base_portal_url=args.portal_url or "", season_id=args.season)
