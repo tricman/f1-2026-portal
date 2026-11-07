@@ -550,15 +550,15 @@ def generate_post_race_modules(
 
 ALL_10_CONSTRUCTORS = [
     ("Mercedes-AMG Petronas", "mercedes", "Sarah (#24) & Hamilton (#44)", "The Silver Bullet / Lady Paddock"),
-    ("Stake F1 Team Kick Sauber (Audi)", "sauber", "Felipe (#5) & Hülkenberg (#27)", "The Paddock Mole / Lady Paddock"),
+    ("Stake F1 Team Kick Sauber", "sauber", "Felipe (#5) & Bottas (#77)", "The Paddock Mole / Lady Paddock"),
     ("Red Bull Racing", "red_bull", "Verstappen (#1) & Pérez (#11)", "The Paddock Mole"),
     ("McLaren F1 Team", "mclaren", "Norris (#4) & Piastri (#81)", "The Paddock Mole"),
     ("Aston Martin Aramco", "aston_martin", "Alonso (#14) & Stroll (#18)", "El Chisme de Montmeló"),
     ("Scuderia Ferrari", "ferrari", "Leclerc (#16) & Sainz (#55)", "Il Cavallino Spia"),
     ("Williams Racing", "williams", "Davi (#15) & Albon (#23)", "The Paddock Mole / Lady Paddock"),
-    ("Alpine F1 Team", "alpine", "Gasly (#10) & Doohan (#7)", "El Chisme de Montmeló"),
-    ("MoneyGram Haas F1 Team", "haas", "Bearman (#87) & Ocon (#31)", "The Paddock Mole"),
-    ("Visa Cash App RB", "vcarb", "Tsunoda (#22) & Lawson (#30)", "Il Cavallino Spia"),
+    ("Alpine F1 Team", "alpine", "Gasly (#10) & Ocon (#31)", "El Chisme de Montmeló"),
+    ("MoneyGram Haas F1 Team", "haas", "Magnussen (#20) & Hülkenberg (#27)", "The Paddock Mole"),
+    ("Visa Cash App RB", "vcarb", "Tsunoda (#22) & Ricciardo (#3)", "Il Cavallino Spia"),
 ]
 
 

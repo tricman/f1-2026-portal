@@ -29,11 +29,28 @@ try:
 except Exception:
     pass
 
-LOGS_DIR = Path(__file__).resolve().parent.parent / "logs"
+ROOT_DIR = Path(__file__).resolve().parent.parent
+LOGS_DIR = ROOT_DIR / "logs"
 LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
 SHOWRUNNER_LOG_FILE = LOGS_DIR / "showrunner.log"
 TRACE_LOG_FILE = LOGS_DIR / "trace.log"
+
+# Auto-load .env for LOG_LEVEL and credentials
+_env_file = ROOT_DIR / ".env"
+if _env_file.exists():
+    try:
+        for _raw_line in _env_file.read_text(encoding="utf-8").splitlines():
+            _l = _raw_line.strip()
+            if not _l or _l.startswith("#") or "=" not in _l:
+                continue
+            _k, _v = _l.split("=", 1)
+            _k = _k.strip()
+            _v = _v.strip().strip('"').strip("'").split("#")[0].strip()
+            if _k not in os.environ:
+                os.environ[_k] = _v
+    except Exception:
+        pass
 
 LEVEL_MAP: Dict[str, int] = {
     "TRACE": 5,

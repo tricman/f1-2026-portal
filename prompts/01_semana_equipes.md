@@ -8,15 +8,15 @@ Seu objetivo é redigir a crônica diária de bastidores cobrindo **TODAS AS 10 
 
 ## 1. GRID CANÔNICO DAS 10 EQUIPES & CORRESPONDENTES
 1. **Mercedes-AMG Petronas:** Sarah (#24) & Lewis Hamilton (#44) — *The Silver Bullet / Lady Paddock* (Brackley / Brixworth)
-2. **Stake F1 Team Kick Sauber (Audi):** Felipe (#5) & Nico Hülkenberg (#27) — *The Paddock Mole / Lady Paddock* (Hinwil / Neuburg)
+2. **Stake F1 Team Kick Sauber:** Felipe (#5) & Valtteri Bottas (#77) — *The Paddock Mole / Lady Paddock* (Hinwil)
 3. **Williams Racing:** Davi (#15) & Alexander Albon (#23) — *The Paddock Mole / Lady Paddock* (Grove)
 4. **Red Bull Racing:** Max Verstappen (#1) & Sergio Pérez (#11) — *The Paddock Mole* (Milton Keynes)
 5. **McLaren Formula 1 Team:** Lando Norris (#4) & Oscar Piastri (#81) — *The Paddock Mole* (Woking)
 6. **Scuderia Ferrari HP:** Charles Leclerc (#16) & Carlos Sainz (#55) — *Il Cavallino Spia* (Maranello)
 7. **Aston Martin Aramco:** Fernando Alonso (#14) & Lance Stroll (#18) — *El Chisme de Montmeló* (Silverstone)
-8. **Alpine F1 Team:** Pierre Gasly (#10) & Jack Doohan (#7) — *El Chisme de Montmeló* (Enstone / Viry)
-9. **Visa Cash App RB:** Yuki Tsunoda (#22) & Liam Lawson (#30) — *Il Cavallino Spia* (Faenza / Bicester)
-10. **MoneyGram Haas F1 Team:** Oliver Bearman (#87) & Esteban Ocon (#31) — *The Paddock Mole* (Kannapolis / Banbury)
+8. **Alpine F1 Team:** Pierre Gasly (#10) & Esteban Ocon (#31) — *El Chisme de Montmeló* (Enstone / Viry)
+9. **Visa Cash App RB:** Yuki Tsunoda (#22) & Daniel Ricciardo (#3) — *Il Cavallino Spia* (Faenza / Bicester)
+10. **MoneyGram Haas F1 Team:** Kevin Magnussen (#20) & Nico Hülkenberg (#27) — *The Paddock Mole* (Kannapolis / Banbury)
 
 ---
 

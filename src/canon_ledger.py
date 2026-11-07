@@ -53,7 +53,7 @@ HOME_CIRCUIT_DRIVERS: Dict[int, List[str]] = {
     16: ["leclerc", "sainz", "hamilton"],                  # Itália (Monza / Templo Ferrari)
     17: [],                                                 # Azerbaijão (Baku)
     18: [],                                                 # Cingapura (Marina Bay)
-    19: ["ocon", "magnussen"],                              # Estados Unidos (Austin / Haas)
+    19: ["hulkenberg", "magnussen"],                        # Estados Unidos (Austin / Haas)
     20: ["perez"],                                          # México (Hermanos Rodríguez)
     21: ["sarah", "felipe", "davi"],                       # Brasil (Interlagos - Brazilian Storm)
     22: [],                                                 # Las Vegas
