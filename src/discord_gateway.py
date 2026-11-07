@@ -408,8 +408,11 @@ class DiscordGatewayClient:
             "debrief_messages": [],
         }
         if state_file.exists():
-            loaded = json.loads(state_file.read_text(encoding="utf-8"))
-            state.update(loaded)
+            try:
+                loaded = json.loads(state_file.read_text(encoding="utf-8"))
+                state.update(loaded)
+            except Exception as exc:
+                trace(f"[Session State Warning] Erro ao ler {state_file}: {exc}")
 
         processed_keys = set(state.get("downloaded_keys", []))
         processed_msg_ids = set(state.get("processed_msg_ids", []))

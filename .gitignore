@@ -26,6 +26,10 @@ validate_*.py
 ~$*
 *.tmp
 
+# Runtime PID and session locks
+*.pid
+data/state/listener.pid
+
 # SQLite databases & WAL
 *.db
 *.db-wal

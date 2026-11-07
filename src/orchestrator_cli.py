@@ -149,7 +149,7 @@ def deploy_portal_to_github_pages(commit_msg: str = "Auto-update F1 2026 Editori
         git_target_dir = ROOT_DIR if (ROOT_DIR / ".git").exists() else (ROOT_DIR / "portal")
         if (git_target_dir / ".git").exists():
             if git_target_dir == ROOT_DIR:
-                subprocess.run(["git", "-C", str(git_target_dir), "add", "index.html", "portal", "data"], check=True)
+                subprocess.run(["git", "-C", str(git_target_dir), "add", "index.html", "portal", "data/seasons"], check=True)
             else:
                 subprocess.run(["git", "-C", str(git_target_dir), "add", "index.html"], check=True)
             diff_res = subprocess.run(
@@ -181,18 +181,27 @@ def deploy_portal_to_github_pages(commit_msg: str = "Auto-update F1 2026 Editori
                 if push_res.returncode == 0:
                     log_text(f"[PORTAL PUSH] ✅ Portal publicado no GitHub Pages com sucesso! ({commit_msg})")
                 else:
-                    log_text(f"[PORTAL PUSH WARNING] Falha inicial no git push: {push_res.stderr.strip()}. Tentando auto-rebase...")
-                    subprocess.run(["git", "-C", str(git_target_dir), "pull", "--rebase", "origin", "main"], check=False)
-                    push_retry = subprocess.run(
-                        ["git", "-C", str(git_target_dir), "push", "origin", "main"],
+                    log_text(f"[PORTAL PUSH WARNING] Falha inicial no git push: {push_res.stderr.strip()}. Tentando sincronizar...")
+                    rebase_res = subprocess.run(
+                        ["git", "-C", str(git_target_dir), "pull", "--rebase", "origin", "main"],
                         capture_output=True,
                         text=True,
                         check=False,
                     )
-                    if push_retry.returncode == 0:
-                        log_text(f"[PORTAL PUSH] ✅ Portal publicado no GitHub Pages com sucesso após rebase! ({commit_msg})")
+                    if rebase_res.returncode == 0:
+                        push_retry = subprocess.run(
+                            ["git", "-C", str(git_target_dir), "push", "origin", "main"],
+                            capture_output=True,
+                            text=True,
+                            check=False,
+                        )
+                        if push_retry.returncode == 0:
+                            log_text(f"[PORTAL PUSH] ✅ Portal publicado no GitHub Pages com sucesso após rebase! ({commit_msg})")
+                        else:
+                            log_text(f"[PORTAL PUSH WARNING] Falha no git push: {push_retry.stderr.strip()}")
                     else:
-                        log_text(f"[PORTAL PUSH WARNING] Falha no git push: {push_retry.stderr.strip()}")
+                        subprocess.run(["git", "-C", str(git_target_dir), "rebase", "--abort"], capture_output=True, check=False)
+                        log_text(f"[PORTAL PUSH WARNING] Rebase automático evitado para proteger workspace: {rebase_res.stderr.strip()}")
             else:
                 log_text("[PORTAL PUSH] Portal já estava sincronizado na última revisão (sem alterações pendentes).")
     except Exception as exc:
