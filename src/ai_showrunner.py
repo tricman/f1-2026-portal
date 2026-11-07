@@ -657,7 +657,7 @@ def generate_m1_daily_episode(
 
     round_dir = get_season_dir(root_dir, season_id) / round_folder
     round_dir.mkdir(parents=True, exist_ok=True)
-    target_file = round_dir / f"ET{round_num:02d}_PRE_A_Semana_da_F1.md"
+    target_file = round_dir / f"ET{round_num:02d}_PRE_A_Semana_da_F1_Dia_{day_num}.md"
 
     base_context = assemble_storytelling_context(root_dir, round_num, round_folder)[:15000]
 
@@ -710,33 +710,11 @@ def generate_m1_daily_episode(
     except Exception as exc:
         episode_md = f"### 📝 {day_label}: {day_theme_focus}\n\nBastidores das 10 equipes em ritmo de preparação para {meta_curr['name']}.\n"
 
-    # Section-based storage (Deduplication engine)
-    existing_days: Dict[int, str] = {}
-    if target_file.exists():
-        raw_existing = target_file.read_text(encoding="utf-8")
-        day_splits = re.split(r"(## 📅 DIA \d/4:[^\n]*)", raw_existing)
-        if len(day_splits) > 1:
-            for i in range(1, len(day_splits), 2):
-                hdr = day_splits[i]
-                body = day_splits[i + 1] if i + 1 < len(day_splits) else ""
-                match_d = re.search(r"DIA (\d)/4", hdr)
-                if match_d:
-                    existing_days[int(match_d.group(1))] = body.strip().lstrip("-").strip()
-
-    # Overwrite current day with fresh generation
-    existing_days[day_num] = episode_md.strip()
-
-    # Reconstruct whole file cleanly with no duplicates
     doc_header = (
-        f"# 🏁 A F1 QUE VOCÊ NÃO VÊ — A Semana da F1 (Etapa {round_num}: {meta_curr['name']})\n"
-        f"## 💣 ESPECIAL SILLY SEASON PRÉ-{round_folder.upper()}\n\n"
+        f"# 🏁 A F1 QUE VOCÊ NÃO VÊ — A Semana da F1 · Dia {day_num}/4 ({day_label})\n"
+        f"## 💣 {day_theme_focus.upper()} — {meta_curr['name'].upper()}\n\n"
     )
-    sections = []
-    for d_idx in sorted(existing_days.keys()):
-        d_lbl, _ = day_names.get(d_idx, (f"DIA {d_idx}", ""))
-        sections.append(f"## 📅 DIA {d_idx}/4: {d_lbl}\n\n{existing_days[d_idx]}")
-
-    full_md = doc_header + "\n\n---\n\n".join(sections) + "\n"
+    full_md = doc_header + episode_md.strip() + "\n"
     target_file.write_text(full_md, encoding="utf-8")
 
     clean_snippet = re.sub(r"[#*`]", "", episode_md)[:180].strip()
@@ -748,7 +726,12 @@ def generate_m1_daily_episode(
     # If day 4 is reached (Thursday), synthesize and record canon event
     if day_num == 4:
         try:
-            extract_and_record_m1_canon_event(root_dir, round_num, round_folder, full_md, ai_client)
+            all_m1_parts = []
+            for d in range(1, 5):
+                f_d = round_dir / f"ET{round_num:02d}_PRE_A_Semana_da_F1_Dia_{d}.md"
+                if f_d.exists():
+                    all_m1_parts.append(f_d.read_text(encoding="utf-8"))
+            extract_and_record_m1_canon_event(root_dir, round_num, round_folder, "\n\n".join(all_m1_parts), ai_client)
         except Exception as exc:
             print(f"[Canon Event Warning] Falha ao sintetizar evento M1 (Dia 4): {exc}")
 

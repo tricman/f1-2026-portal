@@ -31,30 +31,38 @@ ROUND_METADATA: Dict[str, Dict[str, Any]] = {
 }
 
 
-def classify_module_badge(filename: str) -> Tuple[int, str, str, str]:
+def classify_module_badge(filename: str) -> Tuple[float, str, str, str]:
     """
     Return (sort_order, short_tag, badge_label, color_class) for a given Markdown file.
     """
     low = filename.lower()
     if "dilema" in low:
-        return (1, "M1.5 • DILEMA", "Dilema Interativo de Paddock", "badge-amber")
+        return (1.5, "M1.5 • DILEMA", "Dilema Interativo de Paddock", "badge-amber")
     if "semana" in low or "bastidores pré" in low or "bastidores da semana" in low:
-        return (1, "M1 • PRÉ-SEMANA", "Blog: A F1 Que Você Não Vê", "badge-amber")
+        if any(x in low for x in ["dia_1", "dia 1", "dia-1"]):
+            return (1.1, "M1.1 • SEGUNDA", "A Semana da F1 — Dia 1: Diagnóstico", "badge-amber")
+        if any(x in low for x in ["dia_2", "dia 2", "dia-2"]):
+            return (1.2, "M1.2 • TERÇA", "A Semana da F1 — Dia 2: Bastidores & Micos", "badge-amber")
+        if any(x in low for x in ["dia_3", "dia 3", "dia-3"]):
+            return (1.3, "M1.3 • QUARTA", "A Semana da F1 — Dia 3: Fábricas & Contratos", "badge-amber")
+        if any(x in low for x in ["dia_4", "dia 4", "dia-4"]):
+            return (1.4, "M1.4 • QUINTA", "A Semana da F1 — Dia 4: Véspera & Síntese", "badge-amber")
+        return (1.0, "M1 • PRÉ-SEMANA", "Blog: A F1 Que Você Não Vê", "badge-amber")
     if "coletiva" in low:
-        return (2, "M2 • COLETIVA FIA", "Coletiva Oficial Pré-GP", "badge-blue")
+        return (2.0, "M2 • COLETIVA FIA", "Coletiva Oficial Pré-GP", "badge-blue")
     if "treino livre" in low or "treinos livres" in low:
-        return (3, "M3 • TREINO LIVRE", "Relatório Técnico FIA (TL)", "badge-cyan")
+        return (3.0, "M3 • TREINO LIVRE", "Relatório Técnico FIA (TL)", "badge-cyan")
     if "classificação" in low and ("treino" in low or "qualifying" in low or "grid" in low):
-        return (4, "M4 • QUALIFYING", "Relatório FIA Qualifying & Grid", "badge-purple")
+        return (4.0, "M4 • QUALIFYING", "Relatório FIA Qualifying & Grid", "badge-purple")
     if "resultado final" in low or "relatório oficial da fia_ grande prêmio" in low or "relatório oficial fia - gp" in low:
-        return (5, "M5 • CORRIDA OFICIAL", "Resultado Final & Stewards FIA", "badge-red")
+        return (5.0, "M5 • CORRIDA OFICIAL", "Resultado Final & Stewards FIA", "badge-red")
     if "pódio" in low or "podio" in low:
-        return (6, "M6 • PÓDIO & VIP", "Cerimônia do Pódio & Cooldown", "badge-gold")
+        return (6.0, "M6 • PÓDIO & VIP", "Cerimônia do Pódio & Cooldown", "badge-gold")
     if "atualização" in low or "construtores" in low or "mundial" in low:
-        return (7, "M7 • CAMPEONATO FIA", "Boletim Oficial do Mundial", "badge-emerald")
+        return (7.0, "M7 • CAMPEONATO FIA", "Boletim Oficial do Mundial", "badge-emerald")
     if "repercussão" in low or "imprensa" in low or "mídia" in low:
-        return (8, "M8 • IMPRENSA & REDES", "Repercussão Global & Internet", "badge-pink")
-    return (9, "ARQUIVO", filename.replace(".md", ""), "badge-slate")
+        return (8.0, "M8 • IMPRENSA & REDES", "Repercussão Global & Internet", "badge-pink")
+    return (9.0, "ARQUIVO", filename.replace(".md", ""), "badge-slate")
 
 
 def collect_portal_data(root_dir: Path, season_id: Optional[str] = None) -> Dict[str, Any]:
@@ -568,8 +576,8 @@ def build_editorial_portal(root_dir: Path, season_id: Optional[str] = None) -> P
       }}
 
       container.innerHTML = MODULE_SEQUENCE_CONFIG.map(m => {{
-        const art = articles.find(a => a.order === m.order);
-        const isSelected = activeArticle && (activeArticle.order === m.order);
+        const art = articles.find(a => Math.floor(a.order) === m.order);
+        const isSelected = activeArticle && (Math.floor(activeArticle.order) === m.order);
 
         if (art) {{
           const tabCls = isSelected

@@ -104,8 +104,9 @@ class TestSprint1ChatOpsAndAutomation(unittest.TestCase):
         self.assertIn("Escopo de rollback inválido", str(ctx.exception))
 
     def test_rollback_execution_granular_sessao(self):
-        # Create temporary dummy files in et_11_austria
-        round_dir = self.root_dir / "data" / "seasons" / "season_01" / "et_11_austria"
+        # Create temporary dummy files in isolated test season
+        test_season = "season_test_rollback"
+        round_dir = self.root_dir / "data" / "seasons" / test_season / "et_11_austria"
         tel_dir = round_dir / "telemetry"
         photos_dir = round_dir / "photos"
         deb_dir = round_dir / "debriefing"
@@ -125,21 +126,27 @@ class TestSprint1ChatOpsAndAutomation(unittest.TestCase):
         dummy_m1 = round_dir / "Etapa 11 - Dossiê de Bastidores - Semana das Equipes - GP da Áustria 2026.md"
         dummy_m1.write_text("# Semana das Equipes Etapa 11", encoding="utf-8")
 
-        # Execute rollback for scope 'sessao'
-        res = execute_stage_rollback(round_num=11, scope="sessao")
-        self.assertTrue(res["success"])
-        self.assertEqual(res["scope"], "sessao")
+        try:
+            # Execute rollback for scope 'sessao'
+            res = execute_stage_rollback(round_num=11, scope="sessao", season_id=test_season)
+            self.assertTrue(res["success"])
+            self.assertEqual(res["scope"], "sessao")
 
-        # M5, photos, and telemetry must be deleted; M1 must be PRESERVED
-        self.assertFalse(dummy_csv.exists())
-        self.assertFalse(dummy_photo.exists())
-        self.assertFalse(dummy_m5.exists())
-        self.assertTrue(dummy_m1.exists(), "M1 should be preserved in scope 'sessao'")
+            # M5, photos, and telemetry must be deleted; M1 must be PRESERVED
+            self.assertFalse(dummy_csv.exists())
+            self.assertFalse(dummy_photo.exists())
+            self.assertFalse(dummy_m5.exists())
+            self.assertTrue(dummy_m1.exists(), "M1 should be preserved in scope 'sessao'")
 
-        # Now execute rollback 'semana'
-        res_sem = execute_stage_rollback(round_num=11, scope="semana")
-        self.assertTrue(res_sem["success"])
-        self.assertFalse(dummy_m1.exists(), "M1 should be deleted in scope 'semana'")
+            # Now execute rollback 'semana'
+            res_sem = execute_stage_rollback(round_num=11, scope="semana", season_id=test_season)
+            self.assertTrue(res_sem["success"])
+            self.assertFalse(dummy_m1.exists(), "M1 should be deleted in scope 'semana'")
+        finally:
+            import shutil
+            test_s_dir = self.root_dir / "data" / "seasons" / test_season
+            if test_s_dir.exists():
+                shutil.rmtree(test_s_dir, ignore_errors=True)
 
     # -------------------------------------------------------------
     # 1.3 Press Conference Turn-Lock Timeout Contingency Tests

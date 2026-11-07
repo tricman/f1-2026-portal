@@ -1,7 +1,5 @@
-# 🏁 A F1 QUE VOCÊ NÃO VÊ — A Semana da F1 (Etapa 11: GP da Áustria)
-## 💣 ESPECIAL SILLY SEASON PRÉ-ET_11_AUSTRIA
-
-## 📅 DIA 1/4: SEGUNDA-FEIRA
+# 🏁 A F1 QUE VOCÊ NÃO VÊ — A Semana da F1 · Dia 1/4 (SEGUNDA-FEIRA)
+## 💣 A RESSACA DA CORRIDA ANTERIOR & DIAGNÓSTICO — GP DA ÁUSTRIA
 
 # A F1 Que Você Não Vê — Dossiê Especial: A Ressaca de Barcelona e o Desembarque em Spielberg
 *Módulo 1 · Dia 1 de 4 (Segunda-feira) | Cobertura exclusiva do consórcio internacional de jornalistas investigativos.*

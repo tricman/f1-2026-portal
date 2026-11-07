@@ -355,30 +355,16 @@
     {
       "round": 11,
       "entities": [
-        "verstappen",
+        "felipe",
         "fia",
         "imprensa",
         "sarah",
-        "felipe",
         "davi"
       ],
-      "summary": "Na Coletiva Oficial FIA da Etapa 11, Verstappen respondeu a Ted Kravitz (Sky Sports F1 'The Notebook' (Reino Unido)): 'Declaração aos repórteres da FIA.'. Reação no recinto: A sala de imprensa acompanha em silêncio atento.",
+      "summary": "Na Coletiva Oficial FIA da Etapa 11, Felipe declarou a Mariana Becker (Band): '\"O ritmo de hoje refletiu o trabalho metódico que fizemos com a degradação dos compostos, permitindo extrair o máximo do carro de forma consistente ao longo dos stints.\" *(Declaração emitida pela asse'. Reação no recinto: No fundo da sala, James Vowles cruza os braços com um sorriso irônico enquanto Helmut Marko resmunga algo sobre \"engenheiros idosos demais\", arrancando uma cotovelada cúmplice de S",
       "status": "OPEN",
       "event_id": "ET11-M2-Q2",
       "module": "M2_COLETIVA"
-    },
-    {
-      "round": 11,
-      "entities": [
-        "felipe",
-        "fia",
-        "equipe",
-        "et_11_austria"
-      ],
-      "summary": "No Dilema de Paddock da Etapa 11, Felipe decidiu: 'Opção A (Focar na telemetria de longo curso)'. Consequência: ## CONTEÚDO NARRATIVO HOMOLOGADO E2E\nAnálise detalhada do Paddock de Spielberg. Sarah, Davi e Felipe travaram duelo tenso nas montanhas austríacas.",
-      "status": "OPEN",
-      "event_id": "ET11-M1.5-DILEMMA",
-      "module": "M1_5_DILEMA"
     },
     {
       "round": 0,
@@ -642,13 +628,13 @@
     {
       "round": 11,
       "entities": [
-        "sarah",
+        "davi",
         "fia",
         "imprensa",
-        "felipe",
-        "davi"
+        "sarah",
+        "felipe"
       ],
-      "summary": "Na Coletiva Oficial FIA da Etapa 11, Sarah declarou a Julien Fébreau (Canal+ (França)): '\"## CONTEÚDO NARRATIVO HOMOLOGADO E2E\nAnálise detalhada do Paddock de Spielberg. Sarah, Davi e Felipe travaram duelo tenso nas montanhas austríacas.\" *(Declaração emitida pela assessoria de imprensa /'. Reação no recinto: ## CONTEÚDO NARRATIVO HOMOLOGADO E2E\nAnálise detalhada do Paddock de Spielberg. Sarah, Davi e Felipe travaram duelo tenso nas montanhas austríacas.",
+      "summary": "Na Coletiva Oficial FIA da Etapa 11, Davi declarou a Julien Fébreau (Canal+ (França)): '\"## CONTEÚDO NARRATIVO HOMOLOGADO E2E\nAnálise detalhada do Paddock de Spielberg. Sarah, Davi e Felipe travaram duelo tenso nas montanhas austríacas.\" *(Declaração emitida pela assessoria de imprensa /'. Reação no recinto: ## CONTEÚDO NARRATIVO HOMOLOGADO E2E\nAnálise detalhada do Paddock de Spielberg. Sarah, Davi e Felipe travaram duelo tenso nas montanhas austríacas.",
       "status": "OPEN",
       "event_id": "ET11-M2-Q1",
       "module": "M2_COLETIVA"
@@ -656,14 +642,14 @@
     {
       "round": 11,
       "entities": [
-        "ricciardo",
+        "tsunoda",
         "fia",
         "imprensa",
         "sarah",
         "felipe",
         "davi"
       ],
-      "summary": "Na Coletiva Oficial FIA da Etapa 11, Ricciardo respondeu a Michael Schmidt (Auto Motor und Sport (Alemanha)): 'Declaração aos repórteres da FIA.'. Reação no recinto: A sala de imprensa acompanha em silêncio atento.",
+      "summary": "Na Coletiva Oficial FIA da Etapa 11, Tsunoda respondeu a Michael Schmidt (Auto Motor und Sport (Alemanha)): 'Declaração aos repórteres da FIA.'. Reação no recinto: A sala de imprensa acompanha em silêncio atento.",
       "status": "OPEN",
       "event_id": "ET11-M2-Q3",
       "module": "M2_COLETIVA"
@@ -684,19 +670,30 @@
       "module": "M2_COLETIVA"
     },
     {
-      "event_id": "ET11-M2-Q5",
       "round": 11,
-      "module": "M2_COLETIVA",
-      "summary": "Na Coletiva Oficial FIA da Etapa 11, Tsunoda respondeu a Julianne Cerasoli (UOL Esporte / Band (Brasil)): 'Declaração aos repórteres da FIA.'. Reação no recinto: A sala de imprensa acompanha em silêncio atento.",
       "entities": [
-        "tsunoda",
+        "felipe",
         "fia",
         "imprensa",
         "sarah",
-        "felipe",
         "davi"
       ],
-      "status": "OPEN"
+      "summary": "Na Coletiva Oficial FIA da Etapa 11, Felipe declarou a Julianne Cerasoli (UOL Esporte / Band (Brasil)): '\"## CONTEÚDO NARRATIVO HOMOLOGADO E2E\nAnálise detalhada do Paddock de Spielberg. Sarah, Davi e Felipe travaram duelo tenso nas montanhas austríacas.\" *(Declaração emitida pela assessoria de imprensa /'. Reação no recinto: ## CONTEÚDO NARRATIVO HOMOLOGADO E2E\nAnálise detalhada do Paddock de Spielberg. Sarah, Davi e Felipe travaram duelo tenso nas montanhas austríacas.",
+      "status": "OPEN",
+      "event_id": "ET11-M2-Q5",
+      "module": "M2_COLETIVA"
+    },
+    {
+      "round": 11,
+      "entities": [
+        "sarah",
+        "davi",
+        "felipe"
+      ],
+      "summary": "## CONTEÚDO NARRATIVO HOMOLOGADO E2E\nAnálise detalhada do Paddock de Spielberg. Sarah, Davi e Felipe travaram duelo tenso nas montanhas austríacas.",
+      "status": "OPEN",
+      "event_id": "ET11-AUTO-M5",
+      "module": "M5_CORRIDA"
     }
   ]
 }

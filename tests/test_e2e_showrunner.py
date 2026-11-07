@@ -109,7 +109,7 @@ class TestE2EShowrunnerRound11(unittest.TestCase):
             ai_client=mock_ai,
         )
         self.assertTrue(m1_path.exists())
-        self.assertIn("ET11_PRE_A_Semana_da_F1.md", m1_path.name)
+        self.assertIn("ET11_PRE_A_Semana_da_F1_Dia_3.md", m1_path.name)
         m1_text = m1_path.read_text(encoding="utf-8")
         self.assertIn("QUARTA-FEIRA", m1_text)
 

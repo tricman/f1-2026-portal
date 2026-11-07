@@ -136,9 +136,10 @@ class TestSprint2StorytellingAndPrompts(unittest.TestCase):
         if target_md.exists():
             target_md.unlink()
 
-        # Purge test event from Canon Ledger
-        from src.orchestrator_cli import execute_stage_rollback
-        execute_stage_rollback(11, scope="semana")
+        # Purge test event from Canon Ledger directly without wiping round files
+        ledger = ledger_mgr.load()
+        ledger["events"] = [ev for ev in ledger.get("events", []) if ev.get("event_id") != f"ET{round_num:02d}-M1.5-DILEMMA"]
+        ledger_mgr.save(ledger)
 
     # -------------------------------------------------------------
     # 2.3 M6: NPCs & Áudios de Voz
