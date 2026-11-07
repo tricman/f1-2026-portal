@@ -970,19 +970,28 @@ class DiscordGatewayClient:
                         waiting_driver = pc_data.get("waiting_for_driver") or "felipe"
                         from src.press_conference import PressConferenceSession
                         pc_sess = PressConferenceSession(root_dir, active_r_num, active_folder)
-                        ack_msg = pc_sess.submit_pilot_answer(waiting_driver, content)
+                        ack_msg = pc_sess.submit_pilot_answer(waiting_driver, content, is_voice=is_voice_msg)
                         if should_reply:
-                            self.post_channel_message(reply_channel_id, ack_msg)
+                            msg_to_send = ack_msg
+                            if is_voice_msg and voice_transcription:
+                                msg_to_send = f"🎙️ **[DECLARAÇÃO DE VOZ TRANSCRITA • @{author_name}]**\n> *\"{voice_transcription}\"*\n\n{ack_msg}"
+                            self.post_channel_message(reply_channel_id, msg_to_send)
+                            if reply_channel_id != self.ingest_channel_id:
+                                self.post_channel_message(self.ingest_channel_id, msg_to_send)
                         next_msg, is_lock, next_driver = pc_sess.advance_to_next_question()
                         if should_reply and next_msg:
-                            self.post_channel_message(reply_channel_id, next_msg)
+                            self.post_channel_message(self.ingest_channel_id, next_msg)
+                            if reply_channel_id != self.ingest_channel_id:
+                                self.post_channel_message(reply_channel_id, next_msg)
 
                         # Se a pergunta seguinte for de NPC (is_lock == False), avança automaticamente até atingir o próximo piloto humano ou o término
                         while not is_lock and not pc_sess.state.get("completed"):
                             time.sleep(3.0)
                             next_msg, is_lock, next_driver = pc_sess.advance_to_next_question()
                             if should_reply and next_msg:
-                                self.post_channel_message(reply_channel_id, next_msg)
+                                self.post_channel_message(self.ingest_channel_id, next_msg)
+                                if reply_channel_id != self.ingest_channel_id:
+                                    self.post_channel_message(reply_channel_id, next_msg)
                         continue
                 except Exception as exc:
                     print(f"[Press Conf Answer Warning] {exc}")

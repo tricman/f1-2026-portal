@@ -183,6 +183,41 @@ class TestSprint1ChatOpsAndAutomation(unittest.TestCase):
         ledger["events"] = [ev for ev in ledger.get("events", []) if ev.get("event_id") != "ET11-M2-Q2"]
         ledger_mgr.save(ledger)
 
+    def test_press_conference_voice_answer(self):
+        pc_sess = PressConferenceSession(self.root_dir, 11, "et_11_austria")
+        pc_sess.state["status"] = "AWAITING_PILOT_REPLY"
+        pc_sess.state["waiting_for_driver"] = "felipe"
+        pc_sess.state["waiting_for_driver_name"] = "Felipe"
+        pc_sess.state["pending_question_text"] = "🎙️ **[Pergunta 2 | Mariana Becker para Felipe]:** Como avalia o ritmo?"
+        pc_sess.state["current_question_idx"] = 2
+        pc_sess.state["question_plan"] = [
+            {"driver_id": "felipe", "journalist": {"name": "Mariana Becker", "outlet": "Band"}},
+        ]
+
+        ack = pc_sess.submit_pilot_answer(
+            "felipe",
+            "O carro está muito rápido nas curvas de alta e vamos com tudo para a pole.",
+            is_voice=True
+        )
+        self.assertIsNotNone(ack)
+        self.assertIn("🎙️ *(Gravado via Mensagem de Voz)*", ack)
+        self.assertIn("FELIPE", ack)
+
+        # Verify Canon Ledger was stamped with voice origin
+        from src.canon_ledger import CanonLedgerManager
+        ledger_mgr = CanonLedgerManager()
+        ledger = ledger_mgr.load()
+        voice_event = next((ev for ev in ledger.get("events", []) if ev.get("event_id") == "ET11-M2-Q2"), None)
+        self.assertIsNotNone(voice_event)
+        self.assertIn("via Mensagem de Voz", voice_event.get("summary", ""))
+
+        # Cleanup
+        temp_state_file = self.root_dir / "data" / "state" / "press_conf_et11.json"
+        if temp_state_file.exists():
+            temp_state_file.unlink()
+        ledger["events"] = [ev for ev in ledger.get("events", []) if ev.get("event_id") != "ET11-M2-Q2"]
+        ledger_mgr.save(ledger)
+
     # -------------------------------------------------------------
     # 1.4 Listener PID Lifecycle Check
     # -------------------------------------------------------------

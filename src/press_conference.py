@@ -314,7 +314,7 @@ class PressConferenceSession:
 
             call_to_action = (
                 f"\n\n🛑 **[TRAVA DE TURNO ATIVA | Microfone aberto para @{discord_tag} ({driver_name})]**\n"
-                f"> 💬 *Digite sua resposta aqui no chat do canal de voz para que ela seja registrada oficialmente na ata da FIA!*"
+                f"> 💬 *Piloto @{discord_tag}, digite sua declaração aqui no chat OU envie uma **MENSAGEM DE VOZ** (áudio) para ser registrada oficialmente na ata da FIA!*"
             )
             full_msg = gen_text + call_to_action
 
@@ -383,10 +383,10 @@ class PressConferenceSession:
         ack_msg = self.submit_pilot_answer(driver_id, full_answer)
         return ack_msg
 
-    def submit_pilot_answer(self, driver_id: str, raw_answer: str) -> str:
+    def submit_pilot_answer(self, driver_id: str, raw_answer: str, is_voice: bool = False) -> str:
         """
-        Receives human pilot answer from Discord, incorporates into transcript and Canon Ledger,
-        and generates context-aware, organic room reaction based on Canon Ledger relationships.
+        Receives human pilot answer from Discord (text or transcribed voice), incorporates into transcript
+        and Canon Ledger, and generates context-aware, organic room reaction based on Canon Ledger relationships.
         """
         clean_answer = raw_answer.strip()
         driver_name, discord_tag, car_desc = DRIVER_MENTIONS.get(driver_id, (driver_id.capitalize(), driver_id, "Piloto"))
@@ -409,10 +409,11 @@ class PressConferenceSession:
 
         # 2. Generate room reaction via Gemini
         q_text = self.state.get("pending_question_text", "")
+        voice_ctx = " (Declaração falada pelo piloto via áudio/mensagem de voz)" if is_voice else ""
         prompt = (
             f"SITUAÇÃO DA COLETIVA FIA (Etapa {self.round_num}):\n"
             f"Pergunta feita: {q_text}\n"
-            f"Resposta de {driver_name}: \"{clean_answer}\"\n\n"
+            f"Resposta de {driver_name}{voice_ctx}: \"{clean_answer}\"\n\n"
             f"RELAÇÕES DO CANON LEDGER:\n{rel_str}\n\n"
             f"TAREFA:\n"
             f"Gere em 1 parágrafo curto (máximo 220 caracteres) a reação no recinto.\n\n"
@@ -436,18 +437,20 @@ class PressConferenceSession:
             if d in full_ctx.lower() and d not in entities:
                 entities.append(d)
 
+        via_str = " via Mensagem de Voz" if is_voice else ""
         mgr.append_event(
             event_id=f"ET{self.round_num:02d}-M2-Q{idx}",
             round_num=self.round_num,
             module="M2_COLETIVA",
-            summary=f"Na Coletiva Oficial FIA da Etapa {self.round_num}, {driver_name} declarou a {journo_name} ({journo_outlet}): '{clean_answer[:200]}'. Reação no recinto: {reaction[:180]}",
+            summary=f"Na Coletiva Oficial FIA da Etapa {self.round_num}, {driver_name} declarou{via_str} a {journo_name} ({journo_outlet}): '{clean_answer[:200]}'. Reação no recinto: {reaction[:180]}",
             entities=entities,
             status="OPEN",
         )
 
+        voice_icon = " 🎙️ *(Mensagem de Voz)*" if is_voice else ""
         qa_block = (
             f"{q_text}\n\n"
-            f"💬 **{driver_name} (@{discord_tag}):** \"{clean_answer}\"\n\n"
+            f"💬 **{driver_name} (@{discord_tag}){voice_icon}:** \"{clean_answer}\"\n\n"
             f"*{reaction}*\n"
         )
         self.state.setdefault("transcript_blocks", []).append(qa_block)
@@ -457,8 +460,9 @@ class PressConferenceSession:
         self.state["status"] = "IN_PROGRESS"
         self._save_state(self.state)
 
+        voice_badge = " 🎙️ *(Gravado via Mensagem de Voz)*" if is_voice else ""
         ack = (
-            f"✅ **RESPOSTA DE {driver_name.upper()} REGISTRADA NA ATA DA FIA!**\n"
+            f"✅ **RESPOSTA DE {driver_name.upper()} REGISTRADA NA ATA DA FIA!**{voice_badge}\n"
             f"> *\"{clean_answer}\"*\n\n"
             f"*{reaction}*\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
