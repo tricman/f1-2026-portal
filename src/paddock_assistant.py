@@ -58,6 +58,19 @@ PILOT_REGISTRY: Dict[str, Dict[str, Any]] = {
     },
 }
 
+TEAM_DISPLAY_NAMES = {
+    "mercedes": "Mercedes-AMG Petronas F1 Team",
+    "sauber": "Stake F1 Team Kick Sauber",
+    "williams": "Williams Racing",
+    "red_bull": "Red Bull Racing",
+    "ferrari": "Scuderia Ferrari HP",
+    "mclaren": "McLaren Formula 1 Team",
+    "aston_martin": "Aston Martin Aramco F1 Team",
+    "alpine": "BWT Alpine F1 Team",
+    "haas": "MoneyGram Haas F1 Team",
+    "vcarb": "Visa Cash App RB F1 Team",
+}
+
 QUESTION_INTENT_STANDINGS_KEYWORDS = [
     "classificação", "classificacao", "pontuação", "pontuacao", "pontos", "tabela",
     "campeonato", "posição", "posicao", "líder", "lider", "vice", "pontuar", "construtores",
@@ -169,7 +182,10 @@ def classify_query_intent(query: str) -> str:
         "perto", "longe", "chance", "chances", "ser campeã", "ser campea", "ser campeão", "ser campeao",
         "título", "titulo", "ganhar", "vencer", "opinião", "opiniao"
     ])
-    has_pure_standings = any(w in clean for w in ["classificação", "classificacao", "tabela", "pontuação", "pontuacao", "pontos", "posição", "posicao"])
+    has_pure_standings = any(w in clean for w in [
+        "classificação", "classificacao", "tabela", "pontuação", "pontuacao", "pontos", "posição", "posicao",
+        "construtores", "construtor", "equipes", "equipe", "escuderias", "escuderia"
+    ])
 
     if has_pure_standings and not has_complex_lore:
         return "STANDINGS"
@@ -181,10 +197,15 @@ def handle_deterministic_standings_query(
     driver_data: Dict[str, Any],
     repo: Optional[IDataRepository] = None,
     target_subject: Optional[Dict[str, Any]] = None,
+    query_text: str = "",
 ) -> str:
     """
     Generates a sub-50ms instant deterministic briefing of current official standings.
     Reads directly from SQLite Document Store / JSON without invoking LLM tokens.
+    Handles:
+    - Constructors table (when requested)
+    - Drivers table (when requested)
+    - Specific driver card (default for personal standing queries)
     """
     active_repo = repo or get_repository()
     standings = active_repo.get_standings()
@@ -196,7 +217,66 @@ def handle_deterministic_standings_query(
     last_r = standings.get("last_completed_round", 10)
     drivers = standings.get("drivers_standings") or standings.get("drivers") or []
     constructors = standings.get("constructors_standings") or standings.get("constructors") or []
+    portal_url = "https://tricman.github.io/f1-2026-portal/"
 
+    clean_q = (query_text or "").strip().lower()
+
+    # 1. Check if user specifically requested Constructors Standing
+    is_constructors_query = any(w in clean_q for w in [
+        "construtor", "construtores", "equipe", "equipes", "escuderia", "escuderias", "marca", "marcas"
+    ])
+
+    if is_constructors_query:
+        lines = []
+        for idx, c in enumerate(constructors):
+            pos = c.get("pos", idx + 1)
+            t_key = (c.get("team_id") or c.get("id") or "").lower()
+            name = c.get("name") or TEAM_DISPLAY_NAMES.get(t_key, t_key.title() or f"Equipe {pos}")
+            pts = c.get("net_points", c.get("points", 0))
+            pen = c.get("fia_penalty_points", 0)
+            pen_str = f" *(Penalidade FIA: {pen} pts)*" if pen and pen < 0 else ""
+            medal = "🥇 " if pos == 1 else "🥈 " if pos == 2 else "🥉 " if pos == 3 else ""
+            is_caller_team = (c.get("team_id") == caller.get("team_id") or c.get("id") == caller.get("team_id"))
+            tag = " 📍" if is_caller_team else ""
+            lines.append(f"• **{pos}º** {medal}**{name}** — **{pts} pts**{pen_str}{tag}")
+
+        table_body = "\n".join(lines) if lines else "Tabela de construtores em consolidação."
+        card = (
+            f"🏛️ **[MUNDIAL DE CONSTRUTORES FIA 2026]**\n"
+            f"📍 *Situação após Etapa {last_r}*\n\n"
+            f"{table_body}\n\n"
+            f"🔗 *Tabela completa e telemetria no Portal:* {portal_url}#standings"
+        )
+        return card
+
+    # 2. Check if user requested Drivers Ranking (General / Grid / Top)
+    is_drivers_query = any(w in clean_q for w in [
+        "pilotos", "grid", "lideres", "líderes", "mundial de pilotos", "tabela de pilotos", "classificação de pilotos", "top 10"
+    ]) and not any(w in clean_q for w in ["minha", "meu", "comigo", "felipe", "sarah", "davi", "eu", "estou", "como fico"])
+
+    if is_drivers_query:
+        lines = []
+        for idx, d in enumerate(drivers[:10]):
+            pos = d.get("pos", idx + 1)
+            name = d.get("name") or d.get("id") or f"Piloto {pos}"
+            pts = d.get("points", 0)
+            wins = d.get("wins", 0)
+            w_str = f" ({wins} vitórias)" if wins > 0 else ""
+            medal = "🥇 " if pos == 1 else "🥈 " if pos == 2 else "🥉 " if pos == 3 else ""
+            is_caller = (d.get("id") == caller.get("driver_id"))
+            tag = " 📍" if is_caller else ""
+            lines.append(f"• **{pos}º** {medal}**{name}** — **{pts} pts**{w_str}{tag}")
+
+        table_body = "\n".join(lines) if lines else "Tabela de pilotos em consolidação."
+        card = (
+            f"🏆 **[MUNDIAL DE PILOTOS FIA 2026]**\n"
+            f"📍 *Situação após Etapa {last_r} (Top 10)*\n\n"
+            f"{table_body}\n\n"
+            f"🔗 *Tabela completa e telemetria no Portal:* {portal_url}#standings"
+        )
+        return card
+
+    # 3. Individual Driver Briefing Card (Default for personal / single pilot queries)
     d_id = subject["driver_id"]
     driver_entry = next((d for d in drivers if d.get("id") == d_id), None)
     leader_entry = drivers[0] if drivers else None
@@ -207,11 +287,12 @@ def handle_deterministic_standings_query(
     podiums = driver_entry.get("podiums", 0) if driver_entry else 0
     poles = driver_entry.get("poles", 0) if driver_entry else 0
 
-    # Construct team entry
+    # Construct team entry with robust team_id / id lookup
     c_id = subject["team_id"]
-    team_entry = next((c for c in constructors if c.get("id") == c_id), None)
+    team_entry = next((c for c in constructors if (c.get("team_id") == c_id or c.get("id") == c_id)), None)
     team_pos = team_entry.get("pos", 2) if team_entry else 2
     team_pts = team_entry.get("net_points", team_entry.get("points", 0)) if team_entry else 0
+    team_name = team_entry.get("name") if (team_entry and team_entry.get("name")) else subject["team_name"]
 
     # Calculate delta
     delta_str = ""
@@ -222,8 +303,6 @@ def handle_deterministic_standings_query(
         p2_gap = pts - drivers[1].get("points", 0)
         delta_str = f" • *+{p2_gap} pts de vantagem sobre P2*"
 
-    portal_url = "https://tricman.github.io/f1-2026-portal/"
-
     inquiry_footer = f"\n*Solicitado por {caller['display_name']} ({caller['team_name']})*" if is_about_rival else ""
 
     card = (
@@ -232,7 +311,7 @@ def handle_deterministic_standings_query(
         f"👤 **{subject['display_name']} (#{subject['car_number']}):**\n"
         f"• **Posição no Mundial:** **{pos}º Lugar** com **{pts} pontos**{delta_str}\n"
         f"• **Desempenho:** {wins} Vitórias | {podiums} Pódios | {poles} Poles\n"
-        f"🏢 **{subject['team_name']}:** {team_pos}º Lugar nos Construtores ({team_pts} pts){inquiry_footer}\n\n"
+        f"🏢 **{team_name}:** {team_pos}º Lugar nos Construtores ({team_pts} pts){inquiry_footer}\n\n"
         f"🔗 *Tabela completa e telemetria detalhada no Portal:* {portal_url}#standings"
     )
     return card
@@ -411,7 +490,12 @@ def process_paddock_assistant_query(
     )
 
     if intent == "STANDINGS":
-        response = handle_deterministic_standings_query(caller_driver, repo=repo, target_subject=target_subject)
+        response = handle_deterministic_standings_query(
+            caller_driver,
+            repo=repo,
+            target_subject=target_subject,
+            query_text=query_text,
+        )
     else:
         response = handle_semantic_paddock_query(
             driver_data=caller_driver,

@@ -122,8 +122,28 @@ class TestPaddockAssistantEngine(unittest.TestCase):
         self.assertIn("Felipe (#5)", reply)
         self.assertIn("2º Lugar", reply)
         self.assertIn("146 pontos", reply)
-        self.assertIn("Stake F1 Team Kick Sauber / Audi", reply)
+        self.assertIn("2º Lugar nos Construtores (146 pts)", reply)
         self.assertIn("Portal", reply)
+
+        # Test Davi's team points
+        driver_davi = PILOT_REGISTRY["davi"]
+        reply_davi = handle_deterministic_standings_query(driver_davi, repo=self.repo)
+        self.assertIn("Williams", reply_davi)
+        self.assertIn("5º Lugar nos Construtores (83 pts)", reply_davi)
+
+        # Test Constructors Table listing
+        reply_const = handle_deterministic_standings_query(
+            driver_felipe,
+            repo=self.repo,
+            query_text="Pode listar a classificação de construtores?",
+        )
+        self.assertIn("MUNDIAL DE CONSTRUTORES FIA 2026", reply_const)
+        self.assertIn("Mercedes", reply_const)
+        self.assertIn("296 pts", reply_const)
+        self.assertIn("Sauber", reply_const)
+        self.assertIn("146 pts", reply_const)
+        self.assertIn("Williams", reply_const)
+        self.assertIn("83 pts", reply_const)
 
     def test_semantic_lore_with_mock_ai(self):
         driver_felipe = PILOT_REGISTRY["felipe"]
