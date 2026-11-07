@@ -176,6 +176,13 @@ class TestSprint1ChatOpsAndAutomation(unittest.TestCase):
         if temp_state_file.exists():
             temp_state_file.unlink()
 
+        # Purge temporary test event from Canon Ledger
+        from src.canon_ledger import CanonLedgerManager
+        ledger_mgr = CanonLedgerManager()
+        ledger = ledger_mgr.load()
+        ledger["events"] = [ev for ev in ledger.get("events", []) if ev.get("event_id") != "ET11-M2-Q2"]
+        ledger_mgr.save(ledger)
+
     # -------------------------------------------------------------
     # 1.4 Listener PID Lifecycle Check
     # -------------------------------------------------------------

@@ -50,6 +50,12 @@ class TestE2EShowrunnerRound11(unittest.TestCase):
         self.state_dir = self.temp_dir / "data" / "state"
         self.state_dir.mkdir(parents=True, exist_ok=True)
 
+        # Isolate repository to temp_dir
+        from src.repositories.local_repository import LocalJsonRepository
+        self.mock_repo = LocalJsonRepository(root_dir=self.temp_dir)
+        self.repo_patcher = patch("src.canon_ledger.get_repository", return_value=self.mock_repo)
+        self.repo_patcher.start()
+
         # Copy prompts and personas for storytelling context
         shutil.copytree(ROOT_PROJECT_DIR / "prompts", self.temp_dir / "prompts")
         shutil.copytree(ROOT_PROJECT_DIR / "personas", self.temp_dir / "personas")
@@ -81,6 +87,8 @@ class TestE2EShowrunnerRound11(unittest.TestCase):
             )
 
     def tearDown(self):
+        if hasattr(self, "repo_patcher"):
+            self.repo_patcher.stop()
         shutil.rmtree(self.temp_dir, ignore_errors=True)
 
     def _create_mock_ai(self) -> MagicMock:
@@ -94,8 +102,9 @@ class TestE2EShowrunnerRound11(unittest.TestCase):
         )
         return mock
 
+    @patch("src.discord_gateway.DiscordGatewayClient.post_channel_message")
     @patch("src.press_conference.deploy_portal_to_github_pages")
-    def test_e2e_complete_austria_round_lifecycle(self, mock_deploy):
+    def test_e2e_complete_austria_round_lifecycle(self, mock_deploy, mock_discord_post):
         mock_ai = self._create_mock_ai()
 
         # -------------------------------------------------------------
